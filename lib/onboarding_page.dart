@@ -81,11 +81,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Custom image for each page
+                            // Custom image
                             Image.asset(
                               onboardingData[index]['image']!,
-                              width: 250,
-                              height: 250,
+                              width: 300,
+                              height: 300,
                             ),
                             const SizedBox(height: 40),
                             Text(
@@ -127,32 +127,46 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           colors: [Colors.blue, Colors.green],
                         )
                             : null,
-                        color: _currentIndex == index
-                            ? null
-                            : Colors.grey,
+                        color: _currentIndex == index ? null : Colors.grey,
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                   ),
                 ),
 
+                const SizedBox(height: 20),
+
                 // Next / Get Started button
                 Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                   child: SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _nextPage,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    height: 55,
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Colors.blue, Colors.green],
                         ),
-                        backgroundColor: null,
-                        // Apply gradient background
-                      ).copyWith(
-                        backgroundColor: MaterialStateProperty.resolveWith(
-                              (states) => null,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ElevatedButton(
+                        onPressed: _nextPage,
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: Colors.transparent, // Important for gradient
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          _currentIndex == onboardingData.length - 1
+                              ? 'Get Started'
+                              : 'Next',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -161,18 +175,20 @@ class _OnboardingPageState extends State<OnboardingPage> {
               ],
             ),
 
-            // Top bar: back and skip buttons
+            // Top-left back button
             Positioned(
               top: 10,
               left: 10,
               child: Visibility(
                 visible: _currentIndex > 0,
                 child: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.deepPurple),
+                  icon: const Icon(Icons.arrow_back, color: Colors.blue),
                   onPressed: _back,
                 ),
               ),
             ),
+
+            // Top-right skip button
             Positioned(
               top: 10,
               right: 10,
@@ -181,7 +197,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 child: const Text(
                   'Skip',
                   style: TextStyle(
-                    color: Colors.deepPurple,
+                    color: Colors.blue,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
