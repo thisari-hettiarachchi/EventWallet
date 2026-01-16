@@ -1,0 +1,525 @@
+import 'package:flutter/material.dart';
+
+class CreateEventPage extends StatefulWidget {
+  const CreateEventPage({Key? key}) : super(key: key);
+
+  @override
+  State<CreateEventPage> createState() => _CreateEventPageState();
+}
+
+class _CreateEventPageState extends State<CreateEventPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _eventNameController = TextEditingController();
+  final _venueController = TextEditingController();
+  final _budgetController = TextEditingController();
+  final _guestCountController = TextEditingController();
+  final _notesController = TextEditingController();
+
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
+  String _selectedCategory = 'Wedding';
+  final List<String> _categories = [
+    'Wedding',
+    'Birthday',
+    'Corporate',
+    'Conference',
+    'Party',
+    'Charity',
+    'Other'
+  ];
+
+  @override
+  void dispose() {
+    _eventNameController.dispose();
+    _venueController.dispose();
+    _budgetController.dispose();
+    _guestCountController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2030),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.blue.shade700,
+              onPrimary: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.blue.shade700,
+              onPrimary: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedTime) {
+      setState(() {
+        _selectedTime = picked;
+      });
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'Wedding':
+        return Icons.favorite;
+      case 'Birthday':
+        return Icons.cake;
+      case 'Corporate':
+        return Icons.business;
+      case 'Conference':
+        return Icons.event;
+      case 'Party':
+        return Icons.celebration;
+      case 'Charity':
+        return Icons.volunteer_activism;
+      default:
+        return Icons.event_note;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey.shade50,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.blue.shade700,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Create New Event',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blue.shade700, Colors.teal.shade500],
+                ),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.event_available, color: Colors.white, size: 32),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Text(
+                      'Plan your perfect event with detailed budgeting',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            const Text(
+              'Event Details',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            _buildTextField(
+              controller: _eventNameController,
+              label: 'Event Name',
+              hint: 'e.g., Sarah & John\'s Wedding',
+              icon: Icons.title,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter event name';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: DropdownButtonFormField<String>(
+                value: _selectedCategory,
+                decoration: InputDecoration(
+                  labelText: 'Event Category',
+                  prefixIcon: Icon(_getCategoryIcon(_selectedCategory), color: Colors.blue.shade700),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                ),
+                items: _categories.map((category) {
+                  return DropdownMenuItem(
+                    value: category,
+                    child: Row(
+                      children: [
+                        Icon(_getCategoryIcon(category), size: 20, color: Colors.grey.shade600),
+                        const SizedBox(width: 12),
+                        Text(category),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedCategory = value!;
+                  });
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _buildDateTimePicker(
+                    label: 'Event Date',
+                    value: _selectedDate != null ? _formatDate(_selectedDate!) : 'Select Date',
+                    icon: Icons.calendar_today,
+                    onTap: () => _selectDate(context),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildDateTimePicker(
+                    label: 'Event Time',
+                    value: _selectedTime != null ? _selectedTime!.format(context) : 'Select Time',
+                    icon: Icons.access_time,
+                    onTap: () => _selectTime(context),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            _buildTextField(
+              controller: _venueController,
+              label: 'Venue',
+              hint: 'e.g., Grand Hotel Ballroom',
+              icon: Icons.location_on,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter venue';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 24),
+
+            const Text(
+              'Budget & Planning',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextField(
+                    controller: _budgetController,
+                    label: 'Total Budget',
+                    hint: '0',
+                    icon: Icons.attach_money,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Enter budget';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildTextField(
+                    controller: _guestCountController,
+                    label: 'Guest Count',
+                    hint: '0',
+                    icon: Icons.people,
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: TextFormField(
+                controller: _notesController,
+                maxLines: 4,
+                decoration: InputDecoration(
+                  labelText: 'Additional Notes',
+                  hintText: 'Add any special requirements or notes...',
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.only(bottom: 60),
+                    child: Icon(Icons.notes, color: Colors.blue.shade700),
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.all(16),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blue.shade50, Colors.green.shade50],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.blue.shade100),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.lightbulb_outline, color: Colors.blue.shade700, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Pro Tips',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _buildTipItem('Set realistic budgets with 10-15% buffer'),
+                  _buildTipItem('Break down expenses by categories'),
+                  _buildTipItem('Track vendor payments separately'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blue.shade700, Colors.green.shade500],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blue.withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    if (_formKey.currentState!.validate()) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Event created successfully!'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      Navigator.pop(context);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Center(
+                      child: Text(
+                        'Create Event',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        validator: validator,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hint,
+          prefixIcon: Icon(icon, color: Colors.blue.shade700),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateTimePicker({
+    required String label,
+    required String value,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Icon(icon, color: Colors.blue.shade700),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        value,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTipItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.check_circle, color: Colors.green.shade600, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey.shade700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
