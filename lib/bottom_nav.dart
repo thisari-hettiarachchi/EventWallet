@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'home.dart';
 import 'event.dart';
 import 'budget.dart';
+import 'profile.dart';
 
 class AppBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -22,6 +23,9 @@ class AppBottomNav extends StatelessWidget {
         break;
       case 2:
         page = const BudgetPage();
+        break;
+      case 3:
+        page = const ProfilePage();
         break;
       default:
         return;
