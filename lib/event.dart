@@ -3,7 +3,7 @@ import 'bottom_nav.dart';
 import 'create_event.dart';
 
 class EventsPage extends StatefulWidget {
-  const EventsPage({Key? key}) : super(key: key);
+  const EventsPage({super.key});
 
   @override
   State<EventsPage> createState() => _EventsPageState();

@@ -3,7 +3,7 @@ import 'login.dart';
 import 'signup.dart';
 
 class WelcomeBackPage extends StatefulWidget {
-  const WelcomeBackPage({Key? key}) : super(key: key);
+  const WelcomeBackPage({super.key});
 
   @override
   State<WelcomeBackPage> createState() => _WelcomeBackPageState();

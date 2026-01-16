@@ -6,7 +6,7 @@ void main() {
 }
 
 class EventWalletApp extends StatelessWidget {
-  const EventWalletApp({Key? key}) : super(key: key);
+  const EventWalletApp({super.key});
 
   @override
   Widget build(BuildContext context) {

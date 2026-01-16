@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'bottom_nav.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -11,7 +11,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
-  int _notificationCount = 3;
+  final int _notificationCount = 3;
   bool _showAllEvents = false;
 
   @override

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'bottom_nav.dart';
 
 class BudgetPage extends StatefulWidget {
-  const BudgetPage({Key? key}) : super(key: key);
+  const BudgetPage({super.key});
 
   @override
   State<BudgetPage> createState() => _BudgetPageState();

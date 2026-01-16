@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CreateEventPage extends StatefulWidget {
-  const CreateEventPage({Key? key}) : super(key: key);
+  const CreateEventPage({super.key});
 
   @override
   State<CreateEventPage> createState() => _CreateEventPageState();
@@ -202,7 +202,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: DropdownButtonFormField<String>(
-                value: _selectedCategory,
+                initialValue: _selectedCategory,
                 decoration: InputDecoration(
                   labelText: 'Event Category',
                   prefixIcon: Icon(_getCategoryIcon(_selectedCategory), color: Colors.blue.shade700),
