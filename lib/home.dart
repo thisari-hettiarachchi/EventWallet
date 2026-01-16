@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'bottom_nav.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -10,7 +11,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
-  int _selectedIndex = 0;
   int _notificationCount = 3;
   bool _showAllEvents = false;
 
@@ -35,7 +35,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  // Replaced intl package with manual formatting
   String _getCurrentDate() {
     final now = DateTime.now();
     final weekdays = [
@@ -71,7 +70,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         child: SafeArea(
           child: Column(
             children: [
-              // Header
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: FadeTransition(
@@ -162,7 +160,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ),
               ),
 
-              // Total Budget Summary Card
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: FadeTransition(
@@ -303,7 +300,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
               const SizedBox(height: 20),
 
-              // Main Content Section
               Expanded(
                 child: Container(
                   decoration: const BoxDecoration(
@@ -316,62 +312,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   child: ListView(
                     padding: const EdgeInsets.all(20),
                     children: [
-                      // Upcoming Events Section
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Upcoming Events',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Colors.blue.shade600, Colors.green.shade500],
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.blue.withOpacity(0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () {},
-                                borderRadius: BorderRadius.circular(12),
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.add, color: Colors.white, size: 20),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        'New Event',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                      const Text(
+                        'Upcoming Events',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
                       ),
                       const SizedBox(height: 16),
 
-                      // Event Cards
                       _buildEventCard(
                         'Wedding Ceremony',
                         'Dec 25, 2025',
@@ -433,33 +383,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
                       const SizedBox(height: 24),
 
-                      // Daily Expenses Section
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Today\'s Expenses',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Text(
-                              'View All',
-                              style: TextStyle(
-                                color: Colors.blue.shade700,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
+                      const Text(
+                        'Today\'s Expenses',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
                       ),
                       const SizedBox(height: 12),
 
-                      // Daily Summary Card
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
@@ -533,35 +466,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
                       const SizedBox(height: 16),
 
-                      // Recent Daily Expenses
                       _buildDailyExpenseItem('Catering Deposit', '\$200', '10:30 AM'),
                       const SizedBox(height: 12),
                       _buildDailyExpenseItem('Decoration Materials', '\$150', '2:15 PM'),
                       const SizedBox(height: 12),
                       _buildDailyExpenseItem('Venue Visit Transport', '\$100', '4:45 PM'),
-
-                      const SizedBox(height: 24),
-
-                      // Quick Action Buttons
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildQuickActionButton(
-                              'Add Expense',
-                              Icons.add_circle_outline,
-                              Colors.blue,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildQuickActionButton(
-                              'Add Event',
-                              Icons.event_outlined,
-                              Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
 
                       const SizedBox(height: 100),
                     ],
@@ -600,52 +509,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           icon: const Icon(Icons.add_circle_outline),
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.blue.shade700,
-          unselectedItemColor: Colors.grey,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.event_outlined),
-              activeIcon: Icon(Icons.event),
-              label: 'Events',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_balance_wallet_outlined),
-              activeIcon: Icon(Icons.account_balance_wallet),
-              label: 'Budget',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 0),
     );
   }
 
@@ -882,48 +746,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildQuickActionButton(String label, IconData icon, Color color) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color.withOpacity(0.8), color],
-        ),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Column(
-              children: [
-                Icon(icon, color: Colors.white, size: 28),
-                const SizedBox(height: 8),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
