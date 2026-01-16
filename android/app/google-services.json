@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "410170220366",
+    "project_id": "eventwallet-ad7db",
+    "storage_bucket": "eventwallet-ad7db.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:410170220366:android:d9630ef11f415547b2c81f",
+        "android_client_info": {
+          "package_name": "com.example.eventwallet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRU1DVrgxF1SQ1s0jyy0rM0B_nbNPF5Q4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
