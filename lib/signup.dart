@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -14,6 +15,11 @@ class _SignupPageState extends State<SignupPage>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   bool _obscurePassword = true;
+
+  // Controllers for backend
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
@@ -41,6 +47,29 @@ class _SignupPageState extends State<SignupPage>
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  // ------------------ SIGNUP FUNCTION ------------------
+  Future<void> _signupUser() async {
+    try {
+      UserCredential userCredential =
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      if (userCredential.user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomePage()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      String message = e.message ?? 'Signup failed';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
   }
 
   @override
@@ -74,12 +103,12 @@ class _SignupPageState extends State<SignupPage>
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center, // ✅ vertical center
-                  crossAxisAlignment: CrossAxisAlignment.center, // ✅ horizontal center
+                  mainAxisAlignment: MainAxisAlignment.center, // vertical center
+                  crossAxisAlignment: CrossAxisAlignment.center, // horizontal center
                   children: [
                     const SizedBox(height: 20),
 
-                    /// Back Button (kept left aligned)
+                    /// Back Button
                     Align(
                       alignment: Alignment.centerLeft,
                       child: FadeTransition(
@@ -130,7 +159,7 @@ class _SignupPageState extends State<SignupPage>
 
                     const SizedBox(height: 20),
 
-                    /// Title (kept left-aligned text)
+                    /// Title
                     Align(
                       alignment: Alignment.centerLeft,
                       child: SlideTransition(
@@ -173,11 +202,12 @@ class _SignupPageState extends State<SignupPage>
 
                     const SizedBox(height: 50),
 
-                    /// Input Fields (full width)
+                    /// Input Fields
                     _buildField(
                       child: _textField(
                         label: 'Full Name',
                         icon: Icons.person,
+                        controller: _nameController,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -186,6 +216,7 @@ class _SignupPageState extends State<SignupPage>
                       child: _textField(
                         label: 'Email',
                         icon: Icons.email,
+                        controller: _emailController,
                         keyboard: TextInputType.emailAddress,
                       ),
                     ),
@@ -195,6 +226,7 @@ class _SignupPageState extends State<SignupPage>
                       child: _textField(
                         label: 'Password',
                         icon: Icons.lock,
+                        controller: _passwordController,
                         obscure: true,
                         suffix: IconButton(
                           icon: Icon(
@@ -214,7 +246,7 @@ class _SignupPageState extends State<SignupPage>
 
                     const SizedBox(height: 40),
 
-                    /// Button
+                    /// Sign Up Button
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: Container(
@@ -230,13 +262,7 @@ class _SignupPageState extends State<SignupPage>
                           ),
                         ),
                         child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const HomePage()),
-                            );
-                          },
+                          onPressed: _signupUser,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
                             shadowColor: Colors.transparent,
@@ -313,11 +339,13 @@ class _SignupPageState extends State<SignupPage>
   Widget _textField({
     required String label,
     required IconData icon,
+    TextEditingController? controller,
     bool obscure = false,
     TextInputType? keyboard,
     Widget? suffix,
   }) {
     return TextField(
+      controller: controller,
       obscureText: obscure ? _obscurePassword : false,
       keyboardType: keyboard,
       style: const TextStyle(color: Colors.white),

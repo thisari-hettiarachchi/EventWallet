@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'signup.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'home.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -14,6 +15,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   bool _obscurePassword = true;
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
@@ -41,6 +45,38 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     super.dispose();
   }
 
+  // ------------------ LOGIN FUNCTION ------------------
+  Future<void> _loginUser() async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      if (userCredential.user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomePage()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      String message = 'Login failed';
+
+      if (e.code == 'user-not-found') {
+        message = 'No account found for this email';
+      } else if (e.code == 'wrong-password') {
+        message = 'Incorrect password';
+      } else if (e.code == 'invalid-email') {
+        message = 'Invalid email format';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,7 +98,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           child: SingleChildScrollView(
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom,
+                minHeight: MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top -
+                    MediaQuery.of(context).padding.bottom,
               ),
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -143,6 +181,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             ],
                           ),
                           child: TextField(
+                            controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
@@ -190,6 +229,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             ],
                           ),
                           child: TextField(
+                            controller: _passwordController,
                             obscureText: _obscurePassword,
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
@@ -226,7 +266,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                     ),
                     const SizedBox(height: 32),
 
-                    // Login Button with elevated white design
+                    // Login Button with Firebase Auth
                     SlideTransition(
                       position: _slideAnimation,
                       child: FadeTransition(
@@ -251,12 +291,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             ],
                           ),
                           child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (_) => const HomePage()),
-                              );
-                            },
+                            onPressed: _loginUser,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
