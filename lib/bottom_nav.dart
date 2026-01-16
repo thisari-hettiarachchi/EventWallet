@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
 import 'event.dart';
+import 'budget.dart';
 
 class AppBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -11,12 +12,16 @@ class AppBottomNav extends StatelessWidget {
     if (index == currentIndex) return;
 
     Widget page;
+
     switch (index) {
       case 0:
         page = const HomePage();
         break;
       case 1:
         page = const EventsPage();
+        break;
+      case 2:
+        page = const BudgetPage();
         break;
       default:
         return;
