@@ -1,3 +1,4 @@
+import 'package:eventwallet/help.dart';
 import 'package:eventwallet/manage_event.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,6 +9,8 @@ import 'services/auth_service.dart';
 import 'edit_profile.dart';
 import 'manage_event.dart';
 import 'privacy.dart';
+import 'help.dart';
+import 'about.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -237,7 +240,14 @@ class ProfilePage extends StatelessWidget {
                         title: 'Help & Support',
                         subtitle: 'Get assistance for your events',
                         color: Colors.cyan,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HelpSupportPage(),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 12),
                       _buildSettingsCard(
@@ -245,7 +255,14 @@ class ProfilePage extends StatelessWidget {
                         title: 'About',
                         subtitle: 'Version 1.0.0',
                         color: Colors.grey,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AboutPage(),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 24),
                       Container(
