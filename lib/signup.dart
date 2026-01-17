@@ -68,15 +68,16 @@ class _SignupPageState extends State<SignupPage>
           'createdAt': FieldValue.serverTimestamp(),
         });
 
-        // 🔹 Navigate to ResultPage
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => ResultPage(
               isSuccess: true,
               message: 'Your account has been created successfully!',
               onButtonPressed: () {
-                // ✅ Navigate to LoginPage when DONE is pressed
+                // Close ResultPage first
+                Navigator.pop(context);
+                // Then navigate to LoginPage
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const LoginPage()),
@@ -85,6 +86,7 @@ class _SignupPageState extends State<SignupPage>
             ),
           ),
         );
+
       }
     } on FirebaseAuthException catch (e) {
       String message = e.message ?? 'Signup failed';
