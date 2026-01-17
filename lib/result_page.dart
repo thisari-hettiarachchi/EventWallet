@@ -6,11 +6,11 @@ class ResultPage extends StatelessWidget {
   final VoidCallback onButtonPressed;
 
   const ResultPage({
-    Key? key,
+    super.key,
     required this.isSuccess,
     required this.message,
     required this.onButtonPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +61,7 @@ class ResultCard extends StatelessWidget {
   final VoidCallback onButtonPressed;
 
   const ResultCard({
-    Key? key,
+    super.key,
     required this.isSuccess,
     required this.message,
     required this.color,
@@ -69,7 +69,7 @@ class ResultCard extends StatelessWidget {
     required this.title,
     required this.buttonText,
     required this.onButtonPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

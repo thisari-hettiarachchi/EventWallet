@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class EventDetailsPage extends StatelessWidget {
+class EventDetailsPage extends StatefulWidget {
   final String eventId;
-  final String eventName; // For the hero animation
+  final String eventName;
 
   const EventDetailsPage({
     super.key,
@@ -12,16 +12,56 @@ class EventDetailsPage extends StatelessWidget {
   });
 
   @override
+  State<EventDetailsPage> createState() => _EventDetailsPageState();
+}
+
+class _EventDetailsPageState extends State<EventDetailsPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StreamBuilder<DocumentSnapshot>(
       stream: FirebaseFirestore.instance
           .collection('events')
-          .doc(eventId)
+          .doc(widget.eventId)
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            body: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blue.shade700, Colors.teal.shade500],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+            ),
           );
         }
 
@@ -33,290 +73,552 @@ class EventDetailsPage extends StatelessWidget {
         final color = _getStatusColor(status);
 
         return Scaffold(
-          backgroundColor: Colors.grey.shade50,
-          body: CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 200,
-                pinned: true,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.blue.shade700, Colors.teal.shade500],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+          backgroundColor: Colors.grey.shade100,
+          body: Stack(
+            children: [
+              // Background gradient
+              Container(
+                height: 320,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.blue.shade700,
+                      Colors.blue.shade600,
+                      Colors.teal.shade500,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              ),
+
+              // Decorative circles
+              Positioned(
+                top: -50,
+                right: -50,
+                child: Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.1),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 100,
+                left: -30,
+                child: Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.08),
+                  ),
+                ),
+              ),
+
+              SafeArea(
+                child: Column(
+                  children: [
+                    // Custom App Bar
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
                         children: [
-                          const SizedBox(height: 40),
-                          Icon(
-                            _getCategoryIcon(event['category'] ?? 'Other'),
-                            size: 60,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(height: 12),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              event['name'] ?? 'Event',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.3),
+                                width: 1,
                               ),
-                              textAlign: TextAlign.center,
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () => Navigator.pop(context),
+                                borderRadius: BorderRadius.circular(12),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(12),
+                                  child: Icon(
+                                    Icons.arrow_back_ios_new,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const Spacer(),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {},
+                                borderRadius: BorderRadius.circular(12),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(12),
+                                  child: Icon(
+                                    Icons.share_outlined,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {},
+                                borderRadius: BorderRadius.circular(12),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(12),
+                                  child: Icon(
+                                    Icons.edit_outlined,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ),
-                backgroundColor: Colors.blue.shade700,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.white),
-                    onPressed: () {
-                      // Navigate to edit page
-                    },
-                  ),
-                ],
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Status Badge
-                      Center(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: color.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: color, width: 2),
-                          ),
-                          child: Text(
-                            status,
-                            style: TextStyle(
-                              color: color,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
 
-                      // Budget Overview Card
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [color, color.withOpacity(0.7)],
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: color.withOpacity(0.3),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          children: [
-                            const Text(
-                              'Budget Overview',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                    // Header Content
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.3),
+                                width: 2,
                               ),
                             ),
-                            const SizedBox(height: 20),
-                            Row(
+                            child: Icon(
+                              _getCategoryIcon(event['category'] ?? 'Other'),
+                              size: 50,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            event['name'] ?? 'Event',
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              letterSpacing: -0.5,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Expanded(
-                                  child: _buildBudgetItem(
-                                    'Total Budget',
-                                    '\$${budget.toStringAsFixed(2)}',
-                                    Icons.account_balance_wallet,
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: color,
+                                    shape: BoxShape.circle,
                                   ),
                                 ),
-                                Container(
-                                  width: 1,
-                                  height: 50,
-                                  color: Colors.white.withOpacity(0.3),
-                                ),
-                                Expanded(
-                                  child: _buildBudgetItem(
-                                    'Spent',
-                                    '\$${spent.toStringAsFixed(2)}',
-                                    Icons.shopping_cart,
-                                  ),
-                                ),
-                                Container(
-                                  width: 1,
-                                  height: 50,
-                                  color: Colors.white.withOpacity(0.3),
-                                ),
-                                Expanded(
-                                  child: _buildBudgetItem(
-                                    'Remaining',
-                                    '\$${(budget - spent).toStringAsFixed(2)}',
-                                    Icons.savings,
+                                const SizedBox(width: 8),
+                                Text(
+                                  status,
+                                  style: TextStyle(
+                                    color: color,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 20),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: LinearProgressIndicator(
-                                value: progress,
-                                minHeight: 12,
-                                backgroundColor: Colors.white.withOpacity(0.3),
-                                valueColor: const AlwaysStoppedAnimation(Colors.white),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              '${(progress * 100).toInt()}% of budget used',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Event Details Card
-                      _buildSectionCard(
-                        'Event Details',
-                        Icons.info_outline,
-                        color,
-                        [
-                          _buildDetailRow(
-                            Icons.calendar_today,
-                            'Date',
-                            _formatTimestamp(event['date']),
-                          ),
-                          _buildDetailRow(
-                            Icons.location_on,
-                            'Venue',
-                            event['venue'] ?? 'Not specified',
-                          ),
-                          _buildDetailRow(
-                            Icons.category,
-                            'Category',
-                            event['category'] ?? 'Other',
-                          ),
-                          _buildDetailRow(
-                            Icons.people,
-                            'Expected Attendees',
-                            event['attendees']?.toString() ?? 'Not specified',
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                    ),
+                    const SizedBox(height: 24),
 
-                      // Description Card
-                      if (event['description'] != null && event['description'].toString().isNotEmpty)
-                        _buildSectionCard(
-                          'Description',
-                          Icons.description,
-                          color,
-                          [
-                            Text(
-                              event['description'],
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.grey.shade700,
-                                height: 1.5,
+                    // Scrollable Content
+                    Expanded(
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: ListView(
+                          padding: const EdgeInsets.all(20),
+                          children: [
+                            // Budget Cards Row
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildGlassCard(
+                                    icon: Icons.account_balance_wallet,
+                                    label: 'Total Budget',
+                                    value: '\$${budget.toStringAsFixed(0)}',
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.blue.shade600,
+                                        Colors.blue.shade700,
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _buildGlassCard(
+                                    icon: Icons.shopping_bag,
+                                    label: 'Spent',
+                                    value: '\$${spent.toStringAsFixed(0)}',
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.teal.shade500,
+                                        Colors.teal.shade600,
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildGlassCard(
+                                    icon: Icons.savings,
+                                    label: 'Remaining',
+                                    value: '\$${(budget - spent).toStringAsFixed(0)}',
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.green.shade500,
+                                        Colors.green.shade600,
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _buildGlassCard(
+                                    icon: Icons.pie_chart,
+                                    label: 'Used',
+                                    value: '${(progress * 100).toInt()}%',
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.orange.shade500,
+                                        Colors.orange.shade600,
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+
+                            // Budget Progress
+                            _buildModernCard(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.blue.shade600,
+                                              Colors.teal.shade500,
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: const Icon(
+                                          Icons.trending_up,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Text(
+                                        'Budget Progress',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Stack(
+                                    children: [
+                                      Container(
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      FractionallySizedBox(
+                                        widthFactor: progress > 1 ? 1 : progress,
+                                        child: Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: progress > 0.8
+                                                  ? [Colors.orange.shade400, Colors.red.shade400]
+                                                  : [Colors.blue.shade600, Colors.teal.shade500],
+                                            ),
+                                            borderRadius: BorderRadius.circular(10),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: (progress > 0.8
+                                                    ? Colors.orange
+                                                    : Colors.blue)
+                                                    .withOpacity(0.4),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        '\$${spent.toStringAsFixed(2)} spent',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.grey.shade600,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        '\$${budget.toStringAsFixed(2)} budget',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.grey.shade600,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      const SizedBox(height: 16),
+                            const SizedBox(height: 20),
 
-                      // Quick Actions
-                      _buildSectionCard(
-                        'Quick Actions',
-                        Icons.flash_on,
-                        color,
-                        [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildActionButton(
+                            // Event Information
+                            _buildModernCard(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.blue.shade600,
+                                              Colors.teal.shade500,
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: const Icon(
+                                          Icons.info_outline,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Text(
+                                        'Event Information',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  _buildInfoRow(
+                                    Icons.calendar_today,
+                                    'Date',
+                                    _formatTimestamp(event['date']),
+                                    Colors.blue.shade600,
+                                  ),
+                                  _buildInfoRow(
+                                    Icons.location_on,
+                                    'Venue',
+                                    event['venue'] ?? 'Not specified',
+                                    Colors.teal.shade500,
+                                  ),
+                                  _buildInfoRow(
+                                    Icons.category,
+                                    'Category',
+                                    event['category'] ?? 'Other',
+                                    Colors.green.shade600,
+                                  ),
+                                  _buildInfoRow(
+                                    Icons.people,
+                                    'Attendees',
+                                    event['attendees']?.toString() ?? 'Not specified',
+                                    Colors.purple.shade600,
+                                    isLast: true,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Description
+                            if (event['description'] != null &&
+                                event['description'].toString().isNotEmpty)
+                              _buildModernCard(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Colors.blue.shade600,
+                                                Colors.teal.shade500,
+                                              ],
+                                            ),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: const Icon(
+                                            Icons.description,
+                                            color: Colors.white,
+                                            size: 20,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        const Text(
+                                          'Description',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      event['description'],
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.grey.shade700,
+                                        height: 1.6,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            const SizedBox(height: 20),
+
+                            // Quick Actions
+                            const Text(
+                              'Quick Actions',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            GridView.count(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio: 1.3,
+                              children: [
+                                _buildActionCard(
                                   'Add Expense',
                                   Icons.add_shopping_cart,
-                                  color,
-                                      () {
-                                    // Navigate to add expense
-                                  },
+                                  Colors.blue.shade600,
+                                  Colors.blue.shade700,
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: _buildActionButton(
-                                  'View Tasks',
+                                _buildActionCard(
+                                  'Tasks',
                                   Icons.check_circle_outline,
+                                  Colors.teal.shade500,
                                   Colors.teal.shade600,
-                                      () {
-                                    // Navigate to tasks
-                                  },
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildActionButton(
+                                _buildActionCard(
                                   'Vendors',
                                   Icons.business_center,
-                                  Colors.orange.shade600,
-                                      () {
-                                    // Navigate to vendors
-                                  },
+                                  Colors.green.shade500,
+                                  Colors.green.shade600,
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: _buildActionButton(
-                                  'Attendees',
+                                _buildActionCard(
+                                  'Guest List',
                                   Icons.people,
+                                  Colors.purple.shade500,
                                   Colors.purple.shade600,
-                                      () {
-                                    // Navigate to attendees
-                                  },
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                            const SizedBox(height: 100),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 80),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -326,106 +628,52 @@ class EventDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBudgetItem(String label, String value, IconData icon) {
-    return Column(
-      children: [
-        Icon(icon, color: Colors.white, size: 24),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.white.withOpacity(0.9),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSectionCard(
-      String title,
-      IconData icon,
-      Color color,
-      List<Widget> children,
-      ) {
+  Widget _buildGlassCard({
+    required IconData icon,
+    required String label,
+    required String value,
+    required LinearGradient gradient,
+  }) {
     return Container(
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, 3),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, color: color, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              gradient: gradient,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: Colors.white, size: 20),
           ),
-          const SizedBox(height: 16),
-          ...children,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: Colors.grey.shade600),
-          const SizedBox(width: 12),
+          const SizedBox(height: 12),
           Text(
-            '$label:',
+            label,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               color: Colors.grey.shade600,
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.right,
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: Colors.black87,
             ),
           ),
         ],
@@ -433,45 +681,118 @@ class EventDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(
+  Widget _buildModernCard({required Widget child}) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildInfoRow(
+      IconData icon,
+      String label,
+      String value,
+      Color color, {
+        bool isLast = false,
+      }) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, size: 18, color: color),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionCard(
       String label,
       IconData icon,
-      Color color,
-      VoidCallback onTap,
+      Color color1,
+      Color color2,
       ) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [color.withOpacity(0.8), color],
-            ),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: color.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [color1, color2],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: color1.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
-          child: Column(
-            children: [
-              Icon(icon, color: Colors.white, size: 28),
-              const SizedBox(height: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {},
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: Colors.white, size: 32),
+                const SizedBox(height: 12),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -513,7 +834,10 @@ class EventDetailsPage extends StatelessWidget {
   String _formatTimestamp(Timestamp? timestamp) {
     if (timestamp == null) return 'No Date';
     final date = timestamp.toDate();
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }

@@ -279,7 +279,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: DropdownButtonFormField<String>(
-                value: _selectedCategory,
+                initialValue: _selectedCategory,
                 decoration: InputDecoration(
                   labelText: 'Event Category',
                   prefixIcon: Icon(_getCategoryIcon(_selectedCategory), color: Colors.blue.shade700),
@@ -384,7 +384,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: DropdownButtonFormField<String>(
-                value: _selectedStatus,
+                initialValue: _selectedStatus,
                 decoration: InputDecoration(
                   labelText: 'Event Status',
                   prefixIcon: Icon(Icons.info, color: Colors.blue.shade700),

@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     double spent = 0;
 
     for (var doc in snapshot.docs) {
-      final data = doc.data() as Map<String, dynamic>;
+      final data = doc.data();
       budget += (data['budget'] ?? 0).toDouble();
       spent += (data['spent'] ?? 0).toDouble();
     }
@@ -423,7 +423,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             Icons.event,
                           ),
                         );
-                      }).toList(),
+                      }),
 
                       const SizedBox(height: 12),
                       if (_upcomingEvents.length > 2)
@@ -476,7 +476,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           '\$${(data['amount'] ?? 0).toStringAsFixed(0)}',
                           data['time'] ?? '',
                         );
-                      }).toList(),
+                      }),
 
                       const SizedBox(height: 100),
                     ],
