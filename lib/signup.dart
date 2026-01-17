@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
+import 'login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'result_page.dart';
-import 'login.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -18,7 +17,6 @@ class _SignupPageState extends State<SignupPage>
   late Animation<Offset> _slideAnimation;
   bool _obscurePassword = true;
 
-  // Controllers for backend
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -51,7 +49,6 @@ class _SignupPageState extends State<SignupPage>
     super.dispose();
   }
 
-  // ------------------ SIGNUP FUNCTION ------------------
   Future<void> _signupUser() async {
     try {
       UserCredential userCredential =
@@ -70,7 +67,7 @@ class _SignupPageState extends State<SignupPage>
               onButtonPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (_) => const HomePage()),
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
                 );
               },
             ),
@@ -296,14 +293,16 @@ class _SignupPageState extends State<SignupPage>
                       ),
                     ),
                     const SizedBox(height: 24),
-                    /// Sign in link
+
+                    /// Sign in link → goes to LoginPage
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: TextButton(
                         onPressed: () {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (_) => const LoginPage()),
+                            MaterialPageRoute(
+                                builder: (_) => const LoginPage()),
                           );
                         },
                         child: const Text(
@@ -316,7 +315,6 @@ class _SignupPageState extends State<SignupPage>
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 40),
                   ],
                 ),

@@ -46,7 +46,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     super.dispose();
   }
 
-  // ------------------ LOGIN FUNCTION ------------------
   Future<void> _loginUser() async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -56,16 +55,19 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       );
 
       if (userCredential.user != null) {
-        Navigator.pushReplacement(
+        // Show success ResultPage and navigate to HomePage on DONE
+        Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => ResultPage(
               isSuccess: true,
               message: 'Login Successful!',
               onButtonPressed: () {
-                Navigator.pushReplacement(
+                // Navigate to HomePage and remove all previous routes
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (_) => const HomePage()),
+                      (route) => false,
                 );
               },
             ),
@@ -82,6 +84,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         message = 'Invalid email format';
       }
 
+      // Show error ResultPage with TRY AGAIN
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -89,13 +92,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             isSuccess: false,
             message: message,
             onButtonPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(context); // back to login page
             },
           ),
         ),
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
