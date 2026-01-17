@@ -7,6 +7,7 @@ import 'login.dart';
 import 'services/auth_service.dart';
 import 'edit_profile.dart';
 import 'manage_event.dart';
+import 'privacy.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -212,7 +213,14 @@ class ProfilePage extends StatelessWidget {
                         title: 'Privacy & Security',
                         subtitle: 'Password and security settings',
                         color: Colors.green,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PrivacySecurityPage(),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 24),
                       const Text(
