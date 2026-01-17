@@ -66,6 +66,7 @@ class ProfilePage extends StatelessWidget {
                       colors: [Colors.blue.shade700, Colors.teal.shade500],
                     ),
                   ),
+
                   child: Column(
                     children: [
                       const SizedBox(height: 20),
