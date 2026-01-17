@@ -120,9 +120,9 @@ class ProfilePage extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            // Events
+                            // Total Events
                             _buildStatItem(
-                              'Events',
+                              'Total Events',
                               userData['eventsCount'] != null ? userData['eventsCount'].toString() : '0',
                             ),
 
@@ -146,9 +146,9 @@ class ProfilePage extends StatelessWidget {
                               color: Colors.white.withOpacity(0.3),
                             ),
 
-                            // Spent
+                            // Amount Spent
                             _buildStatItem(
-                              'Spent',
+                              'Amount Spent',
                               userData['spent'] != null
                                   ? '\$${userData['spent'].toString()}'
                                   : '\$0',
@@ -176,15 +176,15 @@ class ProfilePage extends StatelessWidget {
                       _buildSettingsCard(
                         icon: Icons.person_outline,
                         title: 'Edit Profile',
-                        subtitle: 'Update your personal information',
+                        subtitle: 'Update your personal info for events',
                         color: Colors.blue,
                         onTap: () {},
                       ),
                       const SizedBox(height: 12),
                       _buildSettingsCard(
-                        icon: Icons.notifications_outlined,
-                        title: 'Notifications',
-                        subtitle: 'Manage notification preferences',
+                        icon: Icons.event_note_outlined,
+                        title: 'Manage Events',
+                        subtitle: 'View, edit, or delete your events',
                         color: Colors.orange,
                         onTap: () {},
                       ),
@@ -194,47 +194,6 @@ class ProfilePage extends StatelessWidget {
                         title: 'Privacy & Security',
                         subtitle: 'Password and security settings',
                         color: Colors.green,
-                        onTap: () {},
-                      ),
-                      const SizedBox(height: 12),
-                      _buildSettingsCard(
-                        icon: Icons.payment_outlined,
-                        title: 'Payment Methods',
-                        subtitle: 'Manage your payment options',
-                        color: Colors.purple,
-                        onTap: () {},
-                      ),
-                      const SizedBox(height: 24),
-                      const Text(
-                        'Preferences',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildSettingsCard(
-                        icon: Icons.dark_mode_outlined,
-                        title: 'Theme',
-                        subtitle: 'Light mode',
-                        color: Colors.indigo,
-                        onTap: () {},
-                      ),
-                      const SizedBox(height: 12),
-                      _buildSettingsCard(
-                        icon: Icons.language_outlined,
-                        title: 'Language',
-                        subtitle: 'English',
-                        color: Colors.teal,
-                        onTap: () {},
-                      ),
-                      const SizedBox(height: 12),
-                      _buildSettingsCard(
-                        icon: Icons.currency_exchange_outlined,
-                        title: 'Currency',
-                        subtitle: 'USD (\$)',
-                        color: Colors.amber,
                         onTap: () {},
                       ),
                       const SizedBox(height: 24),
@@ -250,7 +209,7 @@ class ProfilePage extends StatelessWidget {
                       _buildSettingsCard(
                         icon: Icons.help_outline,
                         title: 'Help & Support',
-                        subtitle: 'Get assistance',
+                        subtitle: 'Get assistance for your events',
                         color: Colors.cyan,
                         onTap: () {},
                       ),
@@ -260,14 +219,6 @@ class ProfilePage extends StatelessWidget {
                         title: 'About',
                         subtitle: 'Version 1.0.0',
                         color: Colors.grey,
-                        onTap: () {},
-                      ),
-                      const SizedBox(height: 12),
-                      _buildSettingsCard(
-                        icon: Icons.rate_review_outlined,
-                        title: 'Rate App',
-                        subtitle: 'Share your feedback',
-                        color: Colors.pink,
                         onTap: () {},
                       ),
                       const SizedBox(height: 24),
