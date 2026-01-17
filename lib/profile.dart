@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'bottom_nav.dart';
 import 'services/auth_service.dart';
 import 'login.dart';
@@ -8,6 +9,15 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final User? user = FirebaseAuth.instance.currentUser;
+
+    // Fallback values if user info is not available
+    final String displayName = user?.displayName ?? 'User';
+    final String email = user?.email ?? 'No email';
+    final String initials = displayName.isNotEmpty
+        ? displayName.trim().split(' ').map((e) => e[0]).take(2).join()
+        : 'U';
+
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       body: SafeArea(
@@ -39,7 +49,7 @@ class ProfilePage extends StatelessWidget {
                     child: CircleAvatar(
                       backgroundColor: Colors.white,
                       child: Text(
-                        'JD',
+                        initials,
                         style: TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.bold,
@@ -49,9 +59,9 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'John Doe',
-                    style: TextStyle(
+                  Text(
+                    displayName,
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -59,7 +69,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'john.doe@example.com',
+                    email,
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.white.withOpacity(0.9),
@@ -113,7 +123,6 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   _buildSettingsCard(
                     icon: Icons.person_outline,
                     title: 'Edit Profile',
@@ -145,9 +154,7 @@ class ProfilePage extends StatelessWidget {
                     color: Colors.purple,
                     onTap: () {},
                   ),
-
                   const SizedBox(height: 24),
-
                   const Text(
                     'Preferences',
                     style: TextStyle(
@@ -157,7 +164,6 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   _buildSettingsCard(
                     icon: Icons.dark_mode_outlined,
                     title: 'Theme',
@@ -181,9 +187,7 @@ class ProfilePage extends StatelessWidget {
                     color: Colors.amber,
                     onTap: () {},
                   ),
-
                   const SizedBox(height: 24),
-
                   const Text(
                     'Support',
                     style: TextStyle(
@@ -193,7 +197,6 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   _buildSettingsCard(
                     icon: Icons.help_outline,
                     title: 'Help & Support',
@@ -217,9 +220,7 @@ class ProfilePage extends StatelessWidget {
                     color: Colors.pink,
                     onTap: () {},
                   ),
-
                   const SizedBox(height: 24),
-
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.red.shade50,
@@ -263,7 +264,6 @@ class ProfilePage extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 100),
                 ],
               ),
