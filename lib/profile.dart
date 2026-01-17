@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'bottom_nav.dart';
 import 'login.dart';
 import 'services/auth_service.dart';
+import 'edit_profile.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -178,7 +179,15 @@ class ProfilePage extends StatelessWidget {
                         title: 'Edit Profile',
                         subtitle: 'Update your personal info for events',
                         color: Colors.blue,
-                        onTap: () {},
+                        onTap: () {
+                          // Navigate to EditProfilePage
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const EditProfilePage(),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 12),
                       _buildSettingsCard(
