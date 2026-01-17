@@ -14,10 +14,10 @@ class ResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSuccess ? const Color(0xFF4CAF50) : const Color(0xFF2196F3); // green for success, blue for error
-    final bgColor = isSuccess ? const Color(0xFFE8F5E9) : const Color(0xFFE3F2FD);
+    final color = isSuccess ? const Color(0xFF4CAF50) : Colors.red; // green for success, red for error
+    final bgColor = isSuccess ? const Color(0xFFE8F5E9) : const Color(0xFFFFEBEE);
     final title = isSuccess ? 'Congratulations!' : 'Error';
-    final buttonText = isSuccess ? 'ONCE AGAIN' : 'TRY AGAIN';
+    final buttonText = isSuccess ? 'DONE' : 'TRY AGAIN';
 
     return Scaffold(
       body: Container(
@@ -39,7 +39,7 @@ class ResultPage extends StatelessWidget {
           child: ResultCard(
             isSuccess: isSuccess,
             message: message,
-            color: isSuccess ? const Color(0xFF4CAF50) : Colors.red, // green for success, red for error
+            color: color,
             bgColor: bgColor,
             title: title,
             buttonText: buttonText,

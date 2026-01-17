@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'result_page.dart';
+import 'login.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -61,13 +63,33 @@ class _SignupPageState extends State<SignupPage>
       if (userCredential.user != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const HomePage()),
+          MaterialPageRoute(
+            builder: (_) => ResultPage(
+              isSuccess: true,
+              message: 'Your account has been created successfully!',
+              onButtonPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HomePage()),
+                );
+              },
+            ),
+          ),
         );
       }
     } on FirebaseAuthException catch (e) {
       String message = e.message ?? 'Signup failed';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultPage(
+            isSuccess: false,
+            message: message,
+            onButtonPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
       );
     }
   }
@@ -103,12 +125,10 @@ class _SignupPageState extends State<SignupPage>
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center, // vertical center
-                  crossAxisAlignment: CrossAxisAlignment.center, // horizontal center
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 20),
-
-                    /// Back Button
                     Align(
                       alignment: Alignment.centerLeft,
                       child: FadeTransition(
@@ -130,10 +150,7 @@ class _SignupPageState extends State<SignupPage>
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 40),
-
-                    /// Logo
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: Container(
@@ -156,10 +173,7 @@ class _SignupPageState extends State<SignupPage>
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
-                    /// Title
                     Align(
                       alignment: Alignment.centerLeft,
                       child: SlideTransition(
@@ -199,10 +213,7 @@ class _SignupPageState extends State<SignupPage>
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 50),
-
-                    /// Input Fields
                     _buildField(
                       child: _textField(
                         label: 'Full Name',
@@ -211,7 +222,6 @@ class _SignupPageState extends State<SignupPage>
                       ),
                     ),
                     const SizedBox(height: 20),
-
                     _buildField(
                       child: _textField(
                         label: 'Email',
@@ -221,7 +231,6 @@ class _SignupPageState extends State<SignupPage>
                       ),
                     ),
                     const SizedBox(height: 20),
-
                     _buildField(
                       child: _textField(
                         label: 'Password',
@@ -243,10 +252,7 @@ class _SignupPageState extends State<SignupPage>
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 40),
-
-                    /// Sign Up Button
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: Container(
@@ -289,14 +295,17 @@ class _SignupPageState extends State<SignupPage>
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 24),
-
                     /// Sign in link
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: TextButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => const LoginPage()),
+                          );
+                        },
                         child: const Text(
                           'Already have an account? Sign In',
                           style: TextStyle(
@@ -319,7 +328,6 @@ class _SignupPageState extends State<SignupPage>
     );
   }
 
-  /// Reusable field container
   Widget _buildField({required Widget child}) {
     return Container(
       width: double.infinity,
@@ -335,7 +343,6 @@ class _SignupPageState extends State<SignupPage>
     );
   }
 
-  /// Reusable text field
   Widget _textField({
     required String label,
     required IconData icon,
