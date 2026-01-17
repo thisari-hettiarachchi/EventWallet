@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'result_page.dart';
+import 'event.dart';
 
 class CreateEventPage extends StatefulWidget {
   const CreateEventPage({super.key});
@@ -27,6 +31,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
     'Charity',
     'Other'
   ];
+
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   @override
   void dispose() {
@@ -113,6 +119,78 @@ class _CreateEventPageState extends State<CreateEventPage> {
     }
   }
 
+  Future<void> _createEvent() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultPage(
+            isSuccess: false,
+            message: "You must be logged in to create an event.",
+            onButtonPressed: () => Navigator.pop(context),
+          ),
+        ),
+      );
+      return;
+    }
+
+    // Ensure a date is selected
+    if (_selectedDate == null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultPage(
+            isSuccess: false,
+            message: "Please select an event date.",
+            onButtonPressed: () => Navigator.pop(context),
+          ),
+        ),
+      );
+      return;
+    }
+
+    final data = {
+      'name': _eventNameController.text.trim(),
+      'venue': _venueController.text.trim(),
+      'budget': double.tryParse(_budgetController.text) ?? 0,
+      'guestCount': int.tryParse(_guestCountController.text) ?? 0,
+      'notes': _notesController.text.trim(),
+      'category': _selectedCategory,
+      'date': Timestamp.fromDate(_selectedDate!),
+      'time': _selectedTime != null ? '${_selectedTime!.hour}:${_selectedTime!.minute}' : null,
+      'createdAt': FieldValue.serverTimestamp(),
+      'userId': user.uid,
+    };
+
+    try {
+      await _db.collection('events').add(data);
+
+      // Navigate to events page after success
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const EventsPage(), // <-- Your event list page
+        ),
+      );
+    } catch (e) {
+      print("Firestore error: $e"); // <-- prints exact reason for failure
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultPage(
+            isSuccess: false,
+            message: "Failed to create event. Please try again.",
+            onButtonPressed: () => Navigator.pop(context),
+          ),
+        ),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -170,7 +248,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
               ),
             ),
             const SizedBox(height: 24),
-
             const Text(
               'Event Details',
               style: TextStyle(
@@ -180,21 +257,17 @@ class _CreateEventPageState extends State<CreateEventPage> {
               ),
             ),
             const SizedBox(height: 16),
-
             _buildTextField(
               controller: _eventNameController,
               label: 'Event Name',
               hint: 'e.g., Sarah & John\'s Wedding',
               icon: Icons.title,
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter event name';
-                }
+                if (value == null || value.isEmpty) return 'Please enter event name';
                 return null;
               },
             ),
             const SizedBox(height: 16),
-
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -202,7 +275,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: DropdownButtonFormField<String>(
-                initialValue: _selectedCategory,
+                value: _selectedCategory,
                 decoration: InputDecoration(
                   labelText: 'Event Category',
                   prefixIcon: Icon(_getCategoryIcon(_selectedCategory), color: Colors.blue.shade700),
@@ -229,7 +302,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
               ),
             ),
             const SizedBox(height: 16),
-
             Row(
               children: [
                 Expanded(
@@ -252,21 +324,17 @@ class _CreateEventPageState extends State<CreateEventPage> {
               ],
             ),
             const SizedBox(height: 16),
-
             _buildTextField(
               controller: _venueController,
               label: 'Venue',
               hint: 'e.g., Grand Hotel Ballroom',
               icon: Icons.location_on,
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter venue';
-                }
+                if (value == null || value.isEmpty) return 'Please enter venue';
                 return null;
               },
             ),
             const SizedBox(height: 24),
-
             const Text(
               'Budget & Planning',
               style: TextStyle(
@@ -276,7 +344,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
               ),
             ),
             const SizedBox(height: 16),
-
             Row(
               children: [
                 Expanded(
@@ -287,9 +354,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                     icon: Icons.attach_money,
                     keyboardType: TextInputType.number,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Enter budget';
-                      }
+                      if (value == null || value.isEmpty) return 'Enter budget';
                       return null;
                     },
                   ),
@@ -307,7 +372,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
               ],
             ),
             const SizedBox(height: 16),
-
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -329,43 +393,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue.shade50, Colors.green.shade50],
-                ),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.blue.shade100),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.lightbulb_outline, color: Colors.blue.shade700, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Pro Tips',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  _buildTipItem('Set realistic budgets with 10-15% buffer'),
-                  _buildTipItem('Break down expenses by categories'),
-                  _buildTipItem('Track vendor payments separately'),
-                ],
-              ),
-            ),
             const SizedBox(height: 32),
-
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -383,17 +411,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: () {
-                    if (_formKey.currentState!.validate()) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Event created successfully!'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                      Navigator.pop(context);
-                    }
-                  },
+                  onTap: _createEvent,
                   borderRadius: BorderRadius.circular(12),
                   child: const Padding(
                     padding: EdgeInsets.symmetric(vertical: 16),
@@ -497,28 +515,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTipItem(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.check_circle, color: Colors.green.shade600, size: 16),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey.shade700,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
