@@ -1,3 +1,4 @@
+import 'package:eventwallet/manage_event.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,6 +6,7 @@ import 'bottom_nav.dart';
 import 'login.dart';
 import 'services/auth_service.dart';
 import 'edit_profile.dart';
+import 'manage_event.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -195,7 +197,14 @@ class ProfilePage extends StatelessWidget {
                         title: 'Manage Events',
                         subtitle: 'View, edit, or delete your events',
                         color: Colors.orange,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ManageEventsPage(),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 12),
                       _buildSettingsCard(
