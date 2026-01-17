@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'result_page.dart';
 
 class SignupPage extends StatefulWidget {
@@ -57,7 +58,17 @@ class _SignupPageState extends State<SignupPage>
         password: _passwordController.text.trim(),
       );
 
-      if (userCredential.user != null) {
+      User? user = userCredential.user;
+
+      if (user != null) {
+        // 🔹 Save user info to Firestore
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'name': _nameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        // 🔹 Navigate to ResultPage
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -65,6 +76,7 @@ class _SignupPageState extends State<SignupPage>
               isSuccess: true,
               message: 'Your account has been created successfully!',
               onButtonPressed: () {
+                // ✅ Navigate to LoginPage when DONE is pressed
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const LoginPage()),
@@ -293,8 +305,6 @@ class _SignupPageState extends State<SignupPage>
                       ),
                     ),
                     const SizedBox(height: 24),
-
-                    /// Sign in link → goes to LoginPage
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: TextButton(
