@@ -177,6 +177,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
         }
 
         return ListView.separated(
+          physics: const AlwaysScrollableScrollPhysics(), // <-- fix for tab switching
           padding: const EdgeInsets.all(16),
           itemCount: events.length,
           separatorBuilder: (_, __) => const SizedBox(height: 16),
@@ -190,7 +191,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
               '\$${event['spent'] ?? 0}',
               (event['spent'] ?? 0) / (event['budget'] ?? 1),
               Colors.blue.shade700,
-              Icons.event,
+              _getCategoryIcon(event['category'] ?? 'Other'),
               statusFilter,
             );
           },
@@ -203,6 +204,25 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
     if (timestamp == null) return 'No Date';
     final date = timestamp.toDate();
     return '${date.month}/${date.day}/${date.year}';
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'Wedding':
+        return Icons.favorite;
+      case 'Birthday':
+        return Icons.cake;
+      case 'Corporate':
+        return Icons.business;
+      case 'Conference':
+        return Icons.event;
+      case 'Party':
+        return Icons.celebration;
+      case 'Charity':
+        return Icons.volunteer_activism;
+      default:
+        return Icons.event_note;
+    }
   }
 
   Widget _buildEventCard(
