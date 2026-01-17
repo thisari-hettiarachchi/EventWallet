@@ -120,19 +120,39 @@ class ProfilePage extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildStatItem('Events', '5'),
+                            // Events
+                            _buildStatItem(
+                              'Events',
+                              userData['eventsCount'] != null ? userData['eventsCount'].toString() : '0',
+                            ),
+
                             Container(
                               width: 1,
                               height: 40,
                               color: Colors.white.withOpacity(0.3),
                             ),
-                            _buildStatItem('Total Budget', '\$20K'),
+
+                            // Total Budget
+                            _buildStatItem(
+                              'Total Budget',
+                              userData['totalBudget'] != null
+                                  ? '\$${userData['totalBudget'].toString()}'
+                                  : '\$0',
+                            ),
+
                             Container(
                               width: 1,
                               height: 40,
                               color: Colors.white.withOpacity(0.3),
                             ),
-                            _buildStatItem('Spent', '\$15.7K'),
+
+                            // Spent
+                            _buildStatItem(
+                              'Spent',
+                              userData['spent'] != null
+                                  ? '\$${userData['spent'].toString()}'
+                                  : '\$0',
+                            ),
                           ],
                         ),
                       ),
