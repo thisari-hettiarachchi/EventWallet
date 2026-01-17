@@ -15,8 +15,30 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   final int _notificationCount = 3;
   bool _showAllEvents = false;
 
+  double _totalBudget = 0;
+  double _totalSpent = 0;
+
   List<DocumentSnapshot> _upcomingEvents = [];
   List<DocumentSnapshot> _todayExpenses = [];
+
+  void _fetchTotalBudget() async {
+    final snapshot =
+    await FirebaseFirestore.instance.collection('events').get();
+
+    double budget = 0;
+    double spent = 0;
+
+    for (var doc in snapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      budget += (data['budget'] ?? 0).toDouble();
+      spent += (data['spent'] ?? 0).toDouble();
+    }
+
+    setState(() {
+      _totalBudget = budget;
+      _totalSpent = spent;
+    });
+  }
 
   @override
   void initState() {
@@ -34,6 +56,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
     _fetchUpcomingEvents();
     _fetchTodayExpenses();
+    _fetchTotalBudget();
   }
 
   @override
@@ -86,6 +109,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    // 🔹 Calculate progress and remaining before UI
+    double progress = _totalBudget == 0 ? 0 : _totalSpent / _totalBudget;
+    double remaining = _totalBudget - _totalSpent;
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -246,21 +273,21 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           ],
                         ),
                         const SizedBox(height: 12),
-                        const Row(
+                        Row(
                           children: [
                             Text(
-                              '\$15,750',
-                              style: TextStyle(
+                              '\$${_totalSpent.toStringAsFixed(0)}',
+                              style: const TextStyle(
                                 fontSize: 36,
                                 fontWeight: FontWeight.w900,
                                 color: Colors.white,
                                 letterSpacing: 1,
                               ),
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Text(
-                              '/ \$20,000',
-                              style: TextStyle(
+                              '/ \$${_totalBudget.toStringAsFixed(0)}',
+                              style: const TextStyle(
                                 fontSize: 18,
                                 color: Colors.white70,
                                 fontWeight: FontWeight.w600,
@@ -272,7 +299,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: LinearProgressIndicator(
-                            value: 0.79,
+                            value: progress,
                             minHeight: 10,
                             backgroundColor: Colors.white.withOpacity(0.2),
                             valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
@@ -294,7 +321,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   ),
                                 ),
                                 Text(
-                                  '\$15,750 (79%)',
+                                  '\$${_totalSpent.toStringAsFixed(0)} (${(progress * 100).toInt()}%)',
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.95),
                                     fontSize: 14,
@@ -315,7 +342,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   ),
                                 ),
                                 Text(
-                                  '\$4,250',
+                                  '\$${remaining.toStringAsFixed(0)}',
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.95),
                                     fontSize: 14,
