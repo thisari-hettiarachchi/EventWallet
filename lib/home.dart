@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'bottom_nav.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,6 +15,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   final int _notificationCount = 3;
   bool _showAllEvents = false;
 
+  List<DocumentSnapshot> _upcomingEvents = [];
+  List<DocumentSnapshot> _todayExpenses = [];
+
   @override
   void initState() {
     super.initState();
@@ -27,6 +31,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
 
     _controller.forward();
+
+    _fetchUpcomingEvents();
+    _fetchTodayExpenses();
   }
 
   @override
@@ -48,6 +55,33 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     String weekday = weekdays[now.weekday - 1];
     String month = months[now.month - 1];
     return '$weekday, $month ${now.day}, ${now.year}';
+  }
+
+  void _fetchUpcomingEvents() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('events')
+        .orderBy('date')
+        .get();
+
+    setState(() {
+      _upcomingEvents = snapshot.docs;
+    });
+  }
+
+  void _fetchTodayExpenses() async {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    final endOfDay = startOfDay.add(const Duration(days: 1));
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('expenses')
+        .where('timestamp', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+        .where('timestamp', isLessThan: Timestamp.fromDate(endOfDay))
+        .get();
+
+    setState(() {
+      _todayExpenses = snapshot.docs;
+    });
   }
 
   @override
@@ -322,64 +356,71 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       ),
                       const SizedBox(height: 16),
 
-                      _buildEventCard(
-                        'Wedding Ceremony',
-                        'Dec 25, 2025',
-                        '\$8,500',
-                        '\$10,000',
-                        '\$1,500',
-                        0.85,
-                        Colors.pink,
-                        Icons.favorite,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildEventCard(
-                        'Birthday Party',
-                        'Jan 15, 2026',
-                        '\$2,250',
-                        '\$3,000',
-                        '\$750',
-                        0.75,
-                        Colors.orange,
-                        Icons.cake,
-                      ),
-
-                      if (_showAllEvents) ...[
-                        const SizedBox(height: 16),
-                        _buildEventCard(
-                          'Corporate Meeting',
-                          'Feb 5, 2026',
-                          '\$5,000',
-                          '\$7,000',
-                          '\$2,000',
-                          0.71,
-                          Colors.blue,
-                          Icons.business,
+                      if (_upcomingEvents.isEmpty)
+                        const Center(
+                          child: Text(
+                            'No upcoming events.',
+                            style: TextStyle(color: Colors.grey, fontSize: 14),
+                          ),
                         ),
-                      ],
+
+                      ..._upcomingEvents
+                          .take(_showAllEvents ? _upcomingEvents.length : 2)
+                          .map((doc) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        double budget = (data['budget'] ?? 0).toDouble();
+                        double spent = (data['spent'] ?? 0).toDouble();
+                        double remaining = budget - spent;
+                        double progress = budget == 0 ? 0 : spent / budget;
+
+                        // 🔹 Convert Timestamp to readable date string
+                        String dateStr = '';
+                        if (data['date'] != null && data['date'] is Timestamp) {
+                          dateStr = (data['date'] as Timestamp)
+                              .toDate()
+                              .toLocal()
+                              .toString()
+                              .split(' ')[0];
+                        }
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: _buildEventCard(
+                            data['name'] ?? 'Event',
+                            dateStr,
+                            '\$${spent.toStringAsFixed(0)}',
+                            '\$${budget.toStringAsFixed(0)}',
+                            '\$${remaining.toStringAsFixed(0)}',
+                            progress,
+                            Colors.blue,
+                            Icons.event,
+                          ),
+                        );
+                      }).toList(),
 
                       const SizedBox(height: 12),
-                      Center(
-                        child: TextButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              _showAllEvents = !_showAllEvents;
-                            });
-                          },
-                          icon: Icon(
-                            _showAllEvents ? Icons.expand_less : Icons.expand_more,
-                            color: Colors.blue.shade700,
-                          ),
-                          label: Text(
-                            _showAllEvents ? 'Show Less' : 'Load More Events',
-                            style: TextStyle(
+                      if (_upcomingEvents.length > 2)
+                        Center(
+                          child: TextButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _showAllEvents = !_showAllEvents;
+                              });
+                            },
+                            icon: Icon(
+                              _showAllEvents ? Icons.expand_less : Icons.expand_more,
                               color: Colors.blue.shade700,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
+                            ),
+                            label: Text(
+                              _showAllEvents ? 'Show Less' : 'Load More Events',
+                              style: TextStyle(
+                                color: Colors.blue.shade700,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
                             ),
                           ),
                         ),
-                      ),
 
                       const SizedBox(height: 24),
 
@@ -393,84 +434,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       ),
                       const SizedBox(height: 12),
 
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.blue.shade50,
-                              Colors.green.shade50,
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Colors.blue.shade100,
-                            width: 1.5,
+                      if (_todayExpenses.isEmpty)
+                        const Center(
+                          child: Text(
+                            'No expenses today.',
+                            style: TextStyle(color: Colors.grey, fontSize: 14),
                           ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Today\'s Total',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey.shade600,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '\$450',
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue.shade800,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.green.shade100,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    'Remaining',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.green.shade800,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    '\$550',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green.shade800,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
 
-                      const SizedBox(height: 16),
-
-                      _buildDailyExpenseItem('Catering Deposit', '\$200', '10:30 AM'),
-                      const SizedBox(height: 12),
-                      _buildDailyExpenseItem('Decoration Materials', '\$150', '2:15 PM'),
-                      const SizedBox(height: 12),
-                      _buildDailyExpenseItem('Venue Visit Transport', '\$100', '4:45 PM'),
+                      ..._todayExpenses.map((doc) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        return _buildDailyExpenseItem(
+                          data['category'] ?? 'Expense',
+                          '\$${(data['amount'] ?? 0).toStringAsFixed(0)}',
+                          data['time'] ?? '',
+                        );
+                      }).toList(),
 
                       const SizedBox(height: 100),
                     ],

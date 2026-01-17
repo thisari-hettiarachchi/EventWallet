@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'bottom_nav.dart';
 
 class BudgetPage extends StatefulWidget {
@@ -10,7 +11,22 @@ class BudgetPage extends StatefulWidget {
 
 class _BudgetPageState extends State<BudgetPage> {
   String _selectedEvent = 'All Events';
-  final List<String> _events = ['All Events', 'Wedding Ceremony', 'Birthday Party', 'Corporate Meeting'];
+  List<String> _events = ['All Events'];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchEvents();
+  }
+
+  // Fetch events from Firestore
+  void _fetchEvents() async {
+    final snapshot = await FirebaseFirestore.instance.collection('events').get();
+    final eventNames = snapshot.docs.map((doc) => doc['name'] as String).toList();
+    setState(() {
+      _events = ['All Events', ...eventNames];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,181 +102,129 @@ class _BudgetPageState extends State<BudgetPage> {
                         width: 1.5,
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('expenses')
+                          .where('event', isEqualTo: _selectedEvent == 'All Events' ? null : _selectedEvent)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        double totalBudget = 0;
+                        double totalSpent = 0;
+
+                        if (snapshot.hasData) {
+                          for (var doc in snapshot.data!.docs) {
+                            totalBudget += (doc['budget'] ?? 0).toDouble();
+                            totalSpent += (doc['spent'] ?? 0).toDouble();
+                          }
+                        }
+
+                        double remaining = totalBudget - totalSpent;
+
+                        return Column(
                           children: [
-                            Text(
-                              'Total',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 36,
-                                fontWeight: FontWeight.w900,
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Total',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                Text(
+                                  '\$${totalBudget.toStringAsFixed(0)}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              '\$20,000',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 36,
-                                fontWeight: FontWeight.w900,
-                              ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildSummaryItem('Spent', '\$${totalSpent.toStringAsFixed(0)}', Colors.red.shade300),
+                                ),
+                                Container(
+                                  width: 1,
+                                  height: 40,
+                                  color: Colors.white.withOpacity(0.3),
+                                ),
+                                Expanded(
+                                  child: _buildSummaryItem('Remaining', '\$${remaining.toStringAsFixed(0)}', Colors.green.shade300),
+                                ),
+                              ],
                             ),
                           ],
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildSummaryItem('Spent', '\$15,750', Colors.red.shade300),
-                            ),
-                            Container(
-                              width: 1,
-                              height: 40,
-                              color: Colors.white.withOpacity(0.3),
-                            ),
-                            Expanded(
-                              child: _buildSummaryItem('Remaining', '\$4,250', Colors.green.shade300),
-                            ),
-                          ],
-                        ),
-                      ],
+                        );
+                      },
                     ),
                   ),
                 ],
               ),
             ),
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(20),
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('expenses')
+                    .where('event', isEqualTo: _selectedEvent == 'All Events' ? null : _selectedEvent)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+
+                  final expenses = snapshot.data!.docs;
+
+                  return ListView(
+                    padding: const EdgeInsets.all(20),
                     children: [
-                      const Text(
-                        'Expenses by Category',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed: () {},
-                        icon: Icon(Icons.add_circle_outline, color: Colors.blue.shade700, size: 20),
-                        label: Text(
-                          'Add',
-                          style: TextStyle(
-                            color: Colors.blue.shade700,
-                            fontWeight: FontWeight.bold,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Expenses by Category',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
-                        ),
+                          TextButton.icon(
+                            onPressed: () {
+                              _showAddExpenseDialog(context);
+                            },
+                            icon: Icon(Icons.add_circle_outline, color: Colors.blue.shade700, size: 20),
+                            label: Text(
+                              'Add',
+                              style: TextStyle(
+                                color: Colors.blue.shade700,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: 16),
+                      ...expenses.map((doc) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _buildCategoryCard(
+                            doc['category'] ?? 'Other',
+                            '\$${(doc['budget'] ?? 0).toStringAsFixed(0)}',
+                            '\$${(doc['spent'] ?? 0).toStringAsFixed(0)}',
+                            ((doc['spent'] ?? 0) / (doc['budget'] ?? 1)).toDouble(),
+                            Colors.blue, // You can customize colors by category if needed
+                            Icons.category,
+                          ),
+                        );
+                      }).toList(),
+                      const SizedBox(height: 100),
                     ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  _buildCategoryCard(
-                    'Catering',
-                    '\$5,000',
-                    '\$4,200',
-                    0.84,
-                    Colors.orange,
-                    Icons.restaurant,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildCategoryCard(
-                    'Venue',
-                    '\$6,000',
-                    '\$6,000',
-                    1.0,
-                    Colors.purple,
-                    Icons.location_city,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildCategoryCard(
-                    'Decoration',
-                    '\$3,000',
-                    '\$2,100',
-                    0.70,
-                    Colors.pink,
-                    Icons.celebration,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildCategoryCard(
-                    'Photography',
-                    '\$2,500',
-                    '\$1,800',
-                    0.72,
-                    Colors.blue,
-                    Icons.camera_alt,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildCategoryCard(
-                    'Entertainment',
-                    '\$1,500',
-                    '\$850',
-                    0.57,
-                    Colors.teal,
-                    Icons.music_note,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildCategoryCard(
-                    'Miscellaneous',
-                    '\$2,000',
-                    '\$800',
-                    0.40,
-                    Colors.green,
-                    Icons.more_horiz,
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  const Text(
-                    'Recent Transactions',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  _buildTransactionItem(
-                    'Venue Booking - Final Payment',
-                    'Dec 1, 2025',
-                    '-\$3,000',
-                    Colors.red,
-                    Icons.location_city,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildTransactionItem(
-                    'Photography Advance',
-                    'Nov 28, 2025',
-                    '-\$800',
-                    Colors.red,
-                    Icons.camera_alt,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildTransactionItem(
-                    'Catering Deposit',
-                    'Nov 25, 2025',
-                    '-\$2,000',
-                    Colors.red,
-                    Icons.restaurant,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildTransactionItem(
-                    'Decoration Materials',
-                    'Nov 20, 2025',
-                    '-\$450',
-                    Colors.red,
-                    Icons.celebration,
-                  ),
-
-                  const SizedBox(height: 100),
-                ],
+                  );
+                },
               ),
             ),
           ],
@@ -420,69 +384,6 @@ class _BudgetPageState extends State<BudgetPage> {
     );
   }
 
-  Widget _buildTransactionItem(
-      String title,
-      String date,
-      String amount,
-      Color amountColor,
-      IconData icon,
-      ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue.shade100, Colors.green.shade100],
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: Colors.blue.shade700, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  date,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            amount,
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-              color: amountColor,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showAddExpenseDialog(BuildContext context) {
     final categoryController = TextEditingController();
     final amountController = TextEditingController();
@@ -533,13 +434,23 @@ class _BudgetPageState extends State<BudgetPage> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Expense added successfully!'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+            onPressed: () async {
+              if (categoryController.text.isNotEmpty && amountController.text.isNotEmpty) {
+                await FirebaseFirestore.instance.collection('expenses').add({
+                  'event': _selectedEvent,
+                  'category': categoryController.text,
+                  'budget': double.tryParse(amountController.text) ?? 0,
+                  'spent': 0,
+                  'description': descriptionController.text,
+                  'timestamp': Timestamp.now(),
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Expense added successfully!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
