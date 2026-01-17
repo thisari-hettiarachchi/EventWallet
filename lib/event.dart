@@ -155,7 +155,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
           ],
         ),
       ),
-      bottomNavigationBar: const AppBottomNav(currentIndex: 1),
+      bottomNavigationBar: AppBottomNav(currentIndex: 1),
     );
   }
 
@@ -167,6 +167,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+
         final events = snapshot.data!.docs.where((doc) {
           final title = doc['name'].toString().toLowerCase();
           final status = doc['status'] ?? 'Upcoming';
@@ -184,7 +185,6 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
           separatorBuilder: (_, __) => const SizedBox(height: 16),
           itemBuilder: (context, index) {
             final event = events[index];
-            // ✅ Navigate to EventDetailsPage on tap
             return GestureDetector(
               onTap: () {
                 Navigator.push(
