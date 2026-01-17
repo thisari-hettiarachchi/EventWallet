@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'bottom_nav.dart';
 import 'create_event.dart';
+import 'event_details_page.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -177,22 +178,36 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
         }
 
         return ListView.separated(
-          physics: const AlwaysScrollableScrollPhysics(), // <-- fix for tab switching
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16),
           itemCount: events.length,
           separatorBuilder: (_, __) => const SizedBox(height: 16),
           itemBuilder: (context, index) {
             final event = events[index];
-            return _buildEventCard(
-              event['name'] ?? '',
-              _formatTimestamp(event['date']),
-              event['venue'] ?? '',
-              '\$${event['budget'] ?? 0}',
-              '\$${event['spent'] ?? 0}',
-              (event['spent'] ?? 0) / (event['budget'] ?? 1),
-              Colors.blue.shade700,
-              _getCategoryIcon(event['category'] ?? 'Other'),
-              statusFilter,
+            // ✅ Navigate to EventDetailsPage on tap
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => EventDetailsPage(
+                      eventId: event.id,
+                      eventName: event['name'] ?? 'Event',
+                    ),
+                  ),
+                );
+              },
+              child: _buildEventCard(
+                event['name'] ?? '',
+                _formatTimestamp(event['date']),
+                event['venue'] ?? '',
+                '\$${event['budget'] ?? 0}',
+                '\$${event['spent'] ?? 0}',
+                (event['spent'] ?? 0) / (event['budget'] ?? 1),
+                Colors.blue.shade700,
+                _getCategoryIcon(event['category'] ?? 'Other'),
+                statusFilter,
+              ),
             );
           },
         );
@@ -203,7 +218,8 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
   String _formatTimestamp(Timestamp? timestamp) {
     if (timestamp == null) return 'No Date';
     final date = timestamp.toDate();
-    return '${date.month}/${date.day}/${date.year}';
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
   IconData _getCategoryIcon(String category) {
@@ -250,131 +266,127 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
       ),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
-                        ),
-                        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
                       ),
-                      child: Icon(icon, color: color, size: 28),
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 19,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              Icon(Icons.calendar_today, size: 14, color: Colors.grey.shade600),
-                              const SizedBox(width: 6),
-                              Text(
-                                date,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey.shade600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        status,
-                        style: TextStyle(
-                          color: color,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(Icons.location_on, size: 14, color: Colors.grey.shade600),
-                    const SizedBox(width: 6),
-                    Text(
-                      venue,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade700,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Budget', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-                          Text(budget, style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey.shade800)),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Spent', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-                          Text(spent, style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: color)),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
-                          Text('of budget', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    minHeight: 8,
-                    backgroundColor: Colors.grey.shade200,
-                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                    child: Icon(icon, color: color, size: 28),
                   ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Icon(Icons.calendar_today, size: 14, color: Colors.grey.shade600),
+                            const SizedBox(width: 6),
+                            Text(
+                              date,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      status,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(Icons.location_on, size: 14, color: Colors.grey.shade600),
+                  const SizedBox(width: 6),
+                  Text(
+                    venue,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Budget', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                        Text(budget, style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey.shade800)),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Spent', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                        Text(spent, style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: color)),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
+                        Text('of budget', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 8,
+                  backgroundColor: Colors.grey.shade200,
+                  valueColor: AlwaysStoppedAnimation<Color>(color),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
