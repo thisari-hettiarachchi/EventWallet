@@ -32,6 +32,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
     'Other'
   ];
 
+  // NEW: status options
+  String _selectedStatus = 'Upcoming';
+  final List<String> _statusOptions = ['Upcoming', 'In Progress', 'Completed'];
+
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   @override
@@ -137,7 +141,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
       return;
     }
 
-    // Ensure a date is selected
     if (_selectedDate == null) {
       Navigator.push(
         context,
@@ -156,6 +159,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
       'name': _eventNameController.text.trim(),
       'venue': _venueController.text.trim(),
       'budget': double.tryParse(_budgetController.text) ?? 0,
+      'spent': 0,
       'guestCount': int.tryParse(_guestCountController.text) ?? 0,
       'notes': _notesController.text.trim(),
       'category': _selectedCategory,
@@ -163,20 +167,21 @@ class _CreateEventPageState extends State<CreateEventPage> {
       'time': _selectedTime != null ? '${_selectedTime!.hour}:${_selectedTime!.minute}' : null,
       'createdAt': FieldValue.serverTimestamp(),
       'userId': user.uid,
+      'status': 'Upcoming',
     };
+
 
     try {
       await _db.collection('events').add(data);
 
-      // Navigate to events page after success
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => const EventsPage(), // <-- Your event list page
+          builder: (_) => const EventsPage(),
         ),
       );
     } catch (e) {
-      print("Firestore error: $e"); // <-- prints exact reason for failure
+      print("Firestore error: $e");
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -189,7 +194,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -370,6 +374,35 @@ class _CreateEventPageState extends State<CreateEventPage> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+            // NEW: Status Dropdown
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: DropdownButtonFormField<String>(
+                value: _selectedStatus,
+                decoration: InputDecoration(
+                  labelText: 'Event Status',
+                  prefixIcon: Icon(Icons.info, color: Colors.blue.shade700),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                ),
+                items: _statusOptions.map((status) {
+                  return DropdownMenuItem(
+                    value: status,
+                    child: Text(status),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedStatus = value!;
+                  });
+                },
+              ),
             ),
             const SizedBox(height: 16),
             Container(

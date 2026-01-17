@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'bottom_nav.dart';
 import 'create_event.dart';
 
@@ -109,7 +110,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                       child: TextField(
                         onChanged: (value) {
                           setState(() {
-                            _searchQuery = value;
+                            _searchQuery = value.toLowerCase();
                           });
                         },
                         decoration: InputDecoration(
@@ -144,9 +145,9 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _buildUpcomingEvents(),
-                  _buildInProgressEvents(),
-                  _buildCompletedEvents(),
+                  _buildEventList('Upcoming'),
+                  _buildEventList('In Progress'),
+                  _buildEventList('Completed'),
                 ],
               ),
             ),
@@ -157,97 +158,51 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildUpcomingEvents() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        _buildEventCard(
-          'Wedding Ceremony',
-          'Dec 25, 2025',
-          'St. Mary\'s Church',
-          '\$10,000',
-          '\$8,500',
-          0.85,
-          Colors.pink,
-          Icons.favorite,
-          '25 days left',
-        ),
-        const SizedBox(height: 16),
-        _buildEventCard(
-          'Birthday Party',
-          'Jan 15, 2026',
-          'Grand Hotel Ballroom',
-          '\$3,000',
-          '\$2,250',
-          0.75,
-          Colors.orange,
-          Icons.cake,
-          '46 days left',
-        ),
-        const SizedBox(height: 16),
-        _buildEventCard(
-          'Corporate Meeting',
-          'Feb 5, 2026',
-          'Conference Center',
-          '\$7,000',
-          '\$5,000',
-          0.71,
-          Colors.blue,
-          Icons.business,
-          '67 days left',
-        ),
-      ],
+  Widget _buildEventList(String statusFilter) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('events')
+          .orderBy('date', descending: false)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+        final events = snapshot.data!.docs.where((doc) {
+          final title = doc['name'].toString().toLowerCase();
+          final status = doc['status'] ?? 'Upcoming';
+          return title.contains(_searchQuery) && status == statusFilter;
+        }).toList();
+
+        if (events.isEmpty) {
+          return const Center(child: Text('No events found.'));
+        }
+
+        return ListView.separated(
+          padding: const EdgeInsets.all(16),
+          itemCount: events.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 16),
+          itemBuilder: (context, index) {
+            final event = events[index];
+            return _buildEventCard(
+              event['name'] ?? '',
+              _formatTimestamp(event['date']),
+              event['venue'] ?? '',
+              '\$${event['budget'] ?? 0}',
+              '\$${event['spent'] ?? 0}',
+              (event['spent'] ?? 0) / (event['budget'] ?? 1),
+              Colors.blue.shade700,
+              Icons.event,
+              statusFilter,
+            );
+          },
+        );
+      },
     );
   }
 
-  Widget _buildInProgressEvents() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        _buildEventCard(
-          'Product Launch',
-          'Dec 20, 2025',
-          'Tech Hub Auditorium',
-          '\$15,000',
-          '\$12,500',
-          0.83,
-          Colors.purple,
-          Icons.rocket_launch,
-          'In 20 days',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCompletedEvents() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        _buildEventCard(
-          'Team Building',
-          'Nov 15, 2025',
-          'Mountain Resort',
-          '\$5,000',
-          '\$4,800',
-          0.96,
-          Colors.green,
-          Icons.groups,
-          'Completed',
-        ),
-        const SizedBox(height: 16),
-        _buildEventCard(
-          'Charity Gala',
-          'Oct 28, 2025',
-          'City Convention Center',
-          '\$20,000',
-          '\$19,500',
-          0.975,
-          Colors.teal,
-          Icons.volunteer_activism,
-          'Completed',
-        ),
-      ],
-    );
+  String _formatTimestamp(Timestamp? timestamp) {
+    if (timestamp == null) return 'No Date';
+    final date = timestamp.toDate();
+    return '${date.month}/${date.day}/${date.year}';
   }
 
   Widget _buildEventCard(
@@ -363,21 +318,8 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Budget',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                          Text(
-                            budget,
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade800,
-                            ),
-                          ),
+                          Text('Budget', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                          Text(budget, style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey.shade800)),
                         ],
                       ),
                     ),
@@ -385,21 +327,8 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Spent',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                          Text(
-                            spent,
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                              color: color,
-                            ),
-                          ),
+                          Text('Spent', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                          Text(spent, style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: color)),
                         ],
                       ),
                     ),
@@ -407,21 +336,8 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(
-                            '${(progress * 100).toInt()}%',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: color,
-                            ),
-                          ),
-                          Text(
-                            'of budget',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
+                          Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
+                          Text('of budget', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
                         ],
                       ),
                     ),
