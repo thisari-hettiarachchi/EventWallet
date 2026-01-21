@@ -1,16 +1,16 @@
-import 'package:eventwallet/help.dart';
-import 'package:eventwallet/manage_event.dart';
+import 'package:eventwallet/features/info/help.dart';
+import 'package:eventwallet/features/events/manage_event.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'bottom_nav.dart';
-import 'login.dart';
-import 'services/auth_service.dart';
+import '../../core/widgets/bottom_nav.dart';
+import '../auth/login.dart';
+import '../../services/auth_service.dart';
 import 'edit_profile.dart';
-import 'manage_event.dart';
-import 'privacy.dart';
-import 'help.dart';
-import 'about.dart';
+import '../events/manage_event.dart';
+import '../info/privacy.dart';
+import '../info/help.dart';
+import '../info/about.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});

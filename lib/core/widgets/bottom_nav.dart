@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
-import 'event.dart';
-import 'budget.dart';
-import 'profile.dart';
+import '../../features/home/home.dart';
+import '../../features/events/event.dart';
+import '../../features/budget/budget.dart';
+import '../../features/profile/profile.dart';
 
 class AppBottomNav extends StatelessWidget {
   final int currentIndex;

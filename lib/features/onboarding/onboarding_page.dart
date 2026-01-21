@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'welcome_back.dart';
+import '../auth/welcome_back.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
