@@ -30,14 +30,14 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: const Color(0xFFF5F7FA),
       body: SafeArea(
         child: Column(
           children: [
             Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.blue.shade700, Colors.teal.shade500],
+                  colors: [Color(0xFF00897B), Color(0xFF1565C0)],
                 ),
               ),
               child: Column(
@@ -62,7 +62,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
+                                color: Colors.black.withValues(alpha: 0.2),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -78,16 +78,16 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                                 );
                               },
                               borderRadius: BorderRadius.circular(12),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                                 child: Row(
                                   children: [
-                                    Icon(Icons.add, color: Colors.blue.shade700),
-                                    const SizedBox(width: 6),
+                                    Icon(Icons.add, color: Color(0xFF00897B)),
+                                    SizedBox(width: 6),
                                     Text(
                                       'New Event',
                                       style: TextStyle(
-                                        color: Colors.blue.shade700,
+                                        color: Color(0xFF00897B),
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15,
                                       ),
@@ -128,9 +128,9 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     color: Colors.white,
                     child: TabBar(
                       controller: _tabController,
-                      labelColor: Colors.blue.shade700,
+                      labelColor: const Color(0xFF00897B),
                       unselectedLabelColor: Colors.grey,
-                      indicatorColor: Colors.blue.shade700,
+                      indicatorColor: const Color(0xFF00897B),
                       indicatorWeight: 3,
                       tabs: const [
                         Tab(text: 'Upcoming'),
@@ -155,7 +155,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
           ],
         ),
       ),
-      bottomNavigationBar: AppBottomNav(currentIndex: 1),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 1),
     );
   }
 
@@ -169,8 +169,9 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
         final events = snapshot.data!.docs.where((doc) {
-          final title = doc['name'].toString().toLowerCase();
-          final status = doc['status'] ?? 'Upcoming';
+          final data = doc.data() as Map<String, dynamic>;
+          final title = (data['eventName'] ?? data['name'] ?? '').toString().toLowerCase();
+          final status = data['status'] ?? 'Upcoming';
           return title.contains(_searchQuery) && status == statusFilter;
         }).toList();
 
@@ -185,6 +186,9 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
           separatorBuilder: (_, __) => const SizedBox(height: 16),
           itemBuilder: (context, index) {
             final event = events[index];
+            final data = event.data() as Map<String, dynamic>;
+            final color = statusFilter == 'Completed' ? const Color(0xFF00897B) : const Color(0xFF1565C0);
+            
             return GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -192,20 +196,20 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                   MaterialPageRoute(
                     builder: (_) => EventDetailsPage(
                       eventId: event.id,
-                      eventName: event['name'] ?? 'Event',
+                      eventName: data['eventName'] ?? data['name'] ?? 'Event',
                     ),
                   ),
                 );
               },
               child: _buildEventCard(
-                event['name'] ?? '',
-                _formatTimestamp(event['date']),
-                event['venue'] ?? '',
-                '\$${event['budget'] ?? 0}',
-                '\$${event['spent'] ?? 0}',
-                (event['spent'] ?? 0) / (event['budget'] ?? 1),
-                Colors.blue.shade700,
-                _getCategoryIcon(event['category'] ?? 'Other'),
+                data['eventName'] ?? data['name'] ?? '',
+                _formatTimestamp(data['date']),
+                data['venue'] ?? '',
+                '\$${data['budget'] ?? 0}',
+                '\$${data['spent'] ?? 0}',
+                (data['spent'] ?? 0).toDouble() / (data['budget'] ?? 1).toDouble(),
+                color,
+                _getCategoryIcon(data['category'] ?? 'Other'),
                 statusFilter,
               ),
             );
@@ -215,9 +219,16 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
     );
   }
 
-  String _formatTimestamp(Timestamp? timestamp) {
+  String _formatTimestamp(dynamic timestamp) {
     if (timestamp == null) return 'No Date';
-    final date = timestamp.toDate();
+    DateTime date;
+    if (timestamp is Timestamp) {
+      date = timestamp.toDate();
+    } else if (timestamp is String) {
+      return timestamp;
+    } else {
+      return 'Invalid Date';
+    }
     final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
@@ -258,7 +269,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -277,7 +288,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+                        colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
                       ),
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -293,7 +304,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                           style: const TextStyle(
                             fontSize: 19,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: Color(0xFF1A1F36),
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -316,7 +327,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.1),
+                      color: color.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -352,7 +363,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Budget', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-                        Text(budget, style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey.shade800)),
+                        Text(budget, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF1A1F36))),
                       ],
                     ),
                   ),

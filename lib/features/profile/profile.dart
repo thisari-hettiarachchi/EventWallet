@@ -7,9 +7,7 @@ import '../../core/widgets/bottom_nav.dart';
 import '../auth/login.dart';
 import '../../services/auth_service.dart';
 import 'edit_profile.dart';
-import '../events/manage_event.dart';
 import '../info/privacy.dart';
-import '../info/help.dart';
 import '../info/about.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -56,14 +54,14 @@ class ProfilePage extends StatelessWidget {
             : 'U';
 
         return Scaffold(
-          backgroundColor: Colors.grey.shade50,
+          backgroundColor: const Color(0xFFF5F7FA),
           body: SafeArea(
             child: Column(
               children: [
                 Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.blue.shade700, Colors.teal.shade500],
+                      colors: [Color(0xFF00897B), Color(0xFF1565C0)],
                     ),
                   ),
 
@@ -78,7 +76,7 @@ class ProfilePage extends StatelessWidget {
                           border: Border.all(color: Colors.white, width: 4),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha: 0.2),
                               blurRadius: 10,
                               offset: const Offset(0, 5),
                             ),
@@ -88,10 +86,10 @@ class ProfilePage extends StatelessWidget {
                           backgroundColor: Colors.white,
                           child: Text(
                             initials,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 36,
                               fontWeight: FontWeight.bold,
-                              color: Colors.blue.shade700,
+                              color: Color(0xFF00897B),
                             ),
                           ),
                         ),
@@ -110,7 +108,7 @@ class ProfilePage extends StatelessWidget {
                         email,
                         style: TextStyle(
                           fontSize: 15,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -118,10 +116,10 @@ class ProfilePage extends StatelessWidget {
                         margin: const EdgeInsets.symmetric(horizontal: 20),
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             width: 1.5,
                           ),
                         ),
@@ -137,7 +135,7 @@ class ProfilePage extends StatelessWidget {
                             Container(
                               width: 1,
                               height: 40,
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                             ),
 
                             // Total Budget
@@ -151,7 +149,7 @@ class ProfilePage extends StatelessWidget {
                             Container(
                               width: 1,
                               height: 40,
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                             ),
 
                             // Amount Spent
@@ -177,7 +175,7 @@ class ProfilePage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Color(0xFF1A1F36),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -185,7 +183,7 @@ class ProfilePage extends StatelessWidget {
                         icon: Icons.person_outline,
                         title: 'Edit Profile',
                         subtitle: 'Update your personal info for events',
-                        color: Colors.blue,
+                        color: const Color(0xFF1565C0),
                         onTap: () {
                           // Navigate to EditProfilePage
                           Navigator.push(
@@ -201,7 +199,7 @@ class ProfilePage extends StatelessWidget {
                         icon: Icons.event_note_outlined,
                         title: 'Manage Events',
                         subtitle: 'View, edit, or delete your events',
-                        color: Colors.orange,
+                        color: Colors.orange.shade800,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -216,7 +214,7 @@ class ProfilePage extends StatelessWidget {
                         icon: Icons.lock_outline,
                         title: 'Privacy & Security',
                         subtitle: 'Password and security settings',
-                        color: Colors.green,
+                        color: const Color(0xFF00897B),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -232,7 +230,7 @@ class ProfilePage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Color(0xFF1A1F36),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -240,7 +238,7 @@ class ProfilePage extends StatelessWidget {
                         icon: Icons.help_outline,
                         title: 'Help & Support',
                         subtitle: 'Get assistance for your events',
-                        color: Colors.cyan,
+                        color: Colors.cyan.shade800,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -255,7 +253,7 @@ class ProfilePage extends StatelessWidget {
                         icon: Icons.info_outline,
                         title: 'About',
                         subtitle: 'Version 1.0.0',
-                        color: Colors.grey,
+                        color: Colors.blueGrey,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -339,7 +337,7 @@ class ProfilePage extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withValues(alpha: 0.9),
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
@@ -361,7 +359,7 @@ class ProfilePage extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -379,7 +377,7 @@ class ProfilePage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(icon, color: color, size: 22),
@@ -394,15 +392,15 @@ class ProfilePage extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Color(0xFF1A1F36),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         subtitle,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 13,
-                          color: Colors.grey.shade600,
+                          color: Color(0xFF4A5568),
                         ),
                       ),
                     ],
@@ -437,18 +435,22 @@ class ProfilePage extends StatelessWidget {
               Navigator.pop(context);
               try {
                 await AuthService().logout();
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                      (route) => false,
-                );
+                if (context.mounted) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginPage()),
+                        (route) => false,
+                  );
+                }
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error logging out: $e'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error logging out: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(

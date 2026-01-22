@@ -7,13 +7,13 @@ class HelpSupportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Help & Support', style: TextStyle(color: Colors.white)),
+        title: const Text('Help & Support', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.blue.shade700, Colors.teal.shade500],
+              colors: [Color(0xFF00897B), Color(0xFF1565C0)],
             ),
           ),
         ),
@@ -27,9 +27,9 @@ class HelpSupportPage extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.blue.shade700, Colors.teal.shade500],
+                  colors: [Color(0xFF00897B), Color(0xFF1565C0)],
                 ),
               ),
               child: Column(
@@ -37,7 +37,7 @@ class HelpSupportPage extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -60,7 +60,7 @@ class HelpSupportPage extends StatelessWidget {
                     'Get assistance for your events and queries',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -77,7 +77,7 @@ class HelpSupportPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: Color(0xFF1A1F36),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -85,7 +85,7 @@ class HelpSupportPage extends StatelessWidget {
                     icon: Icons.email_outlined,
                     title: 'Email',
                     subtitle: 'support@eventwallet.com',
-                    color: Colors.blue,
+                    color: const Color(0xFF1565C0),
                     onTap: () => _launchEmail('support@eventwallet.com'),
                   ),
                   const SizedBox(height: 12),
@@ -93,7 +93,7 @@ class HelpSupportPage extends StatelessWidget {
                     icon: Icons.phone_outlined,
                     title: 'Phone',
                     subtitle: '+94 77 123 4567',
-                    color: Colors.green,
+                    color: const Color(0xFF00897B),
                     onTap: () => _launchPhone('+15551234567'),
                   ),
                   const SizedBox(height: 32),
@@ -102,7 +102,7 @@ class HelpSupportPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: Color(0xFF1A1F36),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -149,7 +149,7 @@ class HelpSupportPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -167,7 +167,7 @@ class HelpSupportPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(icon, color: color, size: 24),
@@ -182,15 +182,15 @@ class HelpSupportPage extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Color(0xFF1A1F36),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         subtitle,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
-                          color: Colors.grey.shade600,
+                          color: Color(0xFF4A5568),
                         ),
                       ),
                     ],
@@ -214,7 +214,7 @@ class HelpSupportPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -228,70 +228,29 @@ class HelpSupportPage extends StatelessWidget {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.teal.shade50,
+              color: const Color(0xFF00897B).withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(Icons.help_outline, color: Colors.teal.shade700, size: 20),
+            child: const Icon(Icons.help_outline, color: Color(0xFF00897B), size: 20),
           ),
           title: Text(
             question,
             style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: Color(0xFF1A1F36),
             ),
           ),
           children: [
             Text(
               answer,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade700,
+                color: Color(0xFF4A5568),
                 height: 1.5,
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickLink({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Icon(icon, color: Colors.blue.shade700, size: 20),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-                Icon(Icons.arrow_forward_ios,
-                    color: Colors.grey.shade400, size: 14),
-              ],
-            ),
-          ),
         ),
       ),
     );
@@ -313,22 +272,5 @@ class HelpSupportPage extends StatelessWidget {
     if (await canLaunchUrl(phoneUri)) {
       await launchUrl(phoneUri);
     }
-  }
-
-  void _showChatDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Live Chat'),
-        content: const Text(
-            'Live chat support is available Monday-Friday, 9 AM - 5 PM EST.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
   }
 }

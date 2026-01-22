@@ -44,7 +44,7 @@ class _BudgetPageState extends State<BudgetPage>
     final snapshot =
     await FirebaseFirestore.instance.collection('events').get();
     final eventNames =
-    snapshot.docs.map((doc) => doc['name'] as String).toList();
+    snapshot.docs.map((doc) => doc['eventName'] ?? doc['name'] as String).toList();
     setState(() {
       _events = ['All Events', ...eventNames];
     });
@@ -58,9 +58,9 @@ class _BudgetPageState extends State<BudgetPage>
         child: Column(
           children: [
             Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [AppColors.primary, AppColors.secondary],
+                  colors: [AppColors.primaryGreen, AppColors.primaryBlue],
                 ),
               ),
               child: Column(
@@ -70,9 +70,9 @@ class _BudgetPageState extends State<BudgetPage>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           AppStrings.budgetOverview,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w900,
                             color: AppColors.textLight,
@@ -91,14 +91,14 @@ class _BudgetPageState extends State<BudgetPage>
                               value: _selectedEvent,
                               isExpanded: true,
                               icon: const Icon(Icons.arrow_drop_down,
-                                  color: AppColors.secondary),
+                                  color: AppColors.primaryBlue),
                               items: _events.map((event) {
                                 return DropdownMenuItem(
                                   value: event,
                                   child: Text(
                                     event,
                                     style: const TextStyle(
-                                      color: AppColors.secondary,
+                                      color: AppColors.primaryBlue,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -130,10 +130,11 @@ class _BudgetPageState extends State<BudgetPage>
 
                       if (snapshot.hasData) {
                         for (var doc in snapshot.data!.docs) {
+                          final data = doc.data() as Map<String, dynamic>;
                           _totalBudget +=
-                              (doc['budget'] ?? 0).toDouble();
+                              (data['budget'] ?? 0).toDouble();
                           _totalSpent +=
-                              (doc['spent'] ?? 0).toDouble();
+                              (data['spent'] ?? 0).toDouble();
                         }
                       }
 
@@ -149,11 +150,11 @@ class _BudgetPageState extends State<BudgetPage>
                           child: Container(
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: AppColors.textLight.withOpacity(0.15),
+                              color: AppColors.textLight.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color:
-                                AppColors.textLight.withOpacity(0.3),
+                                AppColors.textLight.withValues(alpha: 0.3),
                                 width: 1.5,
                               ),
                             ),
@@ -163,9 +164,9 @@ class _BudgetPageState extends State<BudgetPage>
                                   mainAxisAlignment:
                                   MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
+                                    const Text(
                                       AppStrings.totalBudget,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           color: AppColors.textLight,
                                           fontSize: 16),
                                     ),
@@ -200,7 +201,7 @@ class _BudgetPageState extends State<BudgetPage>
                                   value: progress,
                                   minHeight: 10,
                                   backgroundColor:
-                                  AppColors.textLight.withOpacity(0.2),
+                                  AppColors.textLight.withValues(alpha: 0.2),
                                   valueColor:
                                   const AlwaysStoppedAnimation(
                                       AppColors.textLight),
@@ -253,12 +254,13 @@ class _BudgetPageState extends State<BudgetPage>
                   return ListView(
                     padding: const EdgeInsets.all(20),
                     children: expenses.map((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
                       return _buildCategoryCard(
-                        doc['category'] ?? 'Other',
-                        '\$${doc['budget']}',
-                        '\$${doc['spent']}',
-                        (doc['spent'] ?? 0) /
-                            ((doc['budget'] ?? 1).toDouble()),
+                        data['category'] ?? 'Other',
+                        '\$${data['budget']}',
+                        '\$${data['spent']}',
+                        (data['spent'] ?? 0) /
+                            ((data['budget'] ?? 1).toDouble()),
                         AppColors.secondary,
                         Icons.category,
                       );
@@ -283,14 +285,36 @@ class _BudgetPageState extends State<BudgetPage>
   Widget _buildCategoryCard(String category, String budget, String spent,
       double progress, Color color, IconData icon) {
     return Card(
+      color: Colors.white,
+      elevation: 2,
       margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
-        leading: Icon(icon, color: color),
-        title: Text(category),
-        subtitle: LinearProgressIndicator(value: progress),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color),
+        ),
+        title: Text(category, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: LinearProgressIndicator(
+            value: progress,
+            backgroundColor: Colors.grey.shade200,
+            valueColor: AlwaysStoppedAnimation(color),
+            borderRadius: BorderRadius.circular(5),
+          ),
+        ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [Text(spent), Text('of $budget')],
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(spent, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+            Text('of $budget', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+          ],
         ),
       ),
     );

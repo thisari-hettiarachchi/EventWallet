@@ -15,13 +15,13 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Manage Events', style: TextStyle(color: Colors.white)),
+        title: const Text('Manage Events', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.blue.shade700, Colors.teal.shade500],
+              colors: [Color(0xFF00897B), Color(0xFF1565C0)],
             ),
           ),
         ),
@@ -49,7 +49,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                   Icon(
                     Icons.event_busy,
                     size: 80,
-                    color: Colors.grey.shade400,
+                    color: Colors.grey.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -57,7 +57,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade600,
+                      color: Colors.grey.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -65,7 +65,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                     'Create your first event to get started',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey.shade500,
+                      color: Colors.grey.withValues(alpha: 0.5),
                     ),
                   ),
                 ],
@@ -100,7 +100,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -110,11 +110,11 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.blue.shade600, Colors.teal.shade400],
+                colors: [Color(0xFF00897B), Color(0xFF1565C0)],
               ),
-              borderRadius: const BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
               ),
@@ -124,7 +124,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -180,7 +180,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                       child: _buildStatBox(
                         'Budget',
                         '\$$budget',
-                        Colors.green.shade600,
+                        const Color(0xFF00897B),
                         Icons.account_balance_wallet,
                       ),
                     ),
@@ -189,7 +189,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                       child: _buildStatBox(
                         'Spent',
                         '\$$spent',
-                        Colors.orange.shade600,
+                        const Color(0xFF1565C0),
                         Icons.shopping_cart,
                       ),
                     ),
@@ -206,8 +206,8 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                         icon: const Icon(Icons.edit, size: 18),
                         label: const Text('Edit'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.blue.shade700,
-                          side: BorderSide(color: Colors.blue.shade700),
+                          foregroundColor: const Color(0xFF1565C0),
+                          side: const BorderSide(color: Color(0xFF1565C0)),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -243,9 +243,9 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [

@@ -17,7 +17,13 @@ class EventWalletApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'EventWallet',
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF00897B),
+          primary: const Color(0xFF00897B),
+          secondary: const Color(0xFF1565C0),
+        ),
+        scaffoldBackgroundColor: const Color(0xFFF5F7FA),
       ),
       home: const SplashScreen(),
     );

@@ -51,9 +51,9 @@ class _EventDetailsPageState extends State<EventDetailsPage>
         if (!snapshot.hasData) {
           return Scaffold(
             body: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.blue.shade700, Colors.teal.shade500],
+                  colors: [Color(0xFF00897B), Color(0xFF1565C0)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -73,18 +73,17 @@ class _EventDetailsPageState extends State<EventDetailsPage>
         final color = _getStatusColor(status);
 
         return Scaffold(
-          backgroundColor: Colors.grey.shade100,
+          backgroundColor: const Color(0xFFF5F7FA),
           body: Stack(
             children: [
               // Background gradient
               Container(
                 height: 320,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.blue.shade700,
-                      Colors.blue.shade600,
-                      Colors.teal.shade500,
+                      Color(0xFF00897B),
+                      Color(0xFF1565C0),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -101,7 +100,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                   height: 200,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                   ),
                 ),
               ),
@@ -113,7 +112,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                   height: 120,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.08),
+                    color: Colors.white.withValues(alpha: 0.08),
                   ),
                 ),
               ),
@@ -128,10 +127,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 width: 1,
                               ),
                             ),
@@ -154,10 +153,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                           const Spacer(),
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 width: 1,
                               ),
                             ),
@@ -180,10 +179,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                           const SizedBox(width: 8),
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 width: 1,
                               ),
                             ),
@@ -216,10 +215,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                           Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 width: 2,
                               ),
                             ),
@@ -231,7 +230,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            event['name'] ?? 'Event',
+                            event['eventName'] ?? event['name'] ?? 'Event',
                             style: const TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.w900,
@@ -251,7 +250,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: Colors.black.withValues(alpha: 0.1),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
@@ -300,10 +299,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                     icon: Icons.account_balance_wallet,
                                     label: 'Total Budget',
                                     value: '\$${budget.toStringAsFixed(0)}',
-                                    gradient: LinearGradient(
+                                    gradient: const LinearGradient(
                                       colors: [
-                                        Colors.blue.shade600,
-                                        Colors.blue.shade700,
+                                        Color(0xFF00897B),
+                                        Color(0xFF26A69A),
                                       ],
                                     ),
                                   ),
@@ -314,10 +313,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                     icon: Icons.shopping_bag,
                                     label: 'Spent',
                                     value: '\$${spent.toStringAsFixed(0)}',
-                                    gradient: LinearGradient(
+                                    gradient: const LinearGradient(
                                       colors: [
-                                        Colors.teal.shade500,
-                                        Colors.teal.shade600,
+                                        Color(0xFF1565C0),
+                                        Color(0xFF1E88E5),
                                       ],
                                     ),
                                   ),
@@ -368,10 +367,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                       Container(
                                         padding: const EdgeInsets.all(10),
                                         decoration: BoxDecoration(
-                                          gradient: LinearGradient(
+                                          gradient: const LinearGradient(
                                             colors: [
-                                              Colors.blue.shade600,
-                                              Colors.teal.shade500,
+                                              Color(0xFF00897B),
+                                              Color(0xFF1565C0),
                                             ],
                                           ),
                                           borderRadius: BorderRadius.circular(12),
@@ -410,15 +409,15 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                             gradient: LinearGradient(
                                               colors: progress > 0.8
                                                   ? [Colors.orange.shade400, Colors.red.shade400]
-                                                  : [Colors.blue.shade600, Colors.teal.shade500],
+                                                  : [const Color(0xFF00897B), const Color(0xFF1565C0)],
                                             ),
                                             borderRadius: BorderRadius.circular(10),
                                             boxShadow: [
                                               BoxShadow(
                                                 color: (progress > 0.8
                                                     ? Colors.orange
-                                                    : Colors.blue)
-                                                    .withOpacity(0.4),
+                                                    : const Color(0xFF00897B))
+                                                    .withValues(alpha: 0.4),
                                                 blurRadius: 8,
                                                 offset: const Offset(0, 2),
                                               ),
@@ -465,10 +464,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                       Container(
                                         padding: const EdgeInsets.all(10),
                                         decoration: BoxDecoration(
-                                          gradient: LinearGradient(
+                                          gradient: const LinearGradient(
                                             colors: [
-                                              Colors.blue.shade600,
-                                              Colors.teal.shade500,
+                                              Color(0xFF00897B),
+                                              Color(0xFF1565C0),
                                             ],
                                           ),
                                           borderRadius: BorderRadius.circular(12),
@@ -494,25 +493,25 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                     Icons.calendar_today,
                                     'Date',
                                     _formatTimestamp(event['date']),
-                                    Colors.blue.shade600,
+                                    const Color(0xFF00897B),
                                   ),
                                   _buildInfoRow(
                                     Icons.location_on,
                                     'Venue',
                                     event['venue'] ?? 'Not specified',
-                                    Colors.teal.shade500,
+                                    const Color(0xFF1565C0),
                                   ),
                                   _buildInfoRow(
                                     Icons.category,
                                     'Category',
                                     event['category'] ?? 'Other',
-                                    Colors.green.shade600,
+                                    const Color(0xFF00897B),
                                   ),
                                   _buildInfoRow(
                                     Icons.people,
                                     'Attendees',
                                     event['attendees']?.toString() ?? 'Not specified',
-                                    Colors.purple.shade600,
+                                    const Color(0xFF1565C0),
                                     isLast: true,
                                   ),
                                 ],
@@ -532,10 +531,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                         Container(
                                           padding: const EdgeInsets.all(10),
                                           decoration: BoxDecoration(
-                                            gradient: LinearGradient(
+                                            gradient: const LinearGradient(
                                               colors: [
-                                                Colors.blue.shade600,
-                                                Colors.teal.shade500,
+                                                Color(0xFF00897B),
+                                                Color(0xFF1565C0),
                                               ],
                                             ),
                                             borderRadius: BorderRadius.circular(12),
@@ -590,26 +589,26 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                 _buildActionCard(
                                   'Add Expense',
                                   Icons.add_shopping_cart,
-                                  Colors.blue.shade600,
-                                  Colors.blue.shade700,
+                                  const Color(0xFF00897B),
+                                  const Color(0xFF26A69A),
                                 ),
                                 _buildActionCard(
                                   'Tasks',
                                   Icons.check_circle_outline,
-                                  Colors.teal.shade500,
-                                  Colors.teal.shade600,
+                                  const Color(0xFF1565C0),
+                                  const Color(0xFF1E88E5),
                                 ),
                                 _buildActionCard(
                                   'Vendors',
                                   Icons.business_center,
-                                  Colors.green.shade500,
-                                  Colors.green.shade600,
+                                  const Color(0xFF00897B),
+                                  const Color(0xFF00695C),
                                 ),
                                 _buildActionCard(
                                   'Guest List',
                                   Icons.people,
-                                  Colors.purple.shade500,
-                                  Colors.purple.shade600,
+                                  const Color(0xFF1565C0),
+                                  const Color(0xFF0D47A1),
                                 ),
                               ],
                             ),
@@ -641,7 +640,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -689,7 +688,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -713,7 +712,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, size: 18, color: color),
@@ -764,7 +763,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: color1.withOpacity(0.3),
+            color: color1.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -802,11 +801,11 @@ class _EventDetailsPageState extends State<EventDetailsPage>
   Color _getStatusColor(String status) {
     switch (status) {
       case 'Upcoming':
-        return Colors.blue.shade700;
+        return const Color(0xFF1565C0);
       case 'In Progress':
         return Colors.orange.shade600;
       case 'Completed':
-        return Colors.green.shade600;
+        return const Color(0xFF00897B);
       default:
         return Colors.grey.shade600;
     }
@@ -831,9 +830,16 @@ class _EventDetailsPageState extends State<EventDetailsPage>
     }
   }
 
-  String _formatTimestamp(Timestamp? timestamp) {
+  String _formatTimestamp(dynamic timestamp) {
     if (timestamp == null) return 'No Date';
-    final date = timestamp.toDate();
+    DateTime date;
+    if (timestamp is Timestamp) {
+      date = timestamp.toDate();
+    } else if (timestamp is String) {
+      return timestamp;
+    } else {
+      return 'Invalid Date';
+    }
     final months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'

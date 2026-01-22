@@ -105,17 +105,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.blue.shade700,
-              Colors.blue.shade500,
-              Colors.teal.shade400,
-              Colors.green.shade500,
+              Color(0xFF00897B),
+              Color(0xFF1565C0),
             ],
-            stops: const [0.0, 0.3, 0.7, 1.0],
           ),
         ),
         child: SafeArea(
@@ -138,10 +135,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                               blurRadius: 30,
                               spreadRadius: 10,
                             ),
@@ -226,8 +223,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             borderRadius: BorderRadius.circular(18),
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withOpacity(0.95),
-                                Colors.white.withOpacity(0.85),
+                                Colors.white.withValues(alpha: 0.95),
+                                Colors.white.withValues(alpha: 0.85),
                               ],
                             ),
                           ),
@@ -241,10 +238,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                               ),
                             ),
                             child: ShaderMask(
-                              shaderCallback: (bounds) => LinearGradient(
+                              shaderCallback: (bounds) => const LinearGradient(
                                 colors: [
-                                  Colors.blue.shade700,
-                                  Colors.green.shade600,
+                                  Color(0xFF00897B),
+                                  Color(0xFF1565C0),
                                 ],
                               ).createShader(bounds),
                               child: const Text(
@@ -302,10 +299,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
           width: 1.5,
         ),
       ),
@@ -315,7 +312,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.white.withOpacity(0.9)),
+          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.9)),
           prefixIcon: Icon(icon, color: Colors.white),
           suffixIcon: suffix,
           border: OutlineInputBorder(

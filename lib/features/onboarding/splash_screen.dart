@@ -39,6 +39,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Navigate to OnboardingPage after 2.5 seconds
     Timer(const Duration(seconds: 3), () {
+      if (!mounted) return;
       final user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
@@ -65,13 +66,11 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.blue.shade700,
-              Colors.blue.shade500,
-              Colors.teal.shade400,
-              Colors.green.shade500,
+              Color(0xFF00897B),
+              Color(0xFF1565C0),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -90,10 +89,10 @@ class _SplashScreenState extends State<SplashScreen>
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                           blurRadius: 30,
                           spreadRadius: 10,
                         ),

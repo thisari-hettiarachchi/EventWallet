@@ -18,4 +18,11 @@ class AppStrings {
   static const String spent = 'Spent';
   static const String remaining = 'Remaining';
   static const String addExpenseHint = 'Implement add expense form here';
+
+  static const String quickAdd = 'Quick Add';
+  static const String specialOffers = 'Special Offers';
+  static const String categories = 'Categories';
+  static const String popularServices = 'Popular Services';
+  static const String upcomingEvents = 'Upcoming Events';
+  static const String todayExpenses = 'Today Expenses';
 }

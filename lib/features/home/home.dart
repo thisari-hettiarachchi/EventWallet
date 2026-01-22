@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/widgets/bottom_nav.dart';
+import '../../core/constants/colors.dart';
+import '../../core/constants/strings.dart';
+import '../services/photographer.dart';
+import '../services/music.dart';
+import '../services/catering.dart';
+import '../services/venue.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,7 +21,6 @@ class _HomePageState extends State<HomePage>
   late Animation<double> _fadeAnimation;
 
   final int _notificationCount = 3;
-  bool _showAllEvents = false;
 
   double _totalBudget = 0;
   double _totalSpent = 0;
@@ -97,19 +102,32 @@ class _HomePageState extends State<HomePage>
     return "${now.day} ${months[now.month - 1]}, ${now.year}";
   }
 
+  String _formatDate(dynamic date) {
+    if (date == null) return 'No Date';
+    DateTime dt;
+    if (date is Timestamp) {
+      dt = date.toDate();
+    } else if (date is String) {
+      return date;
+    } else {
+      return 'Invalid Date';
+    }
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return "${dt.day} ${months[dt.month - 1]}, ${dt.year}";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppColors.background,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
-            end: Alignment.center,
+            end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF0D47A1), // Deep Blue
-              Color(0xFF1565C0), // Blue
-              Color(0xFF00897B), // Teal
+              AppColors.primaryGreen,
+              AppColors.primaryBlue,
             ],
           ),
         ),
@@ -118,31 +136,25 @@ class _HomePageState extends State<HomePage>
             children: [
               _buildHeader(),
               const SizedBox(height: 20),
-
               Expanded(
                 child: Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF5F7FA),
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(35)),
                   ),
                   child: ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                     children: [
                       _buildBudgetOverview(),
                       const SizedBox(height: 28),
-
                       _buildPromoBanners(),
                       const SizedBox(height: 28),
-
                       _buildCategories(),
                       const SizedBox(height: 28),
-
                       _buildPopularServices(),
                       const SizedBox(height: 28),
-
                       _buildUpcomingEvents(),
                       const SizedBox(height: 28),
-
                       _buildTodayExpenses(),
                       const SizedBox(height: 100),
                     ],
@@ -156,12 +168,12 @@ class _HomePageState extends State<HomePage>
       floatingActionButton: Container(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFF00897B), Color(0xFF26A69A)],
+            colors: [AppColors.primaryGreen, AppColors.secondary],
           ),
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF00897B).withOpacity(0.4),
+              color: AppColors.primaryGreen.withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
@@ -172,7 +184,7 @@ class _HomePageState extends State<HomePage>
           backgroundColor: Colors.transparent,
           elevation: 0,
           icon: const Icon(Icons.add, color: Colors.white, size: 26),
-          label: const Text('Quick Add',
+          label: const Text(AppStrings.quickAdd,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
@@ -201,16 +213,16 @@ class _HomePageState extends State<HomePage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Welcome Back!',
+                          AppStrings.welcomeBack,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 15,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
                         const SizedBox(height: 6),
                         const Text(
-                          'EventWallet',
+                          AppStrings.appName,
                           style: TextStyle(
                             fontSize: 36,
                             fontWeight: FontWeight.w800,
@@ -225,10 +237,10 @@ class _HomePageState extends State<HomePage>
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           width: 1,
                         ),
                       ),
@@ -244,12 +256,12 @@ class _HomePageState extends State<HomePage>
                         child: Container(
                           padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFF3D00),
+                            color: AppColors.error,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.white, width: 2.5),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFFF3D00).withOpacity(0.5),
+                                color: AppColors.error.withValues(alpha: 0.5),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -277,12 +289,12 @@ class _HomePageState extends State<HomePage>
             const SizedBox(height: 12),
             Row(
               children: [
-                Icon(Icons.calendar_today, color: Colors.white.withOpacity(0.7), size: 16),
+                Icon(Icons.calendar_today, color: Colors.white.withValues(alpha: 0.7), size: 16),
                 const SizedBox(width: 8),
                 Text(
                   _getCurrentDate(),
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -307,15 +319,14 @@ class _HomePageState extends State<HomePage>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF1976D2),
-            Color(0xFF1565C0),
-            Color(0xFF00897B),
+            AppColors.primaryGreen,
+            AppColors.primaryBlue,
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1976D2).withOpacity(0.3),
+            color: AppColors.primaryBlue.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -327,8 +338,8 @@ class _HomePageState extends State<HomePage>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Total Budget',
+              Text(
+                AppStrings.totalBudget,
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: 15,
@@ -338,7 +349,7 @@ class _HomePageState extends State<HomePage>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -366,11 +377,11 @@ class _HomePageState extends State<HomePage>
           Row(
             children: [
               Expanded(
-                child: _budgetInfoTile('Spent', _totalSpent, Icons.arrow_upward),
+                child: _budgetInfoTile(AppStrings.spent, _totalSpent, Icons.arrow_upward),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _budgetInfoTile('Remaining', remaining, Icons.arrow_downward),
+                child: _budgetInfoTile(AppStrings.remaining, remaining, Icons.arrow_downward),
               ),
             ],
           ),
@@ -383,9 +394,9 @@ class _HomePageState extends State<HomePage>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -426,7 +437,7 @@ class _HomePageState extends State<HomePage>
         const Padding(
           padding: EdgeInsets.only(bottom: 16),
           child: Text(
-            'Special Offers',
+            AppStrings.specialOffers,
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w800,
@@ -445,19 +456,19 @@ class _HomePageState extends State<HomePage>
                 'Hire Best Photographers',
                 'Up to 30% off',
                 Icons.camera_alt_rounded,
-                [const Color(0xFF1E88E5), const Color(0xFF1565C0)],
+                [AppColors.primaryBlue, AppColors.primaryGreen],
               ),
               _promoCard(
                 'Luxury Hotels',
                 'Special event rates',
                 Icons.hotel_rounded,
-                [const Color(0xFF00897B), const Color(0xFF00695C)],
+                [AppColors.primaryGreen, AppColors.secondary],
               ),
               _promoCard(
                 'Outdoor Locations',
                 'Book now',
                 Icons.park_rounded,
-                [const Color(0xFF26A69A), const Color(0xFF00897B)],
+                [AppColors.secondary, AppColors.primaryGreen],
               ),
             ],
           ),
@@ -479,7 +490,7 @@ class _HomePageState extends State<HomePage>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: colors[0].withOpacity(0.4),
+            color: colors[0].withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -494,7 +505,7 @@ class _HomePageState extends State<HomePage>
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
             ),
@@ -511,7 +522,7 @@ class _HomePageState extends State<HomePage>
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -533,7 +544,7 @@ class _HomePageState extends State<HomePage>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.25),
+                    color: Colors.white.withValues(alpha: 0.25),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -556,17 +567,17 @@ class _HomePageState extends State<HomePage>
   // ================= CATEGORIES =================
   Widget _buildCategories() {
     final categories = [
-      {'icon': Icons.camera_alt, 'label': 'Photography'},
-      {'icon': Icons.location_city, 'label': 'Venues'},
-      {'icon': Icons.restaurant, 'label': 'Catering'},
-      {'icon': Icons.music_note, 'label': 'Music'},
+      {'icon': Icons.camera_alt, 'label': 'Photography', 'page': const PhotographyPage()},
+      {'icon': Icons.location_city, 'label': 'Venues', 'page': const VenuesPage()},
+      {'icon': Icons.restaurant, 'label': 'Catering', 'page': const CateringPage()},
+      {'icon': Icons.music_note, 'label': 'Music', 'page': const MusicPage()},
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Categories',
+          AppStrings.categories,
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,
@@ -582,30 +593,38 @@ class _HomePageState extends State<HomePage>
             separatorBuilder: (_, __) => const SizedBox(width: 16),
             itemBuilder: (context, index) {
               final item = categories[index];
-              return Container(
-                width: 90,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                    )
-                  ],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(item['icon'] as IconData,
-                        size: 32, color: const Color(0xFF1976D2)),
-                    const SizedBox(height: 8),
-                    Text(
-                      item['label'] as String,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                  ],
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => item['page'] as Widget),
+                  );
+                },
+                child: Container(
+                  width: 90,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                      )
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(item['icon'] as IconData,
+                          size: 32, color: AppColors.primaryGreen),
+                      const SizedBox(height: 8),
+                      Text(
+                        item['label'] as String,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -621,7 +640,7 @@ class _HomePageState extends State<HomePage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Popular Services',
+          AppStrings.popularServices,
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,
@@ -630,13 +649,13 @@ class _HomePageState extends State<HomePage>
         ),
         const SizedBox(height: 16),
         Container(
-          padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Row(
-            children: const [
+          child: const Row(
+            children: [
               Icon(Icons.star, color: Colors.amber, size: 28),
               SizedBox(width: 16),
               Expanded(
@@ -658,7 +677,7 @@ class _HomePageState extends State<HomePage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Upcoming Events',
+          AppStrings.upcomingEvents,
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,
@@ -667,56 +686,18 @@ class _HomePageState extends State<HomePage>
         ),
         const SizedBox(height: 16),
         if (_upcomingEvents.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: const Text(
-              'No upcoming events',
-              style: TextStyle(color: Colors.grey),
-            ),
-          )
+          const Text('No upcoming events')
         else
-          Column(
-            children: _upcomingEvents.take(3).map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.event, color: Color(0xFF1976D2)),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            data['title'] ?? 'Event',
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            data['date'] ?? '',
-                            style: const TextStyle(
-                                fontSize: 13, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
+          ..._upcomingEvents.map((e) {
+            final data = e.data() as Map<String, dynamic>;
+            return Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: ListTile(
+                title: Text(data['name'] ?? 'Event'),
+                subtitle: Text(_formatDate(data['date'])),
+              ),
+            );
+          }).toList(),
       ],
     );
   }
@@ -727,7 +708,7 @@ class _HomePageState extends State<HomePage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Today\'s Expenses',
+          AppStrings.todayExpenses,
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,
@@ -736,49 +717,18 @@ class _HomePageState extends State<HomePage>
         ),
         const SizedBox(height: 16),
         if (_todayExpenses.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: const Text(
-              'No expenses today',
-              style: TextStyle(color: Colors.grey),
-            ),
-          )
+          const Text('No expenses today')
         else
-          Column(
-            children: _todayExpenses.take(3).map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.money, color: Color(0xFF1976D2)),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        data['description'] ?? 'Expense',
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                    ),
-                    Text(
-                      '\$${(data['amount'] ?? 0).toString()}',
-                      style: const TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
+          ..._todayExpenses.map((e) {
+            final data = e.data() as Map<String, dynamic>;
+            return Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: ListTile(
+                title: Text(data['title'] ?? 'Expense'),
+                subtitle: Text('\$${(data['amount'] ?? 0).toStringAsFixed(2)}'),
+              ),
+            );
+          }).toList(),
       ],
     );
   }

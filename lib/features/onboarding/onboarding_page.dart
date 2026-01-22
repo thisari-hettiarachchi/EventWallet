@@ -129,7 +129,7 @@ class _OnboardingPageState extends State<OnboardingPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: const Color(0xFFF5F7FA),
       body: SafeArea(
         child: Stack(
           children: [
@@ -144,8 +144,8 @@ class _OnboardingPageState extends State<OnboardingPage>
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      Colors.blue.shade100.withOpacity(0.3),
-                      Colors.green.shade100.withOpacity(0.3),
+                      const Color(0xFF1565C0).withValues(alpha: 0.3),
+                      const Color(0xFF00897B).withValues(alpha: 0.3),
                     ],
                   ),
                 ),
@@ -161,8 +161,8 @@ class _OnboardingPageState extends State<OnboardingPage>
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      Colors.green.shade100.withOpacity(0.2),
-                      Colors.blue.shade100.withOpacity(0.2),
+                      const Color(0xFF00897B).withValues(alpha: 0.2),
+                      const Color(0xFF1565C0).withValues(alpha: 0.2),
                     ],
                   ),
                 ),
@@ -194,32 +194,21 @@ class _OnboardingPageState extends State<OnboardingPage>
                                 const SizedBox(height: 20),
 
                                 // Image container with gradient border
-                                Container(
-                                  child: Image.asset(
-                                    onboardingData[index]['image']!,
-                                      width: 300,
-                                      height: 300,
-                                      fit: BoxFit.contain,
-                                  ),
-
+                                Image.asset(
+                                  onboardingData[index]['image']!,
+                                  width: 300,
+                                  height: 300,
+                                  fit: BoxFit.contain,
                                 ),
 
                                 const SizedBox(height: 60),
 
                                 // Title with gradient
                                 ShaderMask(
-                                  shaderCallback: (bounds) => LinearGradient(
+                                  shaderCallback: (bounds) => const LinearGradient(
                                     colors: [
-                                      index == 0
-                                          ? Colors.blue.shade700
-                                          : index == 1
-                                          ? Colors.teal.shade700
-                                          : Colors.green.shade700,
-                                      index == 0
-                                          ? Colors.blue.shade500
-                                          : index == 1
-                                          ? Colors.teal.shade500
-                                          : Colors.green.shade500,
+                                      Color(0xFF00897B),
+                                      Color(0xFF1565C0),
                                     ],
                                   ).createShader(bounds),
                                   child: Text(
@@ -246,9 +235,9 @@ class _OnboardingPageState extends State<OnboardingPage>
                                   child: Text(
                                     onboardingData[index]['subtitle']!,
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 16,
-                                      color: Colors.grey.shade700,
+                                      color: Color(0xFF4A5568),
                                       fontWeight: FontWeight.w500,
                                       height: 1.5,
                                     ),
@@ -279,11 +268,10 @@ class _OnboardingPageState extends State<OnboardingPage>
                         width: _currentIndex == index ? 30 : 10,
                         decoration: BoxDecoration(
                           gradient: _currentIndex == index
-                              ? LinearGradient(
+                              ? const LinearGradient(
                             colors: [
-                              Colors.blue.shade600,
-                              Colors.teal.shade500,
-                              Colors.green.shade600,
+                              Color(0xFF00897B),
+                              Color(0xFF1565C0),
                             ],
                           )
                               : null,
@@ -294,7 +282,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                           boxShadow: _currentIndex == index
                               ? [
                             BoxShadow(
-                              color: Colors.blue.withOpacity(0.4),
+                              color: const Color(0xFF00897B).withValues(alpha: 0.4),
                               blurRadius: 8,
                               spreadRadius: 1,
                             ),
@@ -320,22 +308,22 @@ class _OnboardingPageState extends State<OnboardingPage>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.blue.shade300,
+                              color: const Color(0xFF00897B).withValues(alpha: 0.3),
                               width: 2,
                             ),
                             color: Colors.white,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.blue.shade100,
+                                color: const Color(0xFF00897B).withValues(alpha: 0.1),
                                 blurRadius: 10,
                                 spreadRadius: 2,
                               ),
                             ],
                           ),
                           child: IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.arrow_back_ios_new_rounded,
-                              color: Colors.blue.shade700,
+                              color: Color(0xFF00897B),
                               size: 20,
                             ),
                             onPressed: _back,
@@ -349,22 +337,16 @@ class _OnboardingPageState extends State<OnboardingPage>
                         child: Container(
                           height: 60,
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
+                            gradient: const LinearGradient(
                               colors: [
-                                Colors.blue.shade600,
-                                Colors.teal.shade500,
-                                Colors.green.shade600,
+                                Color(0xFF00897B),
+                                Color(0xFF1565C0),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(30),
                             boxShadow: [
                               BoxShadow(
-                                color: (_currentIndex == 0
-                                    ? Colors.blue
-                                    : _currentIndex == 1
-                                    ? Colors.teal
-                                    : Colors.green)
-                                    .withOpacity(0.4),
+                                color: const Color(0xFF00897B).withValues(alpha: 0.4),
                                 blurRadius: 20,
                                 offset: const Offset(0, 8),
                               ),
@@ -420,12 +402,12 @@ class _OnboardingPageState extends State<OnboardingPage>
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: Colors.blue.shade200,
+                    color: const Color(0xFF00897B).withValues(alpha: 0.2),
                     width: 1.5,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.blue.shade100,
+                      color: const Color(0xFF00897B).withValues(alpha: 0.1),
                       blurRadius: 8,
                       spreadRadius: 1,
                     ),
@@ -442,10 +424,10 @@ class _OnboardingPageState extends State<OnboardingPage>
                   child: Row(
                     children: [
                       ShaderMask(
-                        shaderCallback: (bounds) => LinearGradient(
+                        shaderCallback: (bounds) => const LinearGradient(
                           colors: [
-                            Colors.blue.shade600,
-                            Colors.green.shade600,
+                            Color(0xFF00897B),
+                            Color(0xFF1565C0),
                           ],
                         ).createShader(bounds),
                         child: const Text(
@@ -459,10 +441,10 @@ class _OnboardingPageState extends State<OnboardingPage>
                       ),
                       const SizedBox(width: 4),
                       ShaderMask(
-                        shaderCallback: (bounds) => LinearGradient(
+                        shaderCallback: (bounds) => const LinearGradient(
                           colors: [
-                            Colors.blue.shade600,
-                            Colors.green.shade600,
+                            Color(0xFF00897B),
+                            Color(0xFF1565C0),
                           ],
                         ).createShader(bounds),
                         child: const Icon(
