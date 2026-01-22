@@ -1,11 +1,11 @@
-import 'package:eventwallet/features/info/help.dart';
-import 'package:eventwallet/features/events/manage_event.dart';
+import 'package:eventwallet/features/user/info/help.dart';
+import 'package:eventwallet/features/user/events/manage_event.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../core/widgets/bottom_nav.dart';
+import '../../../core/widgets/bottom_nav.dart';
 import '../auth/login.dart';
-import '../../services/auth_service.dart';
+import '../../../services/auth_service.dart';
 import 'edit_profile.dart';
 import '../info/privacy.dart';
 import '../info/about.dart';

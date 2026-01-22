@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'signup.dart';
+import '../../user/auth/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../home/home.dart';
+import '../../user/home/home.dart';
 import '../home/result_page.dart';
 
 class LoginPage extends StatefulWidget {

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../core/widgets/bottom_nav.dart';
-import '../../core/constants/colors.dart';
-import '../../core/constants/strings.dart';
+import '../../../core/widgets/bottom_nav.dart';
+import '../../../core/constants/colors.dart';
+import '../../../core/constants/strings.dart';
 import '../services/photographer.dart';
-import '../services/music.dart';
+import '../../user/services/music.dart';
 import '../services/catering.dart';
 import '../services/venue.dart';
 

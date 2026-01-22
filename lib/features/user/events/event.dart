@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../core/widgets/bottom_nav.dart';
+import '../../../core/widgets/bottom_nav.dart';
 import 'create_event.dart';
 import 'event_details_page.dart';
 

@@ -1,48 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../core/constants/colors.dart';
-import '../../core/widgets/gradient.dart';
+import '../../../core/constants/colors.dart';
+import '../../../core/constants/strings.dart';
+import '../../../core/widgets/gradient.dart';
 
-class CateringPage extends StatefulWidget {
-  const CateringPage({super.key});
+class PhotographyPage extends StatefulWidget {
+  const PhotographyPage({super.key});
 
   @override
-  State<CateringPage> createState() => _CateringPageState();
+  State<PhotographyPage> createState() => _PhotographyPageState();
 }
 
-class _CateringPageState extends State<CateringPage> {
+class _PhotographyPageState extends State<PhotographyPage> {
   String _selectedFilter = 'All';
-  final List<String> _filters = ['All', 'Buffet', 'Plated', 'BBQ', 'Desserts', 'Cocktails'];
+  final List<String> _filters = ['All', 'Wedding', 'Portrait', 'Event', 'Commercial'];
 
-  List<DocumentSnapshot> _caterers = [];
+  List<DocumentSnapshot> _photographers = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchCaterers();
+    _fetchPhotographers();
   }
 
-  void _fetchCaterers() async {
+  void _fetchPhotographers() async {
     setState(() => _isLoading = true);
 
     final snapshot = await FirebaseFirestore.instance
-        .collection('caterers')
+        .collection('photographers')
         .orderBy('rating', descending: true)
         .get();
 
     setState(() {
-      _caterers = snapshot.docs;
+      _photographers = snapshot.docs;
       _isLoading = false;
     });
   }
 
-  List<DocumentSnapshot> get _filteredCaterers {
-    if (_selectedFilter == 'All') return _caterers;
-    return _caterers.where((doc) {
+  List<DocumentSnapshot> get _filteredPhotographers {
+    if (_selectedFilter == 'All') return _photographers;
+    return _photographers.where((doc) {
       final data = doc.data() as Map<String, dynamic>;
-      final cuisines = List<String>.from(data['cuisines'] ?? []);
-      return cuisines.contains(_selectedFilter);
+      final specialties = List<String>.from(data['specialties'] ?? []);
+      return specialties.contains(_selectedFilter);
     }).toList();
   }
 
@@ -79,7 +80,7 @@ class _CateringPageState extends State<CateringPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'Catering',
+                                'Photography',
                                 style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.w900,
@@ -87,7 +88,7 @@ class _CateringPageState extends State<CateringPage> {
                                 ),
                               ),
                               Text(
-                                '${_caterers.length} caterers available',
+                                '${_photographers.length} photographers available',
                                 style: TextStyle(
                                   color: Colors.white.withValues(alpha: 0.9),
                                   fontSize: 15,
@@ -97,8 +98,8 @@ class _CateringPageState extends State<CateringPage> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.filter_list, color: Colors.white, size: 28),
-                          onPressed: () => _showFilterOptions(),
+                          icon: const Icon(Icons.search, color: Colors.white, size: 28),
+                          onPressed: () => _showSearchDialog(),
                         ),
                       ],
                     ),
@@ -111,15 +112,15 @@ class _CateringPageState extends State<CateringPage> {
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _filteredCaterers.isEmpty
+                : _filteredPhotographers.isEmpty
                 ? _buildEmptyState()
                 : ListView.builder(
               padding: const EdgeInsets.all(20),
-              itemCount: _filteredCaterers.length,
+              itemCount: _filteredPhotographers.length,
               itemBuilder: (context, index) {
-                final doc = _filteredCaterers[index];
+                final doc = _filteredPhotographers[index];
                 final data = doc.data() as Map<String, dynamic>;
-                return _buildCatererCard(data, doc.id);
+                return _buildPhotographerCard(data, doc.id);
               },
             ),
           ),
@@ -166,14 +167,14 @@ class _CateringPageState extends State<CateringPage> {
     );
   }
 
-  Widget _buildCatererCard(Map<String, dynamic> data, String id) {
-    final name = data['name'] ?? 'Unknown Caterer';
+  Widget _buildPhotographerCard(Map<String, dynamic> data, String id) {
+    final name = data['name'] ?? 'Unknown Photographer';
     final rating = (data['rating'] ?? 0.0).toDouble();
     final reviews = data['reviews'] ?? 0;
-    final pricePerPerson = (data['pricePerPerson'] ?? 0).toDouble();
-    final cuisines = List<String>.from(data['cuisines'] ?? []);
+    final hourlyRate = (data['hourlyRate'] ?? 0).toDouble();
+    final specialties = List<String>.from(data['specialties'] ?? []);
     final imageUrl = data['imageUrl'] ?? '';
-    final minGuests = data['minGuests'] ?? 0;
+    final location = data['location'] ?? 'Location not specified';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -193,7 +194,7 @@ class _CateringPageState extends State<CateringPage> {
                 imageUrl.isNotEmpty
                     ? Image.network(
                   imageUrl,
-                  height: 180,
+                  height: 200,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
@@ -245,44 +246,33 @@ class _CateringPageState extends State<CateringPage> {
                         ),
                       ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '\$${pricePerPerson.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primaryGreen,
-                          ),
-                        ),
-                        const Text(
-                          'per person',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textGrey,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      '\$${hourlyRate.toStringAsFixed(0)}/hr',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryGreen,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(Icons.people,
+                    Icon(Icons.location_on,
                       size: 16,
                       color: AppColors.textGrey.withValues(alpha: 0.7),
                     ),
                     const SizedBox(width: 4),
-                    Text(
-                      'Min. $minGuests guests',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textGrey.withValues(alpha: 0.8),
+                    Expanded(
+                      child: Text(
+                        location,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textGrey.withValues(alpha: 0.8),
+                        ),
                       ),
                     ),
-                    const Spacer(),
                     Text(
                       '$reviews reviews',
                       style: TextStyle(
@@ -296,30 +286,20 @@ class _CateringPageState extends State<CateringPage> {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: cuisines.map((cuisine) {
+                  children: specialties.map((specialty) {
                     return Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.restaurant,
-                            size: 14,
-                            color: AppColors.primaryGreen,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            cuisine,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.primaryGreen,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        specialty,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.primaryGreen,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     );
                   }).toList(),
@@ -329,9 +309,9 @@ class _CateringPageState extends State<CateringPage> {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () => _viewMenu(id, data),
-                        icon: const Icon(Icons.menu_book, size: 18),
-                        label: const Text('Menu'),
+                        onPressed: () => _viewDetails(id, data),
+                        icon: const Icon(Icons.info_outline, size: 18),
+                        label: const Text('Details'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.primaryGreen,
                           side: const BorderSide(color: AppColors.primaryGreen),
@@ -344,9 +324,9 @@ class _CateringPageState extends State<CateringPage> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: () => _getQuote(id, data),
-                        icon: const Icon(Icons.request_quote, size: 18),
-                        label: const Text('Quote'),
+                        onPressed: () => _bookPhotographer(id, data),
+                        icon: const Icon(Icons.calendar_today, size: 18),
+                        label: const Text('Book'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryGreen,
                           foregroundColor: Colors.white,
@@ -368,7 +348,7 @@ class _CateringPageState extends State<CateringPage> {
 
   Widget _buildPlaceholderImage() {
     return Container(
-      height: 180,
+      height: 200,
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -379,7 +359,7 @@ class _CateringPageState extends State<CateringPage> {
         ),
       ),
       child: const Icon(
-        Icons.restaurant_menu,
+        Icons.camera_alt,
         size: 64,
         color: Colors.white,
       ),
@@ -392,17 +372,25 @@ class _CateringPageState extends State<CateringPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.restaurant_outlined,
+            Icons.photo_camera_outlined,
             size: 80,
             color: AppColors.textGrey.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
           Text(
-            'No caterers found',
+            'No photographers found',
             style: TextStyle(
               fontSize: 18,
               color: AppColors.textGrey.withValues(alpha: 0.6),
               fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Try changing your filter',
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.textGrey.withValues(alpha: 0.5),
             ),
           ),
         ],
@@ -410,43 +398,32 @@ class _CateringPageState extends State<CateringPage> {
     );
   }
 
-  void _showFilterOptions() {
-    showModalBottomSheet(
+  void _showSearchDialog() {
+    showDialog(
       context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Filter Options',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            const Text('Price Range'),
-            // Add price range slider here
-            const SizedBox(height: 16),
-            const Text('Dietary Options'),
-            // Add dietary checkboxes here
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                ),
-                child: const Text('Apply Filters'),
-              ),
-            ),
-          ],
+      builder: (context) => AlertDialog(
+        title: const Text('Search Photographers'),
+        content: TextField(
+          decoration: const InputDecoration(
+            hintText: 'Enter photographer name...',
+            prefixIcon: Icon(Icons.search),
+          ),
+          onSubmitted: (value) {
+            Navigator.pop(context);
+            // Implement search logic
+          },
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
       ),
     );
   }
 
-  void _viewMenu(String id, Map<String, dynamic> data) {
+  void _viewDetails(String id, Map<String, dynamic> data) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -475,18 +452,28 @@ class _CateringPageState extends State<CateringPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${data['name']} Menu',
+                      data['name'] ?? 'Photographer',
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildMenuSection('Appetizers', data['appetizers']),
-                    const SizedBox(height: 16),
-                    _buildMenuSection('Main Course', data['mainCourse']),
-                    const SizedBox(height: 16),
-                    _buildMenuSection('Desserts', data['desserts']),
+                    Text(
+                      data['description'] ?? 'No description available.',
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Portfolio',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Add portfolio images grid here
+                    const Text('Portfolio images coming soon...'),
                   ],
                 ),
               ),
@@ -497,67 +484,19 @@ class _CateringPageState extends State<CateringPage> {
     );
   }
 
-  Widget _buildMenuSection(String title, dynamic items) {
-    final menuItems = items is List ? items : [];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.primaryGreen,
-          ),
-        ),
-        const SizedBox(height: 8),
-        if (menuItems.isEmpty)
-          const Text('No items available')
-        else
-          ...menuItems.map((item) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              children: [
-                const Icon(Icons.check_circle,
-                  size: 16,
-                  color: AppColors.primaryGreen,
-                ),
-                const SizedBox(width: 8),
-                Text(item.toString()),
-              ],
-            ),
-          )),
-      ],
-    );
-  }
-
-  void _getQuote(String id, Map<String, dynamic> data) {
-    final guestController = TextEditingController();
-
+  void _bookPhotographer(String id, Map<String, dynamic> data) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Get Quote from ${data['name']}'),
+        title: Text('Book ${data['name']}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Base price: \$${data['pricePerPerson']}/person'),
+            Text('Rate: \$${data['hourlyRate']}/hour'),
             const SizedBox(height: 16),
-            TextField(
-              controller: guestController,
-              decoration: const InputDecoration(
-                labelText: 'Number of guests',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'We\'ll send you a detailed quote based on your requirements.',
-              style: TextStyle(fontSize: 13, color: AppColors.textGrey),
-            ),
+            const Text('Select a date and time for your event:'),
+            // Add date picker here
           ],
         ),
         actions: [
@@ -570,7 +509,7 @@ class _CateringPageState extends State<CateringPage> {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Quote request sent!'),
+                  content: Text('Booking request sent!'),
                   backgroundColor: AppColors.success,
                 ),
               );
@@ -578,7 +517,7 @@ class _CateringPageState extends State<CateringPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryGreen,
             ),
-            child: const Text('Request Quote'),
+            child: const Text('Confirm'),
           ),
         ],
       ),

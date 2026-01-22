@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
-import 'signup.dart';
+import '../auth/login.dart';
+import '../auth/signup.dart';
 
 class WelcomeBackPage extends StatefulWidget {
   const WelcomeBackPage({super.key});

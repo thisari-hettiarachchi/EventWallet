@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'onboarding_page.dart';
+import '../onboarding/onboarding_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../home/home.dart';
 

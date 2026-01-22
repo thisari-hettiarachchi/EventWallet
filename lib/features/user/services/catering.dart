@@ -1,49 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../core/constants/colors.dart';
-import '../../core/constants/strings.dart';
-import '../../core/widgets/gradient.dart';
+import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient.dart';
 
-class PhotographyPage extends StatefulWidget {
-  const PhotographyPage({super.key});
+class CateringPage extends StatefulWidget {
+  const CateringPage({super.key});
 
   @override
-  State<PhotographyPage> createState() => _PhotographyPageState();
+  State<CateringPage> createState() => _CateringPageState();
 }
 
-class _PhotographyPageState extends State<PhotographyPage> {
+class _CateringPageState extends State<CateringPage> {
   String _selectedFilter = 'All';
-  final List<String> _filters = ['All', 'Wedding', 'Portrait', 'Event', 'Commercial'];
+  final List<String> _filters = ['All', 'Buffet', 'Plated', 'BBQ', 'Desserts', 'Cocktails'];
 
-  List<DocumentSnapshot> _photographers = [];
+  List<DocumentSnapshot> _caterers = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchPhotographers();
+    _fetchCaterers();
   }
 
-  void _fetchPhotographers() async {
+  void _fetchCaterers() async {
     setState(() => _isLoading = true);
 
     final snapshot = await FirebaseFirestore.instance
-        .collection('photographers')
+        .collection('caterers')
         .orderBy('rating', descending: true)
         .get();
 
     setState(() {
-      _photographers = snapshot.docs;
+      _caterers = snapshot.docs;
       _isLoading = false;
     });
   }
 
-  List<DocumentSnapshot> get _filteredPhotographers {
-    if (_selectedFilter == 'All') return _photographers;
-    return _photographers.where((doc) {
+  List<DocumentSnapshot> get _filteredCaterers {
+    if (_selectedFilter == 'All') return _caterers;
+    return _caterers.where((doc) {
       final data = doc.data() as Map<String, dynamic>;
-      final specialties = List<String>.from(data['specialties'] ?? []);
-      return specialties.contains(_selectedFilter);
+      final cuisines = List<String>.from(data['cuisines'] ?? []);
+      return cuisines.contains(_selectedFilter);
     }).toList();
   }
 
@@ -80,7 +79,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'Photography',
+                                'Catering',
                                 style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.w900,
@@ -88,7 +87,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
                                 ),
                               ),
                               Text(
-                                '${_photographers.length} photographers available',
+                                '${_caterers.length} caterers available',
                                 style: TextStyle(
                                   color: Colors.white.withValues(alpha: 0.9),
                                   fontSize: 15,
@@ -98,8 +97,8 @@ class _PhotographyPageState extends State<PhotographyPage> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.search, color: Colors.white, size: 28),
-                          onPressed: () => _showSearchDialog(),
+                          icon: const Icon(Icons.filter_list, color: Colors.white, size: 28),
+                          onPressed: () => _showFilterOptions(),
                         ),
                       ],
                     ),
@@ -112,15 +111,15 @@ class _PhotographyPageState extends State<PhotographyPage> {
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _filteredPhotographers.isEmpty
+                : _filteredCaterers.isEmpty
                 ? _buildEmptyState()
                 : ListView.builder(
               padding: const EdgeInsets.all(20),
-              itemCount: _filteredPhotographers.length,
+              itemCount: _filteredCaterers.length,
               itemBuilder: (context, index) {
-                final doc = _filteredPhotographers[index];
+                final doc = _filteredCaterers[index];
                 final data = doc.data() as Map<String, dynamic>;
-                return _buildPhotographerCard(data, doc.id);
+                return _buildCatererCard(data, doc.id);
               },
             ),
           ),
@@ -167,14 +166,14 @@ class _PhotographyPageState extends State<PhotographyPage> {
     );
   }
 
-  Widget _buildPhotographerCard(Map<String, dynamic> data, String id) {
-    final name = data['name'] ?? 'Unknown Photographer';
+  Widget _buildCatererCard(Map<String, dynamic> data, String id) {
+    final name = data['name'] ?? 'Unknown Caterer';
     final rating = (data['rating'] ?? 0.0).toDouble();
     final reviews = data['reviews'] ?? 0;
-    final hourlyRate = (data['hourlyRate'] ?? 0).toDouble();
-    final specialties = List<String>.from(data['specialties'] ?? []);
+    final pricePerPerson = (data['pricePerPerson'] ?? 0).toDouble();
+    final cuisines = List<String>.from(data['cuisines'] ?? []);
     final imageUrl = data['imageUrl'] ?? '';
-    final location = data['location'] ?? 'Location not specified';
+    final minGuests = data['minGuests'] ?? 0;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -194,7 +193,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
                 imageUrl.isNotEmpty
                     ? Image.network(
                   imageUrl,
-                  height: 200,
+                  height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
@@ -246,33 +245,44 @@ class _PhotographyPageState extends State<PhotographyPage> {
                         ),
                       ),
                     ),
-                    Text(
-                      '\$${hourlyRate.toStringAsFixed(0)}/hr',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryGreen,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '\$${pricePerPerson.toStringAsFixed(0)}',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
+                        const Text(
+                          'per person',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textGrey,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(Icons.location_on,
+                    Icon(Icons.people,
                       size: 16,
                       color: AppColors.textGrey.withValues(alpha: 0.7),
                     ),
                     const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        location,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textGrey.withValues(alpha: 0.8),
-                        ),
+                    Text(
+                      'Min. $minGuests guests',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textGrey.withValues(alpha: 0.8),
                       ),
                     ),
+                    const Spacer(),
                     Text(
                       '$reviews reviews',
                       style: TextStyle(
@@ -286,20 +296,30 @@ class _PhotographyPageState extends State<PhotographyPage> {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: specialties.map((specialty) {
+                  children: cuisines.map((cuisine) {
                     return Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text(
-                        specialty,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.primaryGreen,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.restaurant,
+                            size: 14,
+                            color: AppColors.primaryGreen,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            cuisine,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.primaryGreen,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   }).toList(),
@@ -309,9 +329,9 @@ class _PhotographyPageState extends State<PhotographyPage> {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () => _viewDetails(id, data),
-                        icon: const Icon(Icons.info_outline, size: 18),
-                        label: const Text('Details'),
+                        onPressed: () => _viewMenu(id, data),
+                        icon: const Icon(Icons.menu_book, size: 18),
+                        label: const Text('Menu'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.primaryGreen,
                           side: const BorderSide(color: AppColors.primaryGreen),
@@ -324,9 +344,9 @@ class _PhotographyPageState extends State<PhotographyPage> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: () => _bookPhotographer(id, data),
-                        icon: const Icon(Icons.calendar_today, size: 18),
-                        label: const Text('Book'),
+                        onPressed: () => _getQuote(id, data),
+                        icon: const Icon(Icons.request_quote, size: 18),
+                        label: const Text('Quote'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryGreen,
                           foregroundColor: Colors.white,
@@ -348,7 +368,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
 
   Widget _buildPlaceholderImage() {
     return Container(
-      height: 200,
+      height: 180,
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -359,7 +379,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
         ),
       ),
       child: const Icon(
-        Icons.camera_alt,
+        Icons.restaurant_menu,
         size: 64,
         color: Colors.white,
       ),
@@ -372,58 +392,61 @@ class _PhotographyPageState extends State<PhotographyPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.photo_camera_outlined,
+            Icons.restaurant_outlined,
             size: 80,
             color: AppColors.textGrey.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
           Text(
-            'No photographers found',
+            'No caterers found',
             style: TextStyle(
               fontSize: 18,
               color: AppColors.textGrey.withValues(alpha: 0.6),
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Try changing your filter',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textGrey.withValues(alpha: 0.5),
-            ),
-          ),
         ],
       ),
     );
   }
 
-  void _showSearchDialog() {
-    showDialog(
+  void _showFilterOptions() {
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Search Photographers'),
-        content: TextField(
-          decoration: const InputDecoration(
-            hintText: 'Enter photographer name...',
-            prefixIcon: Icon(Icons.search),
-          ),
-          onSubmitted: (value) {
-            Navigator.pop(context);
-            // Implement search logic
-          },
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Filter Options',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            const Text('Price Range'),
+            // Add price range slider here
+            const SizedBox(height: 16),
+            const Text('Dietary Options'),
+            // Add dietary checkboxes here
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryGreen,
+                ),
+                child: const Text('Apply Filters'),
+              ),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-        ],
       ),
     );
   }
 
-  void _viewDetails(String id, Map<String, dynamic> data) {
+  void _viewMenu(String id, Map<String, dynamic> data) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -452,28 +475,18 @@ class _PhotographyPageState extends State<PhotographyPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data['name'] ?? 'Photographer',
+                      '${data['name']} Menu',
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      data['description'] ?? 'No description available.',
-                      style: const TextStyle(fontSize: 15),
-                    ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'Portfolio',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Add portfolio images grid here
-                    const Text('Portfolio images coming soon...'),
+                    _buildMenuSection('Appetizers', data['appetizers']),
+                    const SizedBox(height: 16),
+                    _buildMenuSection('Main Course', data['mainCourse']),
+                    const SizedBox(height: 16),
+                    _buildMenuSection('Desserts', data['desserts']),
                   ],
                 ),
               ),
@@ -484,19 +497,67 @@ class _PhotographyPageState extends State<PhotographyPage> {
     );
   }
 
-  void _bookPhotographer(String id, Map<String, dynamic> data) {
+  Widget _buildMenuSection(String title, dynamic items) {
+    final menuItems = items is List ? items : [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryGreen,
+          ),
+        ),
+        const SizedBox(height: 8),
+        if (menuItems.isEmpty)
+          const Text('No items available')
+        else
+          ...menuItems.map((item) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                const Icon(Icons.check_circle,
+                  size: 16,
+                  color: AppColors.primaryGreen,
+                ),
+                const SizedBox(width: 8),
+                Text(item.toString()),
+              ],
+            ),
+          )),
+      ],
+    );
+  }
+
+  void _getQuote(String id, Map<String, dynamic> data) {
+    final guestController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Book ${data['name']}'),
+        title: Text('Get Quote from ${data['name']}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Rate: \$${data['hourlyRate']}/hour'),
+            Text('Base price: \$${data['pricePerPerson']}/person'),
             const SizedBox(height: 16),
-            const Text('Select a date and time for your event:'),
-            // Add date picker here
+            TextField(
+              controller: guestController,
+              decoration: const InputDecoration(
+                labelText: 'Number of guests',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'We\'ll send you a detailed quote based on your requirements.',
+              style: TextStyle(fontSize: 13, color: AppColors.textGrey),
+            ),
           ],
         ),
         actions: [
@@ -509,7 +570,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Booking request sent!'),
+                  content: Text('Quote request sent!'),
                   backgroundColor: AppColors.success,
                 ),
               );
@@ -517,7 +578,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryGreen,
             ),
-            child: const Text('Confirm'),
+            child: const Text('Request Quote'),
           ),
         ],
       ),
