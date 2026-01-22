@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/constants/colors.dart';
-import '../../../core/widgets/gradient.dart';
 
 class CateringPage extends StatefulWidget {
   const CateringPage({super.key});
