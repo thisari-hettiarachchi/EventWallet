@@ -9,6 +9,7 @@ import '../../../services/auth_service.dart';
 import 'edit_profile.dart';
 import '../info/privacy.dart';
 import '../info/about.dart';
+import '../info/service_provider.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -244,6 +245,21 @@ class ProfilePage extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) => const HelpSupportPage(),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      _buildSettingsCard(
+                        icon: Icons.person_add_alt_1,
+                        title: 'Become a Service Provider',
+                        subtitle: 'Offer your services for events and get bookings',
+                        color: Colors.cyan.shade800,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ServiceProviderApp(),
                             ),
                           );
                         },
