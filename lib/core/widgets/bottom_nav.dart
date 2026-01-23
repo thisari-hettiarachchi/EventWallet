@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../features/home/home.dart';
-import '../../features/events/event.dart';
-import '../../features/budget/budget.dart';
-import '../../features/profile/profile.dart';
+import '../../features/user/home/home.dart';
+import '../../features/user/events/event.dart';
+import '../../features/user/budget/budget.dart';
+import '../../features/user/profile/profile.dart';
 
 class AppBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -44,7 +44,7 @@ class AppBottomNav extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -54,7 +54,7 @@ class AppBottomNav extends StatelessWidget {
         currentIndex: currentIndex,
         onTap: (index) => _onTap(context, index),
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.blue.shade700,
+        selectedItemColor: const Color(0xFF00897B),
         unselectedItemColor: Colors.grey,
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
         elevation: 0,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
-import 'signup.dart';
+import '../auth/login.dart';
+import '../auth/signup.dart';
 
 class WelcomeBackPage extends StatefulWidget {
   const WelcomeBackPage({super.key});
@@ -45,17 +45,14 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.blue.shade700,
-              Colors.blue.shade500,
-              Colors.teal.shade400,
-              Colors.green.shade500,
+              Color(0xFF00897B),
+              Color(0xFF1565C0),
             ],
-            stops: const [0.0, 0.3, 0.7, 1.0],
           ),
         ),
         child: SafeArea(
@@ -73,10 +70,10 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                           blurRadius: 30,
                           spreadRadius: 10,
                         ),
@@ -122,10 +119,10 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                             vertical: 12,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                               width: 1.5,
                             ),
                           ),
@@ -159,13 +156,13 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                         borderRadius: BorderRadius.circular(20),
                         gradient: LinearGradient(
                           colors: [
-                            Colors.white.withOpacity(0.95),
-                            Colors.white.withOpacity(0.85),
+                            Colors.white.withValues(alpha: 0.95),
+                            Colors.white.withValues(alpha: 0.85),
                           ],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -190,10 +187,10 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ShaderMask(
-                              shaderCallback: (bounds) => LinearGradient(
+                              shaderCallback: (bounds) => const LinearGradient(
                                 colors: [
-                                  Colors.blue.shade700,
-                                  Colors.green.shade600,
+                                  Color(0xFF00897B),
+                                  Color(0xFF1565C0),
                                 ],
                               ).createShader(bounds),
                               child: const Text(
@@ -208,10 +205,10 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                             ),
                             const SizedBox(width: 10),
                             ShaderMask(
-                              shaderCallback: (bounds) => LinearGradient(
+                              shaderCallback: (bounds) => const LinearGradient(
                                 colors: [
-                                  Colors.blue.shade700,
-                                  Colors.green.shade600,
+                                  Color(0xFF00897B),
+                                  Color(0xFF1565C0),
                                 ],
                               ).createShader(bounds),
                               child: const Icon(
@@ -245,7 +242,7 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             blurRadius: 15,
                             spreadRadius: 2,
                           ),
@@ -306,7 +303,7 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                           gradient: LinearGradient(
                             colors: [
                               Colors.transparent,
-                              Colors.white.withOpacity(0.5),
+                              Colors.white.withValues(alpha: 0.5),
                             ],
                           ),
                         ),
@@ -316,7 +313,7 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                         child: Text(
                           'Your events, simplified',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
@@ -328,7 +325,7 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              Colors.white.withOpacity(0.5),
+                              Colors.white.withValues(alpha: 0.5),
                               Colors.transparent,
                             ],
                           ),

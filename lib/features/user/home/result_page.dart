@@ -14,8 +14,8 @@ class ResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSuccess ? const Color(0xFF4CAF50) : Colors.red; // green for success, red for error
-    final bgColor = isSuccess ? const Color(0xFFE8F5E9) : const Color(0xFFFFEBEE);
+    final color = isSuccess ? const Color(0xFF00897B) : Colors.red;
+    final bgColor = isSuccess ? const Color(0xFFE0F2F1) : const Color(0xFFFFEBEE);
     final title = isSuccess ? 'Congratulations!' : 'Error';
     final buttonText = isSuccess ? 'DONE' : 'TRY AGAIN';
 
@@ -23,15 +23,13 @@ class ResultPage extends StatelessWidget {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.blue.shade700,
-              Colors.blue.shade500,
-              Colors.teal.shade400,
-              Colors.green.shade500,
+              Color(0xFF00897B),
+              Color(0xFF1565C0),
             ],
           ),
         ),
@@ -81,7 +79,7 @@ class ResultCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 50,
             offset: const Offset(0, 10),
           ),
@@ -197,7 +195,7 @@ class ResultCard extends StatelessWidget {
       top: positions[index].dy,
       child: Icon(
         icons[index % icons.length],
-        color: color.withOpacity(opacities[index]),
+        color: color.withValues(alpha: opacities[index]),
         size: 16,
       ),
     );

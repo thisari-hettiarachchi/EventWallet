@@ -32,7 +32,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
     'Other'
   ];
 
-  // NEW: status options
   String _selectedStatus = 'Upcoming';
   final List<String> _statusOptions = ['Upcoming', 'In Progress', 'Completed'];
 
@@ -57,8 +56,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Colors.blue.shade700,
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF00897B),
               onPrimary: Colors.white,
             ),
           ),
@@ -80,8 +79,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Colors.blue.shade700,
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF00897B),
               onPrimary: Colors.white,
             ),
           ),
@@ -128,34 +127,39 @@ class _CreateEventPageState extends State<CreateEventPage> {
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ResultPage(
-            isSuccess: false,
-            message: "You must be logged in to create an event.",
-            onButtonPressed: () => Navigator.pop(context),
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ResultPage(
+              isSuccess: false,
+              message: "You must be logged in to create an event.",
+              onButtonPressed: () => Navigator.pop(context),
+            ),
           ),
-        ),
-      );
+        );
+      }
       return;
     }
 
     if (_selectedDate == null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ResultPage(
-            isSuccess: false,
-            message: "Please select an event date.",
-            onButtonPressed: () => Navigator.pop(context),
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ResultPage(
+              isSuccess: false,
+              message: "Please select an event date.",
+              onButtonPressed: () => Navigator.pop(context),
+            ),
           ),
-        ),
-      );
+        );
+      }
       return;
     }
 
     final data = {
+      'eventName': _eventNameController.text.trim(),
       'name': _eventNameController.text.trim(),
       'venue': _venueController.text.trim(),
       'budget': double.tryParse(_budgetController.text) ?? 0,
@@ -167,41 +171,44 @@ class _CreateEventPageState extends State<CreateEventPage> {
       'time': _selectedTime != null ? '${_selectedTime!.hour}:${_selectedTime!.minute}' : null,
       'createdAt': FieldValue.serverTimestamp(),
       'userId': user.uid,
-      'status': 'Upcoming',
+      'status': _selectedStatus,
     };
 
 
     try {
       await _db.collection('events').add(data);
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const EventsPage(),
-        ),
-      );
-    } catch (e) {
-      print("Firestore error: $e");
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ResultPage(
-            isSuccess: false,
-            message: "Failed to create event. Please try again.",
-            onButtonPressed: () => Navigator.pop(context),
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const EventsPage(),
           ),
-        ),
-      );
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ResultPage(
+              isSuccess: false,
+              message: "Failed to create event. Please try again.",
+              onButtonPressed: () => Navigator.pop(context),
+            ),
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.blue.shade700,
+        backgroundColor: const Color(0xFF00897B),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -222,8 +229,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue.shade700, Colors.teal.shade500],
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF00897B), Color(0xFF1565C0)],
                 ),
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -232,7 +239,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(Icons.event_available, color: Colors.white, size: 32),
@@ -257,7 +264,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: Color(0xFF1A1F36),
               ),
             ),
             const SizedBox(height: 16),
@@ -279,10 +286,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: DropdownButtonFormField<String>(
-                initialValue: _selectedCategory,
+                value: _selectedCategory,
                 decoration: InputDecoration(
                   labelText: 'Event Category',
-                  prefixIcon: Icon(_getCategoryIcon(_selectedCategory), color: Colors.blue.shade700),
+                  prefixIcon: Icon(_getCategoryIcon(_selectedCategory), color: const Color(0xFF00897B)),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
@@ -344,7 +351,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: Color(0xFF1A1F36),
               ),
             ),
             const SizedBox(height: 16),
@@ -376,7 +383,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
               ],
             ),
             const SizedBox(height: 16),
-            // NEW: Status Dropdown
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -384,10 +390,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: DropdownButtonFormField<String>(
-                initialValue: _selectedStatus,
+                value: _selectedStatus,
                 decoration: InputDecoration(
                   labelText: 'Event Status',
-                  prefixIcon: Icon(Icons.info, color: Colors.blue.shade700),
+                  prefixIcon: const Icon(Icons.info, color: Color(0xFF00897B)),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
@@ -419,7 +425,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                   hintText: 'Add any special requirements or notes...',
                   prefixIcon: Padding(
                     padding: const EdgeInsets.only(bottom: 60),
-                    child: Icon(Icons.notes, color: Colors.blue.shade700),
+                    child: Icon(Icons.notes, color: const Color(0xFF00897B)),
                   ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.all(16),
@@ -429,13 +435,13 @@ class _CreateEventPageState extends State<CreateEventPage> {
             const SizedBox(height: 32),
             Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue.shade700, Colors.green.shade500],
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF00897B), Color(0xFF1565C0)],
                 ),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.blue.withOpacity(0.3),
+                    color: const Color(0xFF00897B).withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -490,7 +496,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-          prefixIcon: Icon(icon, color: Colors.blue.shade700),
+          prefixIcon: Icon(icon, color: const Color(0xFF00897B)),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
@@ -519,7 +525,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                Icon(icon, color: Colors.blue.shade700),
+                Icon(icon, color: const Color(0xFF00897B)),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -538,7 +544,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black87,
+                          color: Color(0xFF1A1F36),
                         ),
                       ),
                     ],
