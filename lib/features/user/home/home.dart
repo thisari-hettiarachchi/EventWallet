@@ -129,7 +129,7 @@ class _HomePageState extends State<HomePage>
               Color(0xFF00897B),
               Color(0xFF1565C0),
             ],
-            stops: [0.0, 0.3], // Gradient restricted to top 30%
+            stops: [0.0, 0.3],
           ),
         ),
         child: SafeArea(
@@ -458,18 +458,21 @@ class _HomePageState extends State<HomePage>
                 'Up to 30% off',
                 Icons.camera_alt_rounded,
                 [const Color(0xFF1565C0), const Color(0xFF00897B)],
+                imagePath: 'assets/images/hire.jpg',
               ),
               _promoCard(
                 'Luxury Hotels',
                 'Special event rates',
                 Icons.hotel_rounded,
                 [const Color(0xFF00897B), const Color(0xFF26A69A)],
+                imagePath: 'assets/images/hire2.jpg',
               ),
               _promoCard(
                 'Outdoor Locations',
                 'Book now',
                 Icons.park_rounded,
                 [const Color(0xFF26A69A), const Color(0xFF00897B)],
+                imagePath: 'assets/images/hire3.jpg',
               ),
             ],
           ),
@@ -478,89 +481,111 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Widget _promoCard(String title, String subtitle, IconData icon, List<Color> colors) {
+  Widget _promoCard(String title, String subtitle, IconData icon, List<Color> colors, {String? imagePath}) {
     return Container(
-      width: 280,
+      width: 315,
       margin: const EdgeInsets.only(right: 16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: colors,
-        ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: colors[0].withValues(alpha: 0.4),
+            color: colors[0].withValues(alpha: 0.2),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: -20,
-            top: -20,
-            child: Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(14),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: imagePath != null
+            ? Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Icon(icon, color: colors[1], size: 32),
-                ),
-                const Spacer(),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.3,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    subtitle,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: colors,
                     ),
                   ),
+                  child: Center(child: Icon(icon, color: Colors.white, size: 40)),
                 ),
-              ],
-            ),
-          ),
-        ],
+              )
+            : Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: colors,
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      right: -20,
+                      top: -20,
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Icon(icon, color: colors[1], size: 32),
+                          ),
+                          const Spacer(),
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.25),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              subtitle,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
       ),
     );
   }
@@ -732,7 +757,7 @@ class _HomePageState extends State<HomePage>
         if (_todayExpenses.isEmpty)
           const Text('No expenses today', style: TextStyle(color: Colors.grey))
         else
-          ..._todayExpenses.take(3).map((e) {
+          ..._todayExpenses.map((e) {
             final data = e.data() as Map<String, dynamic>;
             return Card(
               color: Colors.white,
