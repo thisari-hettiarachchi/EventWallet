@@ -132,7 +132,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                       ),
                     ),
                   ),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 55),
                 ],
               ),
             ),
