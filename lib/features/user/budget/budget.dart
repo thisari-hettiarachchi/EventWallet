@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/strings.dart';
 import '../../../core/constants/colors.dart';
+import 'add_expense.dart';
 
 class BudgetPage extends StatefulWidget {
   const BudgetPage({super.key});
@@ -18,9 +19,6 @@ class _BudgetPageState extends State<BudgetPage>
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-
-  double _totalBudget = 0;
-  double _totalSpent = 0;
 
   @override
   void initState() {
@@ -44,7 +42,7 @@ class _BudgetPageState extends State<BudgetPage>
     final snapshot =
     await FirebaseFirestore.instance.collection('events').get();
     final eventNames =
-    snapshot.docs.map((doc) => doc['eventName'] ?? doc['name'] as String).toList();
+    snapshot.docs.map((doc) => (doc['eventName'] ?? doc['name']).toString()).toList();
     setState(() {
       _events = ['All Events', ...eventNames];
     });
@@ -53,18 +51,10 @@ class _BudgetPageState extends State<BudgetPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppColors.background,
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF00897B),
-              Color(0xFF1565C0),
-            ],
-            stops: [0.0, 0.3],
-          ),
+          gradient: AppColors.headerGradient,
         ),
         child: SafeArea(
           child: Column(
@@ -95,14 +85,14 @@ class _BudgetPageState extends State<BudgetPage>
                           value: _selectedEvent,
                           isExpanded: true,
                           icon: const Icon(Icons.arrow_drop_down,
-                              color: Color(0xFF1565C0)),
+                              color: AppColors.primaryBlue),
                           items: _events.map((event) {
                             return DropdownMenuItem(
                               value: event,
                               child: Text(
                                 event,
                                 style: const TextStyle(
-                                  color: Color(0xFF1565C0),
+                                  color: AppColors.primaryBlue,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -121,31 +111,27 @@ class _BudgetPageState extends State<BudgetPage>
               ),
               StreamBuilder<QuerySnapshot>(
                 stream: _selectedEvent == 'All Events'
-                    ? FirebaseFirestore.instance
-                    .collection('expenses')
-                    .snapshots()
+                    ? FirebaseFirestore.instance.collection('events').snapshots()
                     : FirebaseFirestore.instance
-                    .collection('expenses')
-                    .where('event', isEqualTo: _selectedEvent)
-                    .snapshots(),
+                        .collection('events')
+                        .where('eventName', isEqualTo: _selectedEvent)
+                        .snapshots(),
                 builder: (context, snapshot) {
-                  _totalBudget = 0;
-                  _totalSpent = 0;
+                  double totalBudget = 0;
+                  double totalSpent = 0;
 
                   if (snapshot.hasData) {
                     for (var doc in snapshot.data!.docs) {
                       final data = doc.data() as Map<String, dynamic>;
-                      _totalBudget +=
-                          (data['budget'] ?? 0).toDouble();
-                      _totalSpent +=
-                          (data['spent'] ?? 0).toDouble();
+                      totalBudget += (data['budget'] ?? 0).toDouble();
+                      totalSpent += (data['spent'] ?? 0).toDouble();
                     }
                   }
 
-                  double remaining = _totalBudget - _totalSpent;
-                  double progress = _totalBudget == 0
+                  double remaining = totalBudget - totalSpent;
+                  double progress = totalBudget == 0
                       ? 0
-                      : (_totalSpent / _totalBudget).clamp(0, 1);
+                      : (totalSpent / totalBudget).clamp(0, 1);
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -184,7 +170,7 @@ class _BudgetPageState extends State<BudgetPage>
                             Row(
                               children: [
                                 Text(
-                                  '\$${_totalSpent.toStringAsFixed(0)}',
+                                  '\$${totalSpent.toStringAsFixed(0)}',
                                   style: const TextStyle(
                                       fontSize: 36,
                                       fontWeight: FontWeight.bold,
@@ -192,7 +178,7 @@ class _BudgetPageState extends State<BudgetPage>
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  '/ \$${_totalBudget.toStringAsFixed(0)}',
+                                  '/ \$${totalBudget.toStringAsFixed(0)}',
                                   style: const TextStyle(
                                       fontSize: 18,
                                       color: Colors.white70),
@@ -215,7 +201,7 @@ class _BudgetPageState extends State<BudgetPage>
                               MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  '${AppStrings.spent}: \$${_totalSpent.toStringAsFixed(0)}',
+                                  '${AppStrings.spent}: \$${totalSpent.toStringAsFixed(0)}',
                                   style: const TextStyle(
                                       color: Colors.white),
                                 ),
@@ -237,17 +223,19 @@ class _BudgetPageState extends State<BudgetPage>
               Expanded(
                 child: Container(
                   decoration: const BoxDecoration(
-                    color: Color(0xFFF5F7FA),
+                    color: AppColors.background,
                     borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
                   ),
                   child: StreamBuilder<QuerySnapshot>(
                     stream: _selectedEvent == 'All Events'
                         ? FirebaseFirestore.instance
                         .collection('expenses')
+                        .orderBy('timestamp', descending: true)
                         .snapshots()
                         : FirebaseFirestore.instance
                         .collection('expenses')
                         .where('event', isEqualTo: _selectedEvent)
+                        .orderBy('timestamp', descending: true)
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
@@ -260,20 +248,14 @@ class _BudgetPageState extends State<BudgetPage>
                         return const Center(child: Text('No expenses found', style: TextStyle(color: Colors.grey)));
                       }
 
-                      return ListView(
+                      return ListView.builder(
                         padding: const EdgeInsets.all(20),
-                        children: expenses.map((doc) {
+                        itemCount: expenses.length,
+                        itemBuilder: (context, index) {
+                          final doc = expenses[index];
                           final data = doc.data() as Map<String, dynamic>;
-                          return _buildCategoryCard(
-                            data['category'] ?? 'Other',
-                            '\$${data['budget']}',
-                            '\$${data['spent']}',
-                            (data['spent'] ?? 0) /
-                                ((data['budget'] ?? 1).toDouble()),
-                            const Color(0xFF1565C0),
-                            Icons.category,
-                          );
-                        }).toList(),
+                          return _buildExpenseCard(data);
+                        },
                       );
                     },
                   ),
@@ -285,20 +267,23 @@ class _BudgetPageState extends State<BudgetPage>
       ),
       floatingActionButton: Container(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF00897B), Color(0xFF26A69A)],
-          ),
+          gradient: AppColors.buttonGradient,
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF00897B).withValues(alpha: 0.4),
+              color: AppColors.primaryGreen.withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
           ],
         ),
         child: FloatingActionButton.extended(
-          onPressed: () => _showAddExpenseDialog(context),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AddExpensePage()),
+            );
+          },
           backgroundColor: Colors.transparent,
           elevation: 0,
           icon: const Icon(Icons.add, color: Colors.white),
@@ -309,50 +294,34 @@ class _BudgetPageState extends State<BudgetPage>
     );
   }
 
-  Widget _buildCategoryCard(String category, String budget, String spent,
-      double progress, Color color, IconData icon) {
-    return Card(
-      color: Colors.white,
-      elevation: 2,
+  Widget _buildExpenseCard(Map<String, dynamic> data) {
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [AppColors.cardShadow()],
+      ),
       child: ListTile(
         leading: Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
+            color: AppColors.primaryBlue.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: color),
+          child: const Icon(Icons.receipt_long, color: AppColors.primaryBlue),
         ),
-        title: Text(category, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1F36))),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: LinearProgressIndicator(
-            value: progress,
-            backgroundColor: Colors.grey.shade200,
-            valueColor: AlwaysStoppedAnimation(color),
-            borderRadius: BorderRadius.circular(5),
-          ),
-        ),
+        title: Text(data['title'] ?? 'Expense', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textDark)),
+        subtitle: Text(data['category'] ?? 'Other', style: const TextStyle(color: AppColors.textGrey)),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(spent, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1F36))),
-            Text('of $budget', style: const TextStyle(fontSize: 12, color: Color(0xFF4A5568))),
+            Text('\$${(data['amount'] ?? 0).toStringAsFixed(2)}', 
+              style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.danger, fontSize: 16)),
+            Text(data['event'] ?? '', style: const TextStyle(fontSize: 11, color: AppColors.textGrey)),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showAddExpenseDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => const AlertDialog(
-        title: Text(AppStrings.addExpense),
-        content: Text(AppStrings.addExpenseHint),
       ),
     );
   }
