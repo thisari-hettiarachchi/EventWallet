@@ -119,16 +119,17 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF5F7FA),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.primaryGreen,
-              AppColors.primaryBlue,
+              Color(0xFF00897B),
+              Color(0xFF1565C0),
             ],
+            stops: [0.0, 0.3], // Gradient restricted to top 30%
           ),
         ),
         child: SafeArea(
@@ -138,9 +139,9 @@ class _HomePageState extends State<HomePage>
               const SizedBox(height: 20),
               Expanded(
                 child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(35)),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF5F7FA),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
                   ),
                   child: ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -168,12 +169,12 @@ class _HomePageState extends State<HomePage>
       floatingActionButton: Container(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [AppColors.primaryGreen, AppColors.secondary],
+            colors: [Color(0xFF00897B), Color(0xFF26A69A)],
           ),
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primaryGreen.withValues(alpha: 0.4),
+              color: const Color(0xFF00897B).withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
@@ -256,12 +257,12 @@ class _HomePageState extends State<HomePage>
                         child: Container(
                           padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                            color: AppColors.error,
+                            color: const Color(0xFFFF3D00),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.white, width: 2.5),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.error.withValues(alpha: 0.5),
+                                color: const Color(0xFFFF3D00).withValues(alpha: 0.5),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -319,14 +320,14 @@ class _HomePageState extends State<HomePage>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primaryGreen,
-            AppColors.primaryBlue,
+            Color(0xFF00897B),
+            Color(0xFF1565C0),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryBlue.withValues(alpha: 0.3),
+            color: const Color(0xFF1565C0).withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -340,7 +341,7 @@ class _HomePageState extends State<HomePage>
             children: [
               Text(
                 AppStrings.totalBudget,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
@@ -456,19 +457,19 @@ class _HomePageState extends State<HomePage>
                 'Hire Best Photographers',
                 'Up to 30% off',
                 Icons.camera_alt_rounded,
-                [AppColors.primaryBlue, AppColors.primaryGreen],
+                [const Color(0xFF1565C0), const Color(0xFF00897B)],
               ),
               _promoCard(
                 'Luxury Hotels',
                 'Special event rates',
                 Icons.hotel_rounded,
-                [AppColors.primaryGreen, AppColors.secondary],
+                [const Color(0xFF00897B), const Color(0xFF26A69A)],
               ),
               _promoCard(
                 'Outdoor Locations',
                 'Book now',
                 Icons.park_rounded,
-                [AppColors.secondary, AppColors.primaryGreen],
+                [const Color(0xFF26A69A), const Color(0xFF00897B)],
               ),
             ],
           ),
@@ -616,7 +617,7 @@ class _HomePageState extends State<HomePage>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(item['icon'] as IconData,
-                          size: 32, color: AppColors.primaryGreen),
+                          size: 32, color: const Color(0xFF00897B)),
                       const SizedBox(height: 8),
                       Text(
                         item['label'] as String,
@@ -686,15 +687,27 @@ class _HomePageState extends State<HomePage>
         ),
         const SizedBox(height: 16),
         if (_upcomingEvents.isEmpty)
-          const Text('No upcoming events')
+          const Text('No upcoming events', style: TextStyle(color: Colors.grey))
         else
-          ..._upcomingEvents.map((e) {
+          ..._upcomingEvents.take(3).map((e) {
             final data = e.data() as Map<String, dynamic>;
             return Card(
+              color: Colors.white,
+              elevation: 2,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              margin: const EdgeInsets.only(bottom: 12),
               child: ListTile(
-                title: Text(data['name'] ?? 'Event'),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF00897B).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.event, color: Color(0xFF00897B)),
+                ),
+                title: Text(data['eventName'] ?? data['name'] ?? 'Event', style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text(_formatDate(data['date'])),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               ),
             );
           }).toList(),
@@ -717,15 +730,27 @@ class _HomePageState extends State<HomePage>
         ),
         const SizedBox(height: 16),
         if (_todayExpenses.isEmpty)
-          const Text('No expenses today')
+          const Text('No expenses today', style: TextStyle(color: Colors.grey))
         else
-          ..._todayExpenses.map((e) {
+          ..._todayExpenses.take(3).map((e) {
             final data = e.data() as Map<String, dynamic>;
             return Card(
+              color: Colors.white,
+              elevation: 2,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              margin: const EdgeInsets.only(bottom: 12),
               child: ListTile(
-                title: Text(data['title'] ?? 'Expense'),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1565C0).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.money, color: Color(0xFF1565C0)),
+                ),
+                title: Text(data['description'] ?? data['title'] ?? 'Expense', style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text('\$${(data['amount'] ?? 0).toStringAsFixed(2)}'),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               ),
             );
           }).toList(),

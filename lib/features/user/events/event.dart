@@ -31,19 +31,23 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF00897B), Color(0xFF1565C0)],
-                ),
+      body: Column(
+        children: [
+          // Header with Gradient
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF00897B), Color(0xFF1565C0)],
               ),
+            ),
+            child: SafeArea(
+              bottom: false,
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
                     child: Row(
                       children: [
                         const Expanded(
@@ -58,15 +62,12 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.3),
+                              width: 1,
+                            ),
                           ),
                           child: Material(
                             color: Colors.transparent,
@@ -82,12 +83,12 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                                 child: Row(
                                   children: [
-                                    Icon(Icons.add, color: Color(0xFF00897B)),
+                                    Icon(Icons.add, color: Colors.white, size: 20),
                                     SizedBox(width: 6),
                                     Text(
                                       'New Event',
                                       style: TextStyle(
-                                        color: Color(0xFF00897B),
+                                        color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15,
                                       ),
@@ -107,6 +108,13 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: TextField(
                         onChanged: (value) {
@@ -116,6 +124,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                         },
                         decoration: InputDecoration(
                           hintText: 'Search events...',
+                          hintStyle: TextStyle(color: Colors.grey.shade400),
                           prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -123,37 +132,50 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Container(
-                    color: Colors.white,
-                    child: TabBar(
+                  const SizedBox(height: 25),
+                ],
+              ),
+            ),
+          ),
+          // Main Content
+          Expanded(
+            child: Container(
+              transform: Matrix4.translationValues(0, -25, 0),
+              decoration: const BoxDecoration(
+                color: Color(0xFFF5F7FA),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  TabBar(
+                    controller: _tabController,
+                    labelColor: const Color(0xFF00897B),
+                    unselectedLabelColor: Colors.grey,
+                    indicatorColor: const Color(0xFF00897B),
+                    indicatorWeight: 3,
+                    indicatorSize: TabBarIndicatorSize.label,
+                    tabs: const [
+                      Tab(text: 'Upcoming'),
+                      Tab(text: 'In Progress'),
+                      Tab(text: 'Completed'),
+                    ],
+                  ),
+                  Expanded(
+                    child: TabBarView(
                       controller: _tabController,
-                      labelColor: const Color(0xFF00897B),
-                      unselectedLabelColor: Colors.grey,
-                      indicatorColor: const Color(0xFF00897B),
-                      indicatorWeight: 3,
-                      tabs: const [
-                        Tab(text: 'Upcoming'),
-                        Tab(text: 'In Progress'),
-                        Tab(text: 'Completed'),
+                      children: [
+                        _buildEventList('Upcoming'),
+                        _buildEventList('In Progress'),
+                        _buildEventList('Completed'),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildEventList('Upcoming'),
-                  _buildEventList('In Progress'),
-                  _buildEventList('Completed'),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
       bottomNavigationBar: const AppBottomNav(currentIndex: 1),
     );
@@ -176,7 +198,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
         }).toList();
 
         if (events.isEmpty) {
-          return const Center(child: Text('No events found.'));
+          return Center(child: Text('No $statusFilter events found.', style: const TextStyle(color: Colors.grey)));
         }
 
         return ListView.separated(

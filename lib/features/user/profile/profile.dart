@@ -56,280 +56,287 @@ class ProfilePage extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: const Color(0xFFF5F7FA),
-          body: SafeArea(
-            child: Column(
-              children: [
-                Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF00897B), Color(0xFF1565C0)],
+          body: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF00897B), // Teal/Green
+                  Color(0xFF1565C0), // Blue
+                ],
+                stops: [0.0, 0.3], // Color covers top 30% like an app bar
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 4),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      child: Text(
+                        initials,
+                        style: const TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00897B),
+                        ),
+                      ),
                     ),
                   ),
-
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 4),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: Text(
-                            initials,
-                            style: const TextStyle(
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF00897B),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        displayName,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        email,
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 20),
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.3),
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            // Total Events
-                            _buildStatItem(
-                              'Total Events',
-                              userData['eventsCount'] != null ? userData['eventsCount'].toString() : '0',
-                            ),
-
-                            Container(
-                              width: 1,
-                              height: 40,
-                              color: Colors.white.withValues(alpha: 0.3),
-                            ),
-
-                            // Total Budget
-                            _buildStatItem(
-                              'Total Budget',
-                              userData['totalBudget'] != null
-                                  ? '\$${userData['totalBudget'].toString()}'
-                                  : '\$0',
-                            ),
-
-                            Container(
-                              width: 1,
-                              height: 40,
-                              color: Colors.white.withValues(alpha: 0.3),
-                            ),
-
-                            // Amount Spent
-                            _buildStatItem(
-                              'Amount Spent',
-                              userData['spent'] != null
-                                  ? '\$${userData['spent'].toString()}'
-                                  : '\$0',
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
+                  const SizedBox(height: 16),
+                  Text(
+                    displayName,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: ListView(
+                  const SizedBox(height: 4),
+                  Text(
+                    email,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
                     padding: const EdgeInsets.all(20),
-                    children: [
-                      const Text(
-                        'Account Settings',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A1F36),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        // Total Events
+                        _buildStatItem(
+                          'Total Events',
+                          userData['eventsCount'] != null ? userData['eventsCount'].toString() : '0',
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildSettingsCard(
-                        icon: Icons.person_outline,
-                        title: 'Edit Profile',
-                        subtitle: 'Update your personal info for events',
-                        color: const Color(0xFF1565C0),
-                        onTap: () {
-                          // Navigate to EditProfilePage
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const EditProfilePage(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _buildSettingsCard(
-                        icon: Icons.event_note_outlined,
-                        title: 'Manage Events',
-                        subtitle: 'View, edit, or delete your events',
-                        color: Colors.orange.shade800,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ManageEventsPage(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _buildSettingsCard(
-                        icon: Icons.lock_outline,
-                        title: 'Privacy & Security',
-                        subtitle: 'Password and security settings',
-                        color: const Color(0xFF00897B),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const PrivacySecurityPage(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      const Text(
-                        'Support',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A1F36),
+
+                        Container(
+                          width: 1,
+                          height: 40,
+                          color: Colors.white.withValues(alpha: 0.3),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildSettingsCard(
-                        icon: Icons.help_outline,
-                        title: 'Help & Support',
-                        subtitle: 'Get assistance for your events',
-                        color: Colors.cyan.shade800,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HelpSupportPage(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      _buildSettingsCard(
-                        icon: Icons.person_add_alt_1,
-                        title: 'Become a Service Provider',
-                        subtitle: 'Offer your services for events and get bookings',
-                        color: Colors.cyan.shade800,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ServiceProviderPage(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _buildSettingsCard(
-                        icon: Icons.info_outline,
-                        title: 'About',
-                        subtitle: 'Version 1.0.0',
-                        color: Colors.blueGrey,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AboutPage(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.red.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.red.shade200),
+
+                        // Total Budget
+                        _buildStatItem(
+                          'Total Budget',
+                          userData['totalBudget'] != null
+                              ? '\$${userData['totalBudget'].toString()}'
+                              : '\$0',
                         ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
+
+                        Container(
+                          width: 1,
+                          height: 40,
+                          color: Colors.white.withValues(alpha: 0.3),
+                        ),
+
+                        // Amount Spent
+                        _buildStatItem(
+                          'Amount Spent',
+                          userData['spent'] != null
+                              ? '\$${userData['spent'].toString()}'
+                              : '\$0',
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF5F7FA),
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+                      ),
+                      child: ListView(
+                        padding: const EdgeInsets.all(20),
+                        children: [
+                          const Text(
+                            'Account Settings',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1A1F36),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildSettingsCard(
+                            icon: Icons.person_outline,
+                            title: 'Edit Profile',
+                            subtitle: 'Update your personal info for events',
+                            color: const Color(0xFF1565C0),
                             onTap: () {
-                              _showLogoutDialog(context);
+                              // Navigate to EditProfilePage
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const EditProfilePage(),
+                                ),
+                              );
                             },
-                            borderRadius: BorderRadius.circular(12),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red.shade100,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Icon(Icons.logout,
-                                        color: Colors.red.shade700, size: 22),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      'Logout',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red.shade700,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildSettingsCard(
+                            icon: Icons.event_note_outlined,
+                            title: 'Manage Events',
+                            subtitle: 'View, edit, or delete your events',
+                            color: Colors.orange.shade800,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ManageEventsPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          _buildSettingsCard(
+                            icon: Icons.lock_outline,
+                            title: 'Privacy & Security',
+                            subtitle: 'Password and security settings',
+                            color: const Color(0xFF00897B),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const PrivacySecurityPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 24),
+                          const Text(
+                            'Support',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1A1F36),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildSettingsCard(
+                            icon: Icons.help_outline,
+                            title: 'Help & Support',
+                            subtitle: 'Get assistance for your events',
+                            color: Colors.cyan.shade800,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const HelpSupportPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          _buildSettingsCard(
+                            icon: Icons.person_add_alt_1,
+                            title: 'Become a Service Provider',
+                            subtitle: 'Offer your services for events and get bookings',
+                            color: Colors.cyan.shade800,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ServiceProviderPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          _buildSettingsCard(
+                            icon: Icons.info_outline,
+                            title: 'About',
+                            subtitle: 'Version 1.0.0',
+                            color: Colors.blueGrey,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AboutPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 24),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade50,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.red.shade200),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  _showLogoutDialog(context);
+                                },
+                                borderRadius: BorderRadius.circular(12),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.shade100,
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: Icon(Icons.logout,
+                                            color: Colors.red.shade700, size: 22),
                                       ),
-                                    ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          'Logout',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.red.shade700,
+                                          ),
+                                        ),
+                                      ),
+                                      Icon(Icons.arrow_forward_ios,
+                                          color: Colors.red.shade400, size: 16),
+                                    ],
                                   ),
-                                  Icon(Icons.arrow_forward_ios,
-                                      color: Colors.red.shade400, size: 16),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 100),
+                        ],
                       ),
-                      const SizedBox(height: 100),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           bottomNavigationBar: const AppBottomNav(currentIndex: 3),
