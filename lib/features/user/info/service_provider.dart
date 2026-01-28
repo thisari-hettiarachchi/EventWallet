@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../service_provider/auth/login.dart';
+import '../../service_provider/auth/signup.dart';
 
 class ServiceProviderPage extends StatelessWidget {
   const ServiceProviderPage({Key? key}) : super(key: key);
@@ -74,7 +76,10 @@ class ServiceProviderPage extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
-                                // Navigate to login
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const ServiceProviderLoginPage()),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
@@ -98,7 +103,10 @@ class ServiceProviderPage extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
-                                // Navigate to signup
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const ServiceProviderSignupPage()),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF00897B),
@@ -257,7 +265,10 @@ class ServiceProviderPage extends StatelessWidget {
                     width: 200,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Navigate to signup
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ServiceProviderSignupPage()),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
