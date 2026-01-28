@@ -1,14 +1,25 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'features/user/onboarding/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp();
-  } catch (e) {
-    debugPrint("Firebase initialization error: $e");
+
+  // Initialize Firebase only on supported platforms
+  // Windows support is experimental and may have issues
+  if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.windows)) {
+    debugPrint("Firebase on Windows is experimental. Skipping initialization for development.");
+    // You can add a mock Firebase or alternative backend here
+  } else {
+    try {
+      await Firebase.initializeApp();
+      debugPrint("Firebase initialized successfully");
+    } catch (e) {
+      debugPrint("Firebase initialization error: $e");
+    }
   }
+
   runApp(const EventWalletApp());
 }
 
