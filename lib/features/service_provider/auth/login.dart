@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../service_provider/dashboard/result_page.dart';
+import '../../result/result_page.dart';
 import '../dashboard/dashboard.dart';
 import '../auth/signup.dart';
+import '../../../services/providers_auth.dart';
 
 class ServiceProviderLoginPage extends StatefulWidget {
   const ServiceProviderLoginPage({super.key});
@@ -50,58 +51,56 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
 
   Future<void> _loginServiceProvider() async {
     try {
-      UserCredential credential =
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+      final authService = ServiceProviderAuthService();
+
+      final user = await authService.loginServiceProvider(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
       );
 
-      final user = credential.user;
+      if (user == null) throw Exception('Login failed');
 
-      if (user != null) {
-        // 🔹 Get provider data from Firestore
-        final doc = await FirebaseFirestore.instance
-            .collection('service_providers')
-            .doc(user.uid)
-            .get();
+      final doc = await FirebaseFirestore.instance
+          .collection('service_providers')
+          .doc(user.uid)
+          .get();
 
-        if (!doc.exists) {
-          throw Exception('Service provider account not found');
-        }
-
-        final providerType = doc['providerType'];
-
-        if (!mounted) return;
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ResultPage(
-              isSuccess: true,
-              message: 'Service Provider Login Successful!',
-              onButtonPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ServiceProviderDashboard(
-                      providerId: user.uid,
-                      providerType: providerType,
-                    ),
-                  ),
-                      (route) => false,
-                );
-              },
-            ),
-          ),
-        );
+      if (!doc.exists || doc['role'] != 'service_provider') {
+        throw Exception('Not a service provider account');
       }
-    } on FirebaseAuthException catch (e) {
+
+      final providerType = doc['providerType'];
+
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultPage(
+            isSuccess: true,
+            message: 'Login successful!',
+            onButtonPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ServiceProviderDashboard(
+                    providerId: user.uid,
+                    providerType: providerType,
+                  ),
+                ),
+                    (_) => false,
+              );
+            },
+          ),
+        ),
+      );
+    } catch (e) {
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => ResultPage(
             isSuccess: false,
-            message: e.message ?? 'Login failed',
+            message: e.toString(),
             onButtonPressed: () => Navigator.pop(context),
           ),
         ),
@@ -331,8 +330,4 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
       ),
     );
   }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

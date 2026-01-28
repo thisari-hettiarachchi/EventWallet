@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../service_provider/dashboard/result_page.dart';
+import '../../result/result_page.dart';
+import '../../../services/providers_auth.dart';
 import 'login.dart';
 
 class ServiceProviderSignupPage extends StatefulWidget {
@@ -57,65 +57,91 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
   }
 
   Future<void> _signupServiceProvider() async {
+    // Basic validation
+    if (_emailController.text.trim().isEmpty ||
+        _passwordController.text.trim().isEmpty ||
+        _businessController.text.trim().isEmpty ||
+        _typeController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
     try {
-      UserCredential userCredential =
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
       );
 
-      User? user = userCredential.user;
+      final authService = ServiceProviderAuthService();
+
+      final user = await authService.signUpServiceProvider(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+        _businessController.text.trim(),
+        _typeController.text.trim(),
+      );
+
+      if (!mounted) return;
+      Navigator.pop(context); // Remove loading indicator
 
       if (user != null) {
-        // Save service provider info to Firestore
-        await FirebaseFirestore.instance
-            .collection('service_providers')
-            .doc(user.uid)
-            .set({
-          'businessName': _businessController.text.trim(),
-          'providerType': _typeController.text.trim(),
-          'email': _emailController.text.trim(),
-          'role': 'service_provider',
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-
-        if (mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => ResultPage(
-                isSuccess: true,
-                message: 'Your service provider account has been created successfully!',
-                onButtonPressed: () {
-                  // Close ResultPage first
-                  Navigator.pop(context);
-                  // Then navigate to LoginPage
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ServiceProviderLoginPage()),
-                  );
-                },
-              ),
-            ),
-          );
-        }
-      }
-    } on FirebaseAuthException catch (e) {
-      String message = e.message ?? 'Signup failed';
-      if (mounted) {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => ResultPage(
-              isSuccess: false,
-              message: message,
+              isSuccess: true,
+              message: 'Service provider account created successfully!',
               onButtonPressed: () {
-                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ServiceProviderLoginPage(),
+                  ),
+                );
               },
             ),
           ),
         );
       }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context); // Remove loading indicator
+      
+      String message = e.message ?? 'Signup failed';
+      if (e.code == 'email-already-in-use') {
+        message = 'This email is already registered. Try logging in.';
+      } else if (e.code == 'weak-password') {
+        message = 'The password provided is too weak.';
+      }
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultPage(
+            isSuccess: false,
+            message: message,
+            onButtonPressed: () => Navigator.pop(context),
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context); // Remove loading indicator
+      
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultPage(
+            isSuccess: false,
+            message: 'An unexpected error occurred: ${e.toString()}',
+            onButtonPressed: () => Navigator.pop(context),
+          ),
+        ),
+      );
     }
   }
 
@@ -397,8 +423,4 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
       ),
     );
   }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

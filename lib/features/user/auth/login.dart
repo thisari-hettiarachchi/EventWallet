@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../user/auth/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../user/home/home.dart';
-import '../home/result_page.dart';
+import '../../result/result_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -55,6 +56,22 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       );
 
       if (userCredential.user != null) {
+        // Check if user exists in 'users' collection
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .get();
+
+        if (!userDoc.exists) {
+          await FirebaseAuth.instance.signOut();
+          throw FirebaseAuthException(
+            code: 'user-not-found',
+            message: 'No user account found. You might be registered as a service provider.',
+          );
+        }
+
+        if (!mounted) return;
+
         // Show success ResultPage and navigate to HomePage on DONE
         Navigator.push(
           context,
@@ -75,14 +92,16 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         );
       }
     } on FirebaseAuthException catch (e) {
-      String message = 'Login failed';
+      String message = e.message ?? 'Login failed';
       if (e.code == 'user-not-found') {
-        message = 'No account found for this email';
+        message = e.message ?? 'No account found for this email';
       } else if (e.code == 'wrong-password') {
         message = 'Incorrect password';
       } else if (e.code == 'invalid-email') {
         message = 'Invalid email format';
       }
+
+      if (!mounted) return;
 
       // Show error ResultPage with TRY AGAIN
       Navigator.push(
@@ -93,6 +112,20 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             message: message,
             onButtonPressed: () {
               Navigator.pop(context); // back to login page
+            },
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultPage(
+            isSuccess: false,
+            message: e.toString(),
+            onButtonPressed: () {
+              Navigator.pop(context);
             },
           ),
         ),
