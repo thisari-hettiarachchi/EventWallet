@@ -22,7 +22,7 @@ android {
     defaultConfig {
         applicationId = "com.example.eventwallet"
         // Set minSdk to 21 for better Firebase compatibility
-        minSdk = 21 
+        minSdk = flutter.minSdkVersion 
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
