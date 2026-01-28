@@ -1020,4 +1020,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       ),
     );
   }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes

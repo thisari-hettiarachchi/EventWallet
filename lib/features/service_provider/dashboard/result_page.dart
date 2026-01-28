@@ -200,4 +200,8 @@ class ResultCard extends StatelessWidget {
       ),
     );
   }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes

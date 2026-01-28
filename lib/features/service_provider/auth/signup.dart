@@ -397,4 +397,8 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
       ),
     );
   }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes

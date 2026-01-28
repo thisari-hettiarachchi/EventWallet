@@ -331,4 +331,8 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
       ),
     );
   }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes
