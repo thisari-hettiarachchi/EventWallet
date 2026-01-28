@@ -55,8 +55,4 @@ class ServiceProviderAuthService {
   Future<void> logout() async {
     await _auth.signOut();
   }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

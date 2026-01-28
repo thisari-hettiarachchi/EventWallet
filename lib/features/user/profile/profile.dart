@@ -31,9 +31,9 @@ class ProfilePage extends StatelessWidget {
       );
     }
 
-    // Fetch user data from Firestore
+    // Fetch user data from Firestore - Check both 'users' and 'service_providers'
     return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseFirestore.instance.collection('users').doc(user.uid).get(),
+      future: _getUserData(user.uid),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -48,7 +48,10 @@ class ProfilePage extends StatelessWidget {
         }
 
         final userData = snapshot.data!.data() as Map<String, dynamic>;
-        final displayName = userData['name'] ?? 'User';
+        final bool isServiceProvider = userData.containsKey('businessName');
+        final displayName = isServiceProvider 
+            ? userData['businessName'] ?? 'Service Provider'
+            : userData['name'] ?? 'User';
         final email = userData['email'] ?? 'No email';
         final initials = displayName.isNotEmpty
             ? displayName.trim().split(' ').map((e) => e[0]).take(2).join()
@@ -116,7 +119,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Container(
+                  if (!isServiceProvider) Container(
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -188,7 +191,7 @@ class ProfilePage extends StatelessWidget {
                           _buildSettingsCard(
                             icon: Icons.person_outline,
                             title: 'Edit Profile',
-                            subtitle: 'Update your personal info for events',
+                            subtitle: 'Update your account info',
                             color: const Color(0xFF1565C0),
                             onTap: () {
                               // Navigate to EditProfilePage
@@ -200,21 +203,23 @@ class ProfilePage extends StatelessWidget {
                               );
                             },
                           ),
-                          const SizedBox(height: 12),
-                          _buildSettingsCard(
-                            icon: Icons.event_note_outlined,
-                            title: 'Manage Events',
-                            subtitle: 'View, edit, or delete your events',
-                            color: Colors.orange.shade800,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ManageEventsPage(),
-                                ),
-                              );
-                            },
-                          ),
+                          if (!isServiceProvider) ...[
+                            const SizedBox(height: 12),
+                            _buildSettingsCard(
+                              icon: Icons.event_note_outlined,
+                              title: 'Manage Events',
+                              subtitle: 'View, edit, or delete your events',
+                              color: Colors.orange.shade800,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ManageEventsPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                           const SizedBox(height: 12),
                           _buildSettingsCard(
                             icon: Icons.lock_outline,
@@ -243,7 +248,7 @@ class ProfilePage extends StatelessWidget {
                           _buildSettingsCard(
                             icon: Icons.help_outline,
                             title: 'Help & Support',
-                            subtitle: 'Get assistance for your events',
+                            subtitle: 'Get assistance',
                             color: Colors.cyan.shade800,
                             onTap: () {
                               Navigator.push(
@@ -254,21 +259,23 @@ class ProfilePage extends StatelessWidget {
                               );
                             },
                           ),
-                          const SizedBox(height: 16),
-                          _buildSettingsCard(
-                            icon: Icons.person_add_alt_1,
-                            title: 'Become a Service Provider',
-                            subtitle: 'Offer your services for events and get bookings',
-                            color: Colors.cyan.shade800,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ServiceProviderPage(),
-                                ),
-                              );
-                            },
-                          ),
+                          if (!isServiceProvider) ...[
+                            const SizedBox(height: 16),
+                            _buildSettingsCard(
+                              icon: Icons.person_add_alt_1,
+                              title: 'Become a Service Provider',
+                              subtitle: 'Offer your services for events and get bookings',
+                              color: Colors.cyan.shade800,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ServiceProviderPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                           const SizedBox(height: 12),
                           _buildSettingsCard(
                             icon: Icons.info_outline,
@@ -343,6 +350,15 @@ class ProfilePage extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<DocumentSnapshot> _getUserData(String uid) async {
+    // Try to get from 'users' collection first
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    if (userDoc.exists) return userDoc;
+
+    // If not found, try 'service_providers' collection
+    return await FirebaseFirestore.instance.collection('service_providers').doc(uid).get();
   }
 
   Widget _buildStatItem(String label, String value) {

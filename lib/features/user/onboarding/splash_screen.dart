@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../onboarding/onboarding_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../home/home.dart';
+import '../../service_provider/dashboard/dashboard.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -21,7 +23,6 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // Single controller for both fade and scale
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -37,23 +38,65 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // Navigate to OnboardingPage after 2.5 seconds
-    Timer(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      final user = FirebaseAuth.instance.currentUser;
+    _checkAuthAndNavigate();
+  }
 
-      if (user != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomePage()),
-        );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const OnboardingPage()),
-        );
+  Future<void> _checkAuthAndNavigate() async {
+    await Future.delayed(const Duration(seconds: 3));
+    if (!mounted) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      try {
+        // Check if user is a regular user
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (userDoc.exists) {
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const HomePage()),
+          );
+          return;
+        }
+
+        // Check if user is a service provider
+        final providerDoc = await FirebaseFirestore.instance
+            .collection('service_providers')
+            .doc(user.uid)
+            .get();
+
+        if (providerDoc.exists) {
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ServiceProviderDashboard(
+                providerId: user.uid,
+                providerType: providerDoc['providerType'],
+              ),
+            ),
+          );
+          return;
+        }
+
+        // If user session exists but not found in any collection, sign out
+        await FirebaseAuth.instance.signOut();
+      } catch (e) {
+        debugPrint("Error checking user role: $e");
+        await FirebaseAuth.instance.signOut();
       }
-    });
+    }
+
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const OnboardingPage()),
+    );
   }
 
   @override
@@ -84,7 +127,6 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -105,7 +147,6 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // App Name
                   const Text(
                     'EventWallet',
                     style: TextStyle(
@@ -116,7 +157,6 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
                   const SizedBox(height: 30),
-                  // Loading Indicator
                   const CircularProgressIndicator(
                     color: Colors.white,
                     strokeWidth: 3,

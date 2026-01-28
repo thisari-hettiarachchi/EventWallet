@@ -317,6 +317,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                           color: Colors.white,
                           letterSpacing: -0.5,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -326,6 +328,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -341,7 +345,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
             const SizedBox(height: 16),
             Row(
               children: [
-                Icon(Icons.star, color: Colors.amber, size: 20),
+                const Icon(Icons.star, color: Colors.amber, size: 20),
                 const SizedBox(width: 6),
                 Text(
                   _averageRating.toStringAsFixed(1),
@@ -429,6 +433,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               fontWeight: FontWeight.w800,
               letterSpacing: -1,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 20),
           Container(
@@ -440,7 +446,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
             ),
             child: Row(
               children: [
-                Icon(Icons.trending_up, color: Colors.white, size: 24),
+                const Icon(Icons.trending_up, color: Colors.white, size: 24),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -462,6 +468,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -482,7 +490,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       physics: const NeverScrollableScrollPhysics(),
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
-      childAspectRatio: 1.4,
+      childAspectRatio: 1.1, // Adjusted from 1.4 to 1.1 to prevent overflow
       children: [
         _buildStatCard(
           'Total Bookings',
@@ -514,7 +522,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16), // Reduced from 20 to 16
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -538,27 +546,34 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
             ),
             child: Icon(icon, color: color, size: 24),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1A1F36),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 24, // Slightly reduced from 26
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1A1F36),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
+                const SizedBox(height: 2), // Reduced from 4
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12, // Slightly reduced from 13
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -650,11 +665,13 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               label,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 12,
+                fontSize: 11, // Reduced from 12
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF1A1F36),
-                height: 1.3,
+                height: 1.2,
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -770,6 +787,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF1A1F36),
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -778,6 +797,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                         fontSize: 14,
                         color: Colors.grey[600],
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -891,6 +912,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -976,6 +999,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               fontWeight: FontWeight.w600,
               color: Color(0xFF1A1F36),
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         Text(
@@ -1020,8 +1045,4 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       ),
     );
   }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes
