@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../features/service_provider/dashboard/dashboard.dart';
+import '../../features/service_provider/profile/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -14,10 +15,6 @@ class ProviderBottomNav extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    // We need providerType for the Dashboard. 
-    // Usually, we'd get this from a Provider/State Management, 
-    // but here we'll fetch it from Firestore or pass it if known.
-    
     Widget page;
     switch (index) {
       case 0:
@@ -35,7 +32,7 @@ class ProviderBottomNav extends StatelessWidget {
         page = const ProviderServicesPage();
         break;
       case 3:
-        page = const ProviderProfilePage();
+        page = const ServiceProviderProfilePage();
         break;
       default:
         return;
@@ -119,18 +116,6 @@ class ProviderServicesPage extends StatelessWidget {
       appBar: AppBar(title: const Text('My Services')),
       body: const Center(child: Text('Services Page')),
       bottomNavigationBar: const ProviderBottomNav(currentIndex: 2),
-    );
-  }
-}
-
-class ProviderProfilePage extends StatelessWidget {
-  const ProviderProfilePage({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
-      body: const Center(child: Text('Profile Page')),
-      bottomNavigationBar: const ProviderBottomNav(currentIndex: 3),
     );
   }
 }
