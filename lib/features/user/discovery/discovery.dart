@@ -214,7 +214,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _showSavedOnly ? Colors.white : Colors.white.withValues(alpha: 0.2),
+                color: _showSavedOnly ? Colors.white : Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Icon(
@@ -242,7 +242,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                     borderRadius: BorderRadius.circular(15),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
+                        color: Colors.black.withOpacity(0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -310,10 +310,10 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                     duration: const Duration(milliseconds: 300),
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.15),
+                      color: isSelected ? Colors.white : Colors.white.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.2),
+                        color: isSelected ? Colors.white : Colors.white.withOpacity(0.2),
                       ),
                     ),
                     alignment: Alignment.center,
@@ -335,6 +335,15 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     );
   }
 
+  String _getCategoryForQuery(String category) {
+    switch (category) {
+      case 'Photography':
+        return 'photographer';
+      default:
+        return category.toLowerCase();
+    }
+  }
+
   Widget _buildProvidersList() {
     if (_showSavedOnly) {
       if (user == null) return _buildLoginPrompt();
@@ -348,9 +357,10 @@ class _DiscoveryPageState extends State<DiscoveryPage>
 
     Query query = FirebaseFirestore.instance.collection('service_providers');
     if (_selectedCategory != 'All') {
+      final categoryForQuery = _getCategoryForQuery(_selectedCategory);
       query = query.where(Filter.or(
-          Filter('providerType', isEqualTo: _selectedCategory),
-          Filter('category', isEqualTo: _selectedCategory)
+          Filter('providerType', isEqualTo: categoryForQuery),
+          Filter('category', isEqualTo: categoryForQuery)
       ));
     }
     return _buildStreamList(query);
@@ -411,7 +421,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Colors.black.withOpacity(0.06),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -439,7 +449,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.7),
+                      color: Colors.black.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -550,9 +560,9 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                               duration: const Duration(milliseconds: 300),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: isSaved ? AppColors.primaryBlue.withValues(alpha: 0.1) : Colors.transparent,
+                                color: isSaved ? AppColors.primaryBlue.withOpacity(0.1) : Colors.transparent,
                                 border: Border.all(
-                                  color: isSaved ? AppColors.primaryBlue : Colors.grey.withValues(alpha: 0.3),
+                                  color: isSaved ? AppColors.primaryBlue : Colors.grey.withOpacity(0.3),
                                   width: 1.5,
                                 ),
                                 borderRadius: BorderRadius.circular(14),
@@ -585,12 +595,12 @@ class _DiscoveryPageState extends State<DiscoveryPage>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primaryGreen.withValues(alpha: 0.1),
-            AppColors.primaryBlue.withValues(alpha: 0.1)
+            AppColors.primaryGreen.withOpacity(0.1),
+            AppColors.primaryBlue.withOpacity(0.1)
           ],
         ),
       ),
-      child: Icon(Icons.image_outlined, size: 60, color: AppColors.primaryBlue.withValues(alpha: 0.3)),
+      child: Icon(Icons.image_outlined, size: 60, color: AppColors.primaryBlue.withOpacity(0.3)),
     );
   }
 
