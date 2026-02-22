@@ -3,10 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/strings.dart';
-import '../services/photographer.dart';
-import '../../user/services/music.dart';
-import '../services/catering.dart';
-import '../services/venue.dart';
+import '../discovery/discovery.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -593,10 +590,10 @@ class _HomePageState extends State<HomePage>
   // ================= CATEGORIES =================
   Widget _buildCategories() {
     final categories = [
-      {'icon': Icons.camera_alt, 'label': 'Photography', 'page': const PhotographyPage()},
-      {'icon': Icons.location_city, 'label': 'Venues', 'page': const VenuesPage()},
-      {'icon': Icons.restaurant, 'label': 'Catering', 'page': const CateringPage()},
-      {'icon': Icons.music_note, 'label': 'Music', 'page': const MusicPage()},
+      {'icon': Icons.camera_alt, 'label': 'Photography', 'category': 'Photography'},
+      {'icon': Icons.location_city, 'label': 'Venues', 'category': 'Venue'},
+      {'icon': Icons.restaurant, 'label': 'Catering', 'category': 'Catering'},
+      {'icon': Icons.music_note, 'label': 'Music', 'category': 'Music'},
     ];
 
     return Column(
@@ -623,7 +620,11 @@ class _HomePageState extends State<HomePage>
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => item['page'] as Widget),
+                    MaterialPageRoute(
+                      builder: (_) => DiscoveryPage(
+                        initialCategory: item['category'] as String,
+                      ),
+                    ),
                   );
                 },
                 child: Container(

@@ -18,8 +18,8 @@ class ServiceProviderPage extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFF00897B), // Teal/Green
-                    Color(0xFF1565C0), // Blue
+                    Color(0xFF00897B),
+                    Color(0xFF1565C0),
                   ],
                 ),
               ),
