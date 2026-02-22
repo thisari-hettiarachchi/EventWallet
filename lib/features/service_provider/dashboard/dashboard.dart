@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../core/widgets/provider_bottom_nav.dart';
 
 class ServiceProviderDashboard extends StatefulWidget {
   final String providerId;
@@ -275,6 +276,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           ),
         ),
       ),
+      bottomNavigationBar: const ProviderBottomNav(currentIndex: 0),
     );
   }
 
