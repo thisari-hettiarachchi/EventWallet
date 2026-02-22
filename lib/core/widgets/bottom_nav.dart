@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../features/user/home/home.dart';
 import '../../features/user/events/event.dart';
-import '../../features/user/budget/budget.dart';
+import '../../features/user/discovery/discovery.dart';
 import '../../features/user/profile/profile.dart';
 
 class AppBottomNav extends StatelessWidget {
@@ -22,7 +22,7 @@ class AppBottomNav extends StatelessWidget {
         page = const EventsPage();
         break;
       case 2:
-        page = const BudgetPage();
+        page = const DiscoveryPage();
         break;
       case 3:
         page = const ProfilePage();
@@ -71,9 +71,9 @@ class AppBottomNav extends StatelessWidget {
             label: 'Events',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            activeIcon: Icon(Icons.account_balance_wallet),
-            label: 'Budget',
+            icon: Icon(Icons.storefront_outlined),
+            activeIcon: Icon(Icons.storefront),
+            label: 'Services',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
