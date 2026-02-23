@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/constants/colors.dart';
+import 'edit_event.dart';
 
 class ManageEventsPage extends StatefulWidget {
   const ManageEventsPage({super.key});
@@ -199,7 +200,17 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditEventPage(
+                                eventId: eventId,
+                                eventData: data,
+                              ),
+                            ),
+                          );
+                        },
                         icon: const Icon(Icons.edit, size: 18),
                         label: const Text('Edit'),
                         style: OutlinedButton.styleFrom(
@@ -212,7 +223,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () => _deleteEvent(eventId),
+                        onPressed: () => _deleteEvent(eventId, eventName),
                         icon: const Icon(Icons.delete, size: 18),
                         label: const Text('Delete'),
                         style: OutlinedButton.styleFrom(
@@ -272,7 +283,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
-  void _deleteEvent(String eventId) {
+  void _deleteEvent(String eventId, String eventName) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -282,7 +293,23 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () async {
+              final user = FirebaseAuth.instance.currentUser;
               await FirebaseFirestore.instance.collection('events').doc(eventId).delete();
+              
+              if (user != null) {
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(user.uid)
+                    .collection('notifications')
+                    .add({
+                  'title': 'Event Deleted',
+                  'message': 'Your event "$eventName" has been deleted.',
+                  'timestamp': FieldValue.serverTimestamp(),
+                  'isRead': false,
+                  'type': 'event',
+                });
+              }
+
               if (mounted) Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700),

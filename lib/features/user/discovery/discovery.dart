@@ -95,6 +95,20 @@ class _DiscoveryPageState extends State<DiscoveryPage>
             'providerId': providerId,
             'savedAt': FieldValue.serverTimestamp(),
           });
+          
+          // Add notification for adding service to event
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .collection('notifications')
+              .add({
+            'title': 'Service Added',
+            'message': '${data['businessName'] ?? data['name'] ?? 'A service'} has been added to your event.',
+            'timestamp': FieldValue.serverTimestamp(),
+            'isRead': false,
+            'type': 'service',
+          });
+
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -134,6 +148,20 @@ class _DiscoveryPageState extends State<DiscoveryPage>
           'providerId': providerId,
           'savedAt': FieldValue.serverTimestamp(),
         });
+
+        // Add notification for adding to favorites
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('notifications')
+            .add({
+          'title': 'New Favorite',
+          'message': '${data['businessName'] ?? data['name'] ?? 'A provider'} has been added to your favorites.',
+          'timestamp': FieldValue.serverTimestamp(),
+          'isRead': false,
+          'type': 'service',
+        });
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -247,10 +275,18 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         children: [
           Row(
             children: [
-              if (widget.isEventSaving)
+              if (widget.isEventSaving || _showSavedOnly)
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    if (widget.isEventSaving) {
+                      Navigator.pop(context);
+                    } else {
+                      setState(() {
+                        _showSavedOnly = false;
+                      });
+                    }
+                  },
                 ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

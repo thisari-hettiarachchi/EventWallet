@@ -4,6 +4,7 @@ import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/strings.dart';
 import '../discovery/discovery.dart';
+import 'notifications.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -244,7 +245,12 @@ class _HomePageState extends State<HomePage>
                       ),
                       child: IconButton(
                         icon: const Icon(Icons.notifications_outlined, color: Colors.white, size: 28),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const NotificationsPage()),
+                          );
+                        },
                       ),
                     ),
                     if (_notificationCount > 0)

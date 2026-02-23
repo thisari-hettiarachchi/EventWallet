@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/constants/colors.dart';
 
 class EditEventPage extends StatefulWidget {
@@ -70,6 +71,7 @@ class _EditEventPageState extends State<EditEventPage> {
   Future<void> _updateEvent() async {
     if (_formKey.currentState!.validate()) {
       try {
+        final user = FirebaseAuth.instance.currentUser;
         await FirebaseFirestore.instance.collection('events').doc(widget.eventId).update({
           'eventName': _nameController.text.trim(),
           'name': _nameController.text.trim(),
@@ -83,6 +85,21 @@ class _EditEventPageState extends State<EditEventPage> {
           'category': _selectedCategory,
           'date': Timestamp.fromDate(_selectedDate),
         });
+
+        if (user != null) {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .collection('notifications')
+              .add({
+            'title': 'Event Updated',
+            'message': 'Your event "${_nameController.text.trim()}" has been updated.',
+            'timestamp': FieldValue.serverTimestamp(),
+            'isRead': false,
+            'type': 'event',
+          });
+        }
+
         if (mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(

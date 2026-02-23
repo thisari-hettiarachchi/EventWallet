@@ -178,6 +178,15 @@ class _CreateEventPageState extends State<CreateEventPage> {
     try {
       await _db.collection('events').add(data);
 
+      // Add notification
+      await _db.collection('users').doc(user.uid).collection('notifications').add({
+        'title': 'Event Created',
+        'message': 'Your new event "${_eventNameController.text.trim()}" has been created successfully.',
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'type': 'event',
+      });
+
       if (mounted) {
         Navigator.pushReplacement(
           context,
