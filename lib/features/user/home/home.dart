@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/strings.dart';
@@ -17,8 +18,6 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
-
-  final int _notificationCount = 3;
 
   double _totalBudget = 0;
   double _totalSpent = 0;
@@ -150,8 +149,6 @@ class _HomePageState extends State<HomePage>
                       const SizedBox(height: 28),
                       _buildCategories(),
                       const SizedBox(height: 28),
-                      _buildPopularServices(),
-                      const SizedBox(height: 28),
                       _buildUpcomingEvents(),
                       const SizedBox(height: 28),
                       _buildTodayExpenses(),
@@ -164,40 +161,14 @@ class _HomePageState extends State<HomePage>
           ),
         ),
       ),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF00897B), Color(0xFF26A69A)],
-          ),
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF00897B).withValues(alpha: 0.4),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: FloatingActionButton.extended(
-          onPressed: () {},
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          icon: const Icon(Icons.add, color: Colors.white, size: 26),
-          label: const Text(AppStrings.quickAdd,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              )),
-        ),
-      ),
       bottomNavigationBar: const AppBottomNav(currentIndex: 0),
     );
   }
 
   // ================= HEADER =================
   Widget _buildHeader() {
+    final user = FirebaseAuth.instance.currentUser;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: FadeTransition(
@@ -232,61 +203,74 @@ class _HomePageState extends State<HomePage>
                       ]
                   ),
                 ),
-                Stack(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          width: 1,
-                        ),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.notifications_outlined, color: Colors.white, size: 28),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const NotificationsPage()),
-                          );
-                        },
-                      ),
-                    ),
-                    if (_notificationCount > 0)
-                      Positioned(
-                        right: 6,
-                        top: 6,
-                        child: Container(
-                          padding: const EdgeInsets.all(5),
+                StreamBuilder<QuerySnapshot>(
+                  stream: user == null
+                      ? null
+                      : FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(user.uid)
+                          .collection('notifications')
+                          .where('isRead', isEqualTo: false)
+                          .snapshots(),
+                  builder: (context, snapshot) {
+                    final int unreadCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
+                    return Stack(
+                      children: [
+                        Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFF3D00),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.white, width: 2.5),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFFF3D00).withValues(alpha: 0.5),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 20,
-                            minHeight: 20,
-                          ),
-                          child: Text(
-                            '$_notificationCount',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              width: 1,
                             ),
-                            textAlign: TextAlign.center,
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.notifications_outlined, color: Colors.white, size: 28),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const NotificationsPage()),
+                              );
+                            },
                           ),
                         ),
-                      )
-                  ],
+                        if (unreadCount > 0)
+                          Positioned(
+                            right: 6,
+                            top: 6,
+                            child: Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFF3D00),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.white, width: 2.5),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFFF3D00).withValues(alpha: 0.5),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 20,
+                                minHeight: 20,
+                              ),
+                              child: Text(
+                                '$unreadCount',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          )
+                      ],
+                    );
+                  }
                 )
               ],
             ),
@@ -661,43 +645,6 @@ class _HomePageState extends State<HomePage>
                 ),
               );
             },
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ================= POPULAR SERVICES =================
-  Widget _buildPopularServices() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          AppStrings.popularServices,
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w800,
-            color: Color(0xFF1A1F36),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Container(
-        padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Row(
-            children: [
-              Icon(Icons.star, color: Colors.amber, size: 28),
-              SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  'Top-rated photographers and venues available near you',
-                  style: TextStyle(fontSize: 15),
-                ),
-              ),
-            ],
           ),
         ),
       ],

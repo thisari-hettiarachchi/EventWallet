@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/colors.dart';
+import 'provider_profile.dart';
 
 class DiscoveryPage extends StatefulWidget {
   final String initialCategory;
@@ -525,7 +526,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     final rating = (data['rating'] ?? 0.0).toDouble();
     final price = (data['price'] ?? 0.0).toDouble();
     final imageUrl = data['imageUrl'] ?? '';
-    final location = data['location'] ?? 'Location not specified';
+    final availability = data['availability'] ?? 'Available';
     final user = FirebaseAuth.instance.currentUser;
 
     return Container(
@@ -615,24 +616,25 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                         ),
                       ),
                     ),
-                    Text(
-                      price > 0 ? '\$${price.toInt()}' : 'Quote',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.primaryGreen,
+                    if (price > 0)
+                      Text(
+                        '\$${price.toInt()}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.primaryGreen,
+                        ),
                       ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.location_on_rounded, size: 16, color: Colors.grey),
+                    const Icon(Icons.calendar_today_rounded, size: 16, color: Colors.grey),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        location,
+                        availability,
                         style: const TextStyle(color: Colors.grey, fontSize: 14, fontWeight: FontWeight.w500),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -645,7 +647,17 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProviderProfilePage(
+                                providerId: id,
+                                providerData: data,
+                              ),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryGreen,
                           foregroundColor: Colors.white,

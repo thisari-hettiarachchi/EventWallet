@@ -18,13 +18,37 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  /// Determines event status based on date
+  String _getEventStatus(dynamic timestamp) {
+    if (timestamp == null) return 'Upcoming';
+    DateTime eventDate;
+
+    if (timestamp is Timestamp) {
+      eventDate = timestamp.toDate();
+    } else if (timestamp is DateTime) {
+      eventDate = timestamp;
+    } else {
+      return 'Upcoming';
+    }
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final eventDay = DateTime(eventDate.year, eventDate.month, eventDate.day);
+
+    if (eventDay.isAfter(today)) {
+      return 'Upcoming';
+    } else {
+      return 'Completed';
+    }
   }
 
   @override
@@ -62,10 +86,10 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
+                            color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.3),
+                              color: Colors.white.withOpacity(0.3),
                               width: 1,
                             ),
                           ),
@@ -110,7 +134,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
+                            color: Colors.black.withOpacity(0.1),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -157,7 +181,6 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     indicatorSize: TabBarIndicatorSize.label,
                     tabs: const [
                       Tab(text: 'Upcoming'),
-                      Tab(text: 'In Progress'),
                       Tab(text: 'Completed'),
                     ],
                   ),
@@ -166,7 +189,6 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                       controller: _tabController,
                       children: [
                         _buildEventList('Upcoming'),
-                        _buildEventList('In Progress'),
                         _buildEventList('Completed'),
                       ],
                     ),
@@ -193,7 +215,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
         final events = snapshot.data!.docs.where((doc) {
           final data = doc.data() as Map<String, dynamic>;
           final title = (data['eventName'] ?? data['name'] ?? '').toString().toLowerCase();
-          final status = data['status'] ?? 'Upcoming';
+          final status = _getEventStatus(data['date']);
           return title.contains(_searchQuery) && status == statusFilter;
         }).toList();
 
@@ -209,8 +231,15 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
           itemBuilder: (context, index) {
             final event = events[index];
             final data = event.data() as Map<String, dynamic>;
-            final color = statusFilter == 'Completed' ? const Color(0xFF00897B) : const Color(0xFF1565C0);
-            
+            final Color color;
+            switch (statusFilter) {
+              case 'Completed':
+                color = const Color(0xFF00897B);
+                break;
+              default:
+                color = const Color(0xFF1565C0);
+            }
+
             return GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -291,7 +320,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -310,7 +339,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
+                        colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
                       ),
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -349,7 +378,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.1),
+                      color: color.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(

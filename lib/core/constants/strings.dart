@@ -24,5 +24,5 @@ class AppStrings {
   static const String categories = 'Categories';
   static const String popularServices = 'Popular Services';
   static const String upcomingEvents = 'Upcoming Events';
-  static const String todayExpenses = 'Today Expenses';
+  static const String todayExpenses = 'Expenses';
 }
