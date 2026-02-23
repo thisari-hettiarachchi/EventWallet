@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'tasks.dart';
+import 'tasks_page.dart';
 import 'guest_list.dart';
 import '../budget/add_expense.dart';
+import '../budget/expenses_page.dart';
 import '../../../core/constants/colors.dart';
+import '../discovery/discovery.dart';
+import 'edit_event.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final String eventId;
@@ -98,7 +101,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                   height: 200,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: Colors.white.withOpacity(0.1),
                   ),
                 ),
               ),
@@ -110,7 +113,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                   height: 120,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withValues(alpha: 0.08),
+                    color: Colors.white.withOpacity(0.08),
                   ),
                 ),
               ),
@@ -125,10 +128,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
+                                color: Colors.white.withOpacity(0.3),
                                 width: 1,
                               ),
                             ),
@@ -151,10 +154,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                           const Spacer(),
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
+                                color: Colors.white.withOpacity(0.3),
                                 width: 1,
                               ),
                             ),
@@ -177,17 +180,27 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                           const SizedBox(width: 8),
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
+                                color: Colors.white.withOpacity(0.3),
                                 width: 1,
                               ),
                             ),
                             child: Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                onTap: () {},
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => EditEventPage(
+                                        eventId: widget.eventId,
+                                        eventData: event,
+                                      ),
+                                    ),
+                                  );
+                                },
                                 borderRadius: BorderRadius.circular(12),
                                 child: const Padding(
                                   padding: EdgeInsets.all(12),
@@ -213,10 +226,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                           Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
+                                color: Colors.white.withOpacity(0.3),
                                 width: 2,
                               ),
                             ),
@@ -248,7 +261,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
+                                  color: Colors.black.withOpacity(0.1),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
@@ -289,29 +302,33 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                         child: ListView(
                           padding: const EdgeInsets.all(20),
                           children: [
-                            // Budget Cards Row
+                            // Main Management Section
+                            const Text(
+                              'Event Management',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textDark,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
                             Row(
                               children: [
                                 Expanded(
-                                  child: _buildGlassCard(
-                                    icon: Icons.account_balance_wallet,
-                                    label: 'Total Budget',
-                                    value: '\$${budget.toStringAsFixed(0)}',
-                                    gradient: AppColors.buttonGradient,
+                                  child: _buildSmallActionCard(
+                                    'Expenses',
+                                    Icons.account_balance_wallet,
+                                    AppColors.primaryGreen,
+                                    () => Navigator.push(context, MaterialPageRoute(builder: (_) => ExpensesPage(eventId: widget.eventId, eventName: widget.eventName))),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
-                                  child: _buildGlassCard(
-                                    icon: Icons.shopping_bag,
-                                    label: 'Spent',
-                                    value: '\$${spent.toStringAsFixed(0)}',
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFF1565C0),
-                                        Color(0xFF1E88E5),
-                                      ],
-                                    ),
+                                  child: _buildSmallActionCard(
+                                    'Tasks',
+                                    Icons.task_alt,
+                                    AppColors.primaryBlue,
+                                    () => Navigator.push(context, MaterialPageRoute(builder: (_) => TasksPage(eventId: widget.eventId))),
                                   ),
                                 ),
                               ],
@@ -320,29 +337,27 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                             Row(
                               children: [
                                 Expanded(
-                                  child: _buildGlassCard(
-                                    icon: Icons.savings,
-                                    label: 'Remaining',
-                                    value: '\$${(budget - spent).toStringAsFixed(0)}',
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.green.shade500,
-                                        Colors.green.shade600,
-                                      ],
-                                    ),
+                                  child: _buildSmallActionCard(
+                                    'Guest List',
+                                    Icons.people_outline,
+                                    Colors.purple,
+                                    () => Navigator.push(context, MaterialPageRoute(builder: (_) => GuestListPage(eventId: widget.eventId))),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
-                                  child: _buildGlassCard(
-                                    icon: Icons.pie_chart,
-                                    label: 'Used',
-                                    value: '${(progress * 100).toInt()}%',
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.orange.shade500,
-                                        Colors.orange.shade600,
-                                      ],
+                                  child: _buildSmallActionCard(
+                                    'Add Services',
+                                    Icons.add_business_outlined,
+                                    Colors.orange,
+                                    () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => DiscoveryPage(
+                                          eventId: widget.eventId,
+                                          isEventSaving: true,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -405,7 +420,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                                 color: (progress > 0.8
                                                     ? Colors.orange
                                                     : const Color(0xFF00897B))
-                                                    .withValues(alpha: 0.4),
+                                                    .withOpacity(0.4),
                                                 blurRadius: 8,
                                                 offset: const Offset(0, 2),
                                               ),
@@ -440,7 +455,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 24),
 
                             // Event Information
                             _buildModernCard(
@@ -545,56 +560,38 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                   ],
                                 ),
                               ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 24),
 
-                            // Quick Actions
-                            const Text(
-                              'Quick Actions',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textDark,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            GridView.count(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 12,
-                              crossAxisSpacing: 12,
-                              childAspectRatio: 1.3,
+                            // Saved Services Section
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                _buildActionCard(
-                                  'Add Expense',
-                                  Icons.add_shopping_cart,
-                                  AppColors.primaryGreen,
-                                  const Color(0xFF26A69A),
-                                  () => Navigator.push(context, MaterialPageRoute(builder: (_) => AddExpensePage(eventId: widget.eventId, eventName: widget.eventName))),
+                                const Text(
+                                  'Services for this Event',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textDark,
+                                  ),
                                 ),
-                                _buildActionCard(
-                                  'Tasks',
-                                  Icons.check_circle_outline,
-                                  AppColors.primaryBlue,
-                                  const Color(0xFF1E88E5),
-                                  () => Navigator.push(context, MaterialPageRoute(builder: (_) => TasksPage(eventId: widget.eventId))),
-                                ),
-                                _buildActionCard(
-                                  'Vendors',
-                                  Icons.business_center,
-                                  AppColors.primaryGreen,
-                                  const Color(0xFF00695C),
-                                  () {}, // TODO: Link to Vendors
-                                ),
-                                _buildActionCard(
-                                  'Guest List',
-                                  Icons.people,
-                                  AppColors.primaryBlue,
-                                  const Color(0xFF0D47A1),
-                                  () => Navigator.push(context, MaterialPageRoute(builder: (_) => GuestListPage(eventId: widget.eventId))),
+                                TextButton.icon(
+                                  onPressed: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => DiscoveryPage(
+                                        eventId: widget.eventId,
+                                        isEventSaving: true,
+                                      ),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.add, size: 18),
+                                  label: const Text('Add'),
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 16),
+                            _buildSavedServicesSection(),
+
                             const SizedBox(height: 100),
                           ],
                         ),
@@ -610,49 +607,221 @@ class _EventDetailsPageState extends State<EventDetailsPage>
     );
   }
 
-  Widget _buildGlassCard({
-    required IconData icon,
-    required String label,
-    required String value,
-    required LinearGradient gradient,
-  }) {
+  Widget _buildSavedServicesSection() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('events')
+          .doc(widget.eventId)
+          .collection('services')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox(
+            height: 100,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return InkWell(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DiscoveryPage(
+                  eventId: widget.eventId,
+                  isEventSaving: true,
+                ),
+              ),
+            ),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Column(
+                children: [
+                  Icon(Icons.business_center_outlined, size: 48, color: Colors.grey.shade400),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No services added yet',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Tap to discover and add services to your event',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        final services = snapshot.data!.docs;
+        return Column(
+          children: List.generate(
+            services.length,
+            (index) {
+              final data = services[index].data() as Map<String, dynamic>;
+              final name = data['businessName'] ?? data['name'] ?? 'Unknown Service';
+              final type = data['providerType'] ?? data['category'] ?? 'Service';
+              final price = (data['price'] ?? 0.0).toDouble();
+              final rating = (data['rating'] ?? 0.0).toDouble();
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.business, color: AppColors.primaryGreen, size: 20),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: AppColors.textDark,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Text(
+                                type,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.primaryBlue,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              if (rating > 0) ...[
+                                const SizedBox(width: 8),
+                                Icon(Icons.star_rounded, size: 12, color: Colors.amber),
+                                const SizedBox(width: 2),
+                                Text(
+                                  rating.toStringAsFixed(1),
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        if (price > 0)
+                          Text(
+                            '\$${price.toInt()}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: AppColors.primaryGreen,
+                            ),
+                          ),
+                        const SizedBox(height: 4),
+                        GestureDetector(
+                          onTap: () {
+                            FirebaseFirestore.instance
+                                .collection('events')
+                                .doc(widget.eventId)
+                                .collection('services')
+                                .doc(services[index].id)
+                                .delete();
+                          },
+                          child: Icon(Icons.close, size: 18, color: Colors.grey.shade600),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSmallActionCard(
+      String label,
+      IconData icon,
+      Color color,
+      VoidCallback onTap,
+      ) {
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [AppColors.cardShadow()],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              gradient: gradient,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: Colors.white, size: 20),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: AppColors.textGrey,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-              color: AppColors.textDark,
-            ),
+        border: Border.all(color: color.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: color, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textDark,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -683,7 +852,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, size: 18, color: color),
@@ -714,58 +883,6 @@ class _EventDetailsPageState extends State<EventDetailsPage>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildActionCard(
-      String label,
-      IconData icon,
-      Color color1,
-      Color color2,
-      VoidCallback onTap,
-      ) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color1, color2],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: color1.withValues(alpha: 0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: Colors.white, size: 32),
-                const SizedBox(height: 12),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

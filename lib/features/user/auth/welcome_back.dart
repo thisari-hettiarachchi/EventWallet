@@ -106,6 +106,7 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                               children: [
                                 const Text(
                                   'Welcome Back!',
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 38,
                                     fontWeight: FontWeight.w900,
@@ -186,15 +187,18 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                                 Row(
                                   children: [
                                     Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.3))),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                                      child: Text(
-                                        'ARE YOU A PROVIDER?',
-                                        style: TextStyle(
-                                          color: Colors.white.withValues(alpha: 0.6),
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 1.5,
+                                    Flexible(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                                        child: Text(
+                                          'ARE YOU A PROVIDER?',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(alpha: 0.6),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 1.5,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -213,10 +217,11 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                         // Bottom text
                         FadeTransition(
                           opacity: _fadeAnimation,
-                          child: Text(
+                          child: const Text(
                             'Your events, simplified',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.7),
+                              color: Colors.white70,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                               letterSpacing: 0.5,
@@ -272,17 +277,21 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Color(0xFF00897B), Color(0xFF1565C0)],
-              ).createShader(bounds),
-              child: Text(
-                text,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
+            Flexible(
+              child: ShaderMask(
+                shaderCallback: (bounds) => const LinearGradient(
+                  colors: [Color(0xFF00897B), Color(0xFF1565C0)],
+                ).createShader(bounds),
+                child: Text(
+                  text,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
                 ),
               ),
             ),
@@ -323,13 +332,17 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              text,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1,
+            Flexible(
+              child: Text(
+                text,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -352,6 +365,7 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
         },
         borderRadius: BorderRadius.circular(20),
         child: Container(
+          width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
@@ -359,7 +373,6 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
             border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
           ),
           child: Row(
-            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
@@ -370,27 +383,29 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                 child: const Icon(Icons.business_center_rounded, color: Colors.white, size: 20),
               ),
               const SizedBox(width: 16),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Sign In As A Service Provider',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Sign In As A Service Provider',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Manage your business profile',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
+                    Text(
+                      'Manage your business profile',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               const SizedBox(width: 12),
               const Icon(Icons.chevron_right_rounded, color: Colors.white70),
