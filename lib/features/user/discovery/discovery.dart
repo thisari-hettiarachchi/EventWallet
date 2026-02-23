@@ -23,7 +23,6 @@ class DiscoveryPage extends StatefulWidget {
 class _DiscoveryPageState extends State<DiscoveryPage>
     with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
-  final User? user = FirebaseAuth.instance.currentUser;
 
   String _searchQuery = '';
   late String _selectedCategory;
@@ -60,19 +59,60 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   }
 
   Future<void> _toggleSaveProvider(String providerId, Map<String, dynamic> data) async {
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please login to save providers')),
-      );
-      return;
-    }
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please login to save providers')),
+        );
+        return;
+      }
 
-    // If this is event-specific saving
-    if (widget.isEventSaving && widget.eventId != null) {
+      // If this is event-specific saving
+      if (widget.isEventSaving && widget.eventId != null) {
+        final docRef = FirebaseFirestore.instance
+            .collection('events')
+            .doc(widget.eventId!)
+            .collection('services')
+            .doc(providerId);
+
+        final doc = await docRef.get();
+
+        if (doc.exists) {
+          await docRef.delete();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Service removed from event'),
+                backgroundColor: Colors.orange,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        } else {
+          await docRef.set({
+            ...data,
+            'providerId': providerId,
+            'savedAt': FieldValue.serverTimestamp(),
+          });
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Service added to event'),
+                backgroundColor: AppColors.success,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        }
+        return;
+      }
+
+      // Original behavior for general favorites
       final docRef = FirebaseFirestore.instance
-          .collection('events')
-          .doc(widget.eventId!)
-          .collection('services')
+          .collection('users')
+          .doc(user.uid)
+          .collection('saved_providers')
           .doc(providerId);
 
       final doc = await docRef.get();
@@ -82,7 +122,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Service removed from event'),
+              content: Text('Removed from favorites'),
               backgroundColor: Colors.orange,
               behavior: SnackBarBehavior.floating,
             ),
@@ -91,51 +131,25 @@ class _DiscoveryPageState extends State<DiscoveryPage>
       } else {
         await docRef.set({
           ...data,
+          'providerId': providerId,
           'savedAt': FieldValue.serverTimestamp(),
         });
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Service added to event'),
+              content: Text('Added to favorites'),
               backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
             ),
           );
         }
       }
-      return;
-    }
-
-    // Original behavior for general favorites
-    final docRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('saved_providers')
-        .doc(providerId);
-
-    final doc = await docRef.get();
-
-    if (doc.exists) {
-      await docRef.delete();
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Removed from favorites'),
-            backgroundColor: Colors.orange,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } else {
-      await docRef.set({
-        ...data,
-        'savedAt': FieldValue.serverTimestamp(),
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Added to favorites'),
-            backgroundColor: AppColors.success,
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -231,29 +245,38 @@ class _DiscoveryPageState extends State<DiscoveryPage>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Text(
-                widget.isEventSaving
-                    ? 'Add Services'
-                    : (_showSavedOnly ? 'My Favorites' : 'Discovery'),
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                  letterSpacing: -1,
+              if (widget.isEventSaving)
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+                  onPressed: () => Navigator.pop(context),
                 ),
-              ),
-              Text(
-                widget.isEventSaving
-                    ? 'Select services for your event'
-                    : 'Quality services for your events',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.white70,
-                  fontWeight: FontWeight.w500,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.isEventSaving
+                        ? 'Add Services'
+                        : (_showSavedOnly ? 'My Favorites' : 'Discovery'),
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: -1,
+                    ),
+                  ),
+                  Text(
+                    widget.isEventSaving
+                        ? 'Select services for your event'
+                        : 'Quality services for your events',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white70,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -399,11 +422,12 @@ class _DiscoveryPageState extends State<DiscoveryPage>
 
   Widget _buildProvidersList() {
     if (_showSavedOnly) {
+      final user = FirebaseAuth.instance.currentUser;
       if (user == null) return _buildLoginPrompt();
       return _buildStreamList(
           FirebaseFirestore.instance
               .collection('users')
-              .doc(user!.uid)
+              .doc(user.uid)
               .collection('saved_providers')
       );
     }
@@ -466,6 +490,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     final price = (data['price'] ?? 0.0).toDouble();
     final imageUrl = data['imageUrl'] ?? '';
     final location = data['location'] ?? 'Location not specified';
+    final user = FirebaseAuth.instance.currentUser;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 22),
@@ -608,7 +633,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                                     .snapshots()
                                 : FirebaseFirestore.instance
                                     .collection('users')
-                                    .doc(user!.uid)
+                                    .doc(user.uid)
                                     .collection('saved_providers')
                                     .doc(id)
                                     .snapshots()),
