@@ -6,7 +6,15 @@ import '../../../core/constants/colors.dart';
 
 class DiscoveryPage extends StatefulWidget {
   final String initialCategory;
-  const DiscoveryPage({super.key, this.initialCategory = 'All'});
+  final String? eventId;
+  final bool isEventSaving;
+  
+  const DiscoveryPage({
+    super.key,
+    this.initialCategory = 'All',
+    this.eventId,
+    this.isEventSaving = false,
+  });
 
   @override
   State<DiscoveryPage> createState() => _DiscoveryPageState();
@@ -59,6 +67,46 @@ class _DiscoveryPageState extends State<DiscoveryPage>
       return;
     }
 
+    // If this is event-specific saving
+    if (widget.isEventSaving && widget.eventId != null) {
+      final docRef = FirebaseFirestore.instance
+          .collection('events')
+          .doc(widget.eventId!)
+          .collection('services')
+          .doc(providerId);
+
+      final doc = await docRef.get();
+
+      if (doc.exists) {
+        await docRef.delete();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Service removed from event'),
+              backgroundColor: Colors.orange,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } else {
+        await docRef.set({
+          ...data,
+          'savedAt': FieldValue.serverTimestamp(),
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Service added to event'),
+              backgroundColor: AppColors.success,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+      return;
+    }
+
+    // Original behavior for general favorites
     final docRef = FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
@@ -173,7 +221,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
           ),
         ),
       ),
-      bottomNavigationBar: const AppBottomNav(currentIndex: 2),
+      bottomNavigationBar: widget.isEventSaving ? null : const AppBottomNav(currentIndex: 2),
     );
   }
 
@@ -187,7 +235,9 @@ class _DiscoveryPageState extends State<DiscoveryPage>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _showSavedOnly ? 'My Favorites' : 'Discovery',
+                widget.isEventSaving
+                    ? 'Add Services'
+                    : (_showSavedOnly ? 'My Favorites' : 'Discovery'),
                 style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w900,
@@ -195,9 +245,11 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                   letterSpacing: -1,
                 ),
               ),
-              const Text(
-                'Quality services for your events',
-                style: TextStyle(
+              Text(
+                widget.isEventSaving
+                    ? 'Select services for your event'
+                    : 'Quality services for your events',
+                style: const TextStyle(
                   fontSize: 14,
                   color: Colors.white70,
                   fontWeight: FontWeight.w500,
@@ -205,24 +257,25 @@ class _DiscoveryPageState extends State<DiscoveryPage>
               ),
             ],
           ),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _showSavedOnly = !_showSavedOnly;
-              });
-            },
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: _showSavedOnly ? Colors.white : Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Icon(
-                _showSavedOnly ? Icons.bookmark : Icons.bookmark_border,
-                color: _showSavedOnly ? AppColors.primaryBlue : Colors.white,
+          if (!widget.isEventSaving)
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _showSavedOnly = !_showSavedOnly;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _showSavedOnly ? Colors.white : Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Icon(
+                  _showSavedOnly ? Icons.bookmark : Icons.bookmark_border,
+                  color: _showSavedOnly ? AppColors.primaryBlue : Colors.white,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -546,12 +599,19 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                     StreamBuilder<DocumentSnapshot>(
                         stream: user == null
                             ? null
-                            : FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(user!.uid)
-                            .collection('saved_providers')
-                            .doc(id)
-                            .snapshots(),
+                            : (widget.isEventSaving && widget.eventId != null
+                                ? FirebaseFirestore.instance
+                                    .collection('events')
+                                    .doc(widget.eventId!)
+                                    .collection('services')
+                                    .doc(id)
+                                    .snapshots()
+                                : FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(user!.uid)
+                                    .collection('saved_providers')
+                                    .doc(id)
+                                    .snapshots()),
                         builder: (context, snapshot) {
                           final isSaved = snapshot.hasData && snapshot.data!.exists;
                           return GestureDetector(
@@ -568,7 +628,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: Icon(
-                                isSaved ? Icons.bookmark : Icons.bookmark_border_rounded,
+                                isSaved ? (widget.isEventSaving ? Icons.check_circle : Icons.bookmark) : (widget.isEventSaving ? Icons.add_circle_outline : Icons.bookmark_border_rounded),
                                 color: AppColors.primaryBlue,
                                 size: 24,
                               ),

@@ -4,6 +4,8 @@ import 'tasks.dart';
 import 'guest_list.dart';
 import '../budget/add_expense.dart';
 import '../../../core/constants/colors.dart';
+import '../discovery/discovery.dart';
+import 'edit_event.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final String eventId;
@@ -187,7 +189,17 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                             child: Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                onTap: () {},
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => EditEventPage(
+                                        eventId: widget.eventId,
+                                        eventData: event,
+                                      ),
+                                    ),
+                                  );
+                                },
                                 borderRadius: BorderRadius.circular(12),
                                 child: const Padding(
                                   padding: EdgeInsets.all(12),
@@ -580,11 +592,19 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                   () => Navigator.push(context, MaterialPageRoute(builder: (_) => TasksPage(eventId: widget.eventId))),
                                 ),
                                 _buildActionCard(
-                                  'Vendors',
+                                  'Services',
                                   Icons.business_center,
                                   AppColors.primaryGreen,
                                   const Color(0xFF00695C),
-                                  () {}, // TODO: Link to Vendors
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => DiscoveryPage(
+                                        eventId: widget.eventId,
+                                        isEventSaving: true,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                                 _buildActionCard(
                                   'Guest List',
@@ -595,6 +615,20 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 32),
+
+                            // Saved Services Section
+                            const Text(
+                              'Services for this Event',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textDark,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildSavedServicesSection(),
+
                             const SizedBox(height: 100),
                           ],
                         ),
@@ -604,6 +638,159 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                 ),
               ),
             ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSavedServicesSection() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('events')
+          .doc(widget.eventId)
+          .collection('services')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox(
+            height: 100,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              children: [
+                Icon(Icons.business_center_outlined, size: 40, color: Colors.grey.shade400),
+                const SizedBox(height: 12),
+                Text(
+                  'No services added yet',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Tap "Services" above to discover and add services',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        }
+
+        final services = snapshot.data!.docs;
+        return Column(
+          children: List.generate(
+            services.length,
+            (index) {
+              final data = services[index].data() as Map<String, dynamic>;
+              final name = data['businessName'] ?? data['name'] ?? 'Unknown Service';
+              final type = data['providerType'] ?? data['category'] ?? 'Service';
+              final price = (data['price'] ?? 0.0).toDouble();
+              final rating = (data['rating'] ?? 0.0).toDouble();
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.business, color: AppColors.primaryGreen, size: 20),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: AppColors.textDark,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Text(
+                                type,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.primaryBlue,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              if (rating > 0) ...[
+                                const SizedBox(width: 8),
+                                Icon(Icons.star_rounded, size: 12, color: Colors.amber),
+                                const SizedBox(width: 2),
+                                Text(
+                                  rating.toStringAsFixed(1),
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        if (price > 0)
+                          Text(
+                            '\$${price.toInt()}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: AppColors.primaryGreen,
+                            ),
+                          ),
+                        const SizedBox(height: 4),
+                        GestureDetector(
+                          onTap: () {
+                            FirebaseFirestore.instance
+                                .collection('events')
+                                .doc(widget.eventId)
+                                .collection('services')
+                                .doc(services[index].id)
+                                .delete();
+                          },
+                          child: Icon(Icons.close, size: 18, color: Colors.grey.shade600),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         );
       },
