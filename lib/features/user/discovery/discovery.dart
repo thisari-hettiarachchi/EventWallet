@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/constants/styles.dart';
 import 'provider_profile.dart';
 
 class DiscoveryPage extends StatefulWidget {

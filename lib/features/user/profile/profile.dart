@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/bottom_nav.dart';
+import '../../../core/constants/colors.dart';
+import '../../../core/constants/styles.dart';
 import '../auth/login.dart';
 import '../../../services/auth_service.dart';
 import 'edit_profile.dart';
@@ -59,19 +61,9 @@ class ProfilePage extends StatelessWidget {
             : 'U';
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF5F7FA),
+          backgroundColor: AppColors.background,
           body: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF00897B), // Teal/Green
-                  Color(0xFF1565C0), // Blue
-                ],
-                stops: [0.0, 0.3], // Color covers top 30% like an app bar
-              ),
-            ),
+            decoration: AppDecorations.pageGradientHeader,
             child: SafeArea(
               child: Column(
                 children: [
@@ -84,7 +76,7 @@ class ProfilePage extends StatelessWidget {
                       border: Border.all(color: Colors.white, width: 4.w),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           blurRadius: 10.r,
                           offset: Offset(0, 5.h),
                         ),
@@ -97,7 +89,7 @@ class ProfilePage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 36.sp,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF00897B),
+                          color: AppColors.primaryGreen,
                         ),
                       ),
                     ),
@@ -105,29 +97,22 @@ class ProfilePage extends StatelessWidget {
                   SizedBox(height: 16.h),
                   Text(
                     displayName,
-                    style: TextStyle(
-                      fontSize: 24.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                    style: AppTextStyles.whiteText(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 4.h),
                   Text(
                     email,
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      color: Colors.white.withOpacity(0.9),
+                    style: AppTextStyles.whiteText(fontSize: 15).copyWith(
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                   SizedBox(height: 24.h),
                   if (!isServiceProvider) Container(
-                    margin: EdgeInsets.symmetric(horizontal: 20.w),
+                    margin: AppSpacing.horizontalPadding,
                     padding: EdgeInsets.all(20.r),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(16.r),
+                    decoration: AppDecorations.overlayButton.copyWith(
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withValues(alpha: 0.3),
                         width: 1.5.w,
                       ),
                     ),
@@ -143,7 +128,7 @@ class ProfilePage extends StatelessWidget {
                         Container(
                           width: 1.w,
                           height: 40.h,
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                         ),
 
                         // Total Budget
@@ -157,7 +142,7 @@ class ProfilePage extends StatelessWidget {
                         Container(
                           width: 1.w,
                           height: 40.h,
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                         ),
 
                         // Amount Spent
@@ -173,20 +158,13 @@ class ProfilePage extends StatelessWidget {
                   SizedBox(height: 20.h),
                   Expanded(
                     child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5F7FA),
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
-                      ),
+                      decoration: AppDecorations.roundedContent(),
                       child: ListView(
                         padding: EdgeInsets.all(20.r),
                         children: [
                           Text(
                             'Account Settings',
-                            style: TextStyle(
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF1A1F36),
-                            ),
+                            style: AppTextStyles.sectionTitle,
                           ),
                           SizedBox(height: 16.h),
                           _buildSettingsCard(
@@ -367,19 +345,13 @@ class ProfilePage extends StatelessWidget {
       children: [
         Text(
           value,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 22.sp,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.whiteText(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 4.h),
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.9),
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
+          style: AppTextStyles.whiteText(fontSize: 13, fontWeight: FontWeight.w500).copyWith(
+            color: Colors.white.withValues(alpha: 0.9),
           ),
         ),
       ],
@@ -394,17 +366,7 @@ class ProfilePage extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10.r,
-            offset: Offset(0, 4.h),
-          ),
-        ],
-      ),
+      decoration: AppDecorations.card(),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -417,7 +379,7 @@ class ProfilePage extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(10.r),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   child: Icon(icon, color: color, size: 22.sp),
@@ -429,25 +391,18 @@ class ProfilePage extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1A1F36),
-                        ),
+                        style: AppTextStyles.bodyLarge,
                       ),
                       SizedBox(height: 4.h),
                       Text(
                         subtitle,
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          color: const Color(0xFF4A5568),
-                        ),
+                        style: AppTextStyles.bodyMedium,
                       ),
                     ],
                   ),
                 ),
                 Icon(Icons.arrow_forward_ios,
-                    color: Colors.grey.shade400, size: 16.sp),
+                    color: AppColors.textGrey, size: 16.sp),
               ],
             ),
           ),

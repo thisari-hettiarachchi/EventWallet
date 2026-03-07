@@ -4,6 +4,7 @@ import '../../user/auth/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../result/result_page.dart';
+import '../../service_provider/auth/login.dart' as provider_login;
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -321,6 +322,56 @@ class _SignupPageState extends State<SignupPage>
                                     color: Colors.white,
                                     fontSize: 14.sp,
                                     fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 12.h),
+                            FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    height: 1.h,
+                                    width: 40.w,
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                                    child: Text(
+                                      'OR',
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(alpha: 0.7),
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 1.h,
+                                    width: 40.w,
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 12.h),
+                            FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const provider_login.ServiceProviderLoginPage()),
+                                  );
+                                },
+                                child: Text(
+                                  "Want to login as a service provider? Sign In",
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp,
                                   ),
                                 ),
                               ),

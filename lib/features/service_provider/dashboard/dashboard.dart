@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/provider_bottom_nav.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/constants/styles.dart';
 import '../services/my_services.dart';
 
 class ServiceProviderDashboard extends StatefulWidget {

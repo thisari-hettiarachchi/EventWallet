@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../core/constants/colors.dart';
+import '../../../core/constants/styles.dart';
 
 class HelpSupportPage extends StatelessWidget {
   const HelpSupportPage({super.key});
@@ -28,17 +30,13 @@ class HelpSupportPage extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(20.r),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF00897B), Color(0xFF1565C0)],
-                ),
-              ),
+              decoration: AppDecorations.pageGradientHeader,
               child: Column(
                 children: [
                   Container(
                     padding: EdgeInsets.all(16.r),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -50,18 +48,13 @@ class HelpSupportPage extends StatelessWidget {
                   SizedBox(height: 16.h),
                   Text(
                     'We\'re Here to Help',
-                    style: TextStyle(
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                    style: AppTextStyles.whiteText(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     'Get assistance for your events and queries',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: Colors.white.withOpacity(0.9),
+                    style: AppTextStyles.whiteText(fontSize: 14).copyWith(
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -75,18 +68,14 @@ class HelpSupportPage extends StatelessWidget {
                 children: [
                   Text(
                     'Contact Us',
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1A1F36),
-                    ),
+                    style: AppTextStyles.sectionTitle,
                   ),
                   SizedBox(height: 16.h),
                   _buildContactCard(
                     icon: Icons.email_outlined,
                     title: 'Email',
                     subtitle: 'support@eventwallet.com',
-                    color: const Color(0xFF1565C0),
+                    color: AppColors.primaryBlue,
                     onTap: () => _launchEmail('support@eventwallet.com'),
                   ),
                   SizedBox(height: 12.h),
@@ -94,17 +83,13 @@ class HelpSupportPage extends StatelessWidget {
                     icon: Icons.phone_outlined,
                     title: 'Phone',
                     subtitle: '+94 77 123 4567',
-                    color: const Color(0xFF00897B),
+                    color: AppColors.primaryGreen,
                     onTap: () => _launchPhone('+15551234567'),
                   ),
                   SizedBox(height: 32.h),
                   Text(
                     'Frequently Asked Questions',
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1A1F36),
-                    ),
+                    style: AppTextStyles.sectionTitle,
                   ),
                   SizedBox(height: 16.h),
                   _buildFAQItem(
@@ -145,17 +130,7 @@ class HelpSupportPage extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10.r,
-            offset: Offset(0, 4.h),
-          ),
-        ],
-      ),
+      decoration: AppDecorations.card(),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -168,7 +143,7 @@ class HelpSupportPage extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(12.r),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   child: Icon(icon, color: color, size: 24.sp),
@@ -180,25 +155,18 @@ class HelpSupportPage extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1A1F36),
-                        ),
+                        style: AppTextStyles.bodyLarge,
                       ),
                       SizedBox(height: 4.h),
                       Text(
                         subtitle,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: const Color(0xFF4A5568),
-                        ),
+                        style: AppTextStyles.bodyMedium,
                       ),
                     ],
                   ),
                 ),
                 Icon(Icons.arrow_forward_ios,
-                    color: Colors.grey.shade400, size: 16.sp),
+                    color: AppColors.textGrey, size: 16.sp),
               ],
             ),
           ),
@@ -210,17 +178,7 @@ class HelpSupportPage extends StatelessWidget {
   Widget _buildFAQItem({required String question, required String answer}) {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10.r,
-            offset: Offset(0, 4.h),
-          ),
-        ],
-      ),
+      decoration: AppDecorations.card(),
       child: Theme(
         data: ThemeData(dividerColor: Colors.transparent),
         child: ExpansionTile(
@@ -229,27 +187,19 @@ class HelpSupportPage extends StatelessWidget {
           leading: Container(
             padding: EdgeInsets.all(8.r),
             decoration: BoxDecoration(
-              color: const Color(0xFF00897B).withOpacity(0.05),
+              color: AppColors.primaryGreen.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8.r),
             ),
-            child: Icon(Icons.help_outline, color: const Color(0xFF00897B), size: 20.sp),
+            child: Icon(Icons.help_outline, color: AppColors.primaryGreen, size: 20.sp),
           ),
           title: Text(
             question,
-            style: TextStyle(
-              fontSize: 15.sp,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF1A1F36),
-            ),
+            style: AppTextStyles.bodyLarge,
           ),
           children: [
             Text(
               answer,
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: const Color(0xFF4A5568),
-                height: 1.5,
-              ),
+              style: AppTextStyles.bodyMedium.copyWith(height: 1.5),
             ),
           ],
         ),

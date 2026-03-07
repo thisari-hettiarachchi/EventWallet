@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../core/constants/colors.dart';
+import '../../../core/constants/styles.dart';
 import '../../result/result_page.dart';
 
 class PrivacySecurityPage extends StatefulWidget {
