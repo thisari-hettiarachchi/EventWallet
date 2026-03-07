@@ -116,18 +116,10 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppColors.background,
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF00897B),
-              Color(0xFF1565C0),
-            ],
-            stops: [0.0, 0.3],
-          ),
+          gradient: AppColors.headerGradient,
         ),
         child: SafeArea(
           child: Column(
@@ -137,7 +129,7 @@ class _HomePageState extends State<HomePage>
               Expanded(
                 child: Container(
                   decoration: const BoxDecoration(
-                    color: Color(0xFFF5F7FA),
+                    color: AppColors.background,
                     borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
                   ),
                   child: ListView(
@@ -303,22 +295,9 @@ class _HomePageState extends State<HomePage>
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF00897B),
-            Color(0xFF1565C0),
-          ],
-        ),
+        gradient: AppColors.cardGradient,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF1565C0).withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        boxShadow: [AppColors.primaryShadow()],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -429,7 +408,7 @@ class _HomePageState extends State<HomePage>
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1A1F36),
+              color: AppColors.textDark,
               letterSpacing: -0.5,
             ),
           ),
@@ -444,21 +423,21 @@ class _HomePageState extends State<HomePage>
                 'Hire Best Photographers',
                 'Up to 30% off',
                 Icons.camera_alt_rounded,
-                [const Color(0xFF1565C0), const Color(0xFF00897B)],
+                [AppColors.primaryBlue, AppColors.primaryGreen],
                 imagePath: 'assets/images/hire.jpg',
               ),
               _promoCard(
                 'Luxury Hotels',
                 'Special event rates',
                 Icons.hotel_rounded,
-                [const Color(0xFF00897B), const Color(0xFF26A69A)],
+                [AppColors.primaryGreen, const Color(0xFF26A69A)],
                 imagePath: 'assets/images/hire2.jpg',
               ),
               _promoCard(
                 'Outdoor Locations',
                 'Book now',
                 Icons.park_rounded,
-                [const Color(0xFF26A69A), const Color(0xFF00897B)],
+                [const Color(0xFF26A69A), AppColors.primaryGreen],
                 imagePath: 'assets/images/hire3.jpg',
               ),
             ],
@@ -594,7 +573,7 @@ class _HomePageState extends State<HomePage>
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF1A1F36),
+            color: AppColors.textDark,
           ),
         ),
         const SizedBox(height: 16),
@@ -633,7 +612,7 @@ class _HomePageState extends State<HomePage>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(item['icon'] as IconData,
-                          size: 32, color: const Color(0xFF00897B)),
+                          size: 32, color: AppColors.primaryGreen),
                       const SizedBox(height: 8),
                       Text(
                         item['label'] as String,
@@ -661,7 +640,7 @@ class _HomePageState extends State<HomePage>
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF1A1F36),
+            color: AppColors.textDark,
           ),
         ),
         const SizedBox(height: 16),
@@ -679,10 +658,10 @@ class _HomePageState extends State<HomePage>
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00897B).withValues(alpha: 0.1),
+                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.event, color: Color(0xFF00897B)),
+                  child: const Icon(Icons.event, color: AppColors.primaryGreen),
                 ),
                 title: Text(data['eventName'] ?? data['name'] ?? 'Event', style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text(_formatDate(data['date'])),
@@ -704,7 +683,7 @@ class _HomePageState extends State<HomePage>
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF1A1F36),
+            color: AppColors.textDark,
           ),
         ),
         const SizedBox(height: 16),
@@ -722,10 +701,10 @@ class _HomePageState extends State<HomePage>
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1565C0).withValues(alpha: 0.1),
+                    color: AppColors.primaryBlue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.money, color: Color(0xFF1565C0)),
+                  child: const Icon(Icons.money, color: AppColors.primaryBlue),
                 ),
                 title: Text(data['description'] ?? data['title'] ?? 'Expense', style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text('\$${(data['amount'] ?? 0).toStringAsFixed(2)}'),

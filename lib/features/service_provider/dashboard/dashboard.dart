@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/widgets/provider_bottom_nav.dart';
+import '../../../core/constants/colors.dart';
+import '../services/my_services.dart';
 
 class ServiceProviderDashboard extends StatefulWidget {
   final String providerId;
-  final String providerType; // 'photographer', 'catering', 'venue', 'music', 'decoration'
+  final String providerType;
 
   const ServiceProviderDashboard({
     super.key,
@@ -152,8 +154,9 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
   }
 
   String _getProviderTitle() {
-    switch (widget.providerType) {
+    switch (widget.providerType.toLowerCase()) {
       case 'photographer':
+      case 'photography':
         return 'Photography Dashboard';
       case 'catering':
         return 'Catering Dashboard';
@@ -169,8 +172,9 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
   }
 
   IconData _getProviderIcon() {
-    switch (widget.providerType) {
+    switch (widget.providerType.toLowerCase()) {
       case 'photographer':
+      case 'photography':
         return Icons.camera_alt_rounded;
       case 'catering':
         return Icons.restaurant_rounded;
@@ -185,21 +189,20 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     }
   }
 
+  void _navigateToServices() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const MyServicesPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppColors.background,
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF00897B),
-              Color(0xFF1565C0),
-            ],
-            stops: [0.0, 0.3],
-          ),
+          gradient: AppColors.primaryGradient,
         ),
         child: SafeArea(
           child: Column(
@@ -209,7 +212,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               Expanded(
                 child: Container(
                   decoration: const BoxDecoration(
-                    color: Color(0xFFF5F7FA),
+                    color: AppColors.background,
                     borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
                   ),
                   child: RefreshIndicator(
@@ -245,23 +248,18 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       ),
       floatingActionButton: Container(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF00897B), Color(0xFF26A69A)],
-          ),
+          gradient: AppColors.buttonGradient,
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF00897B).withValues(alpha: 0.4),
+              color: AppColors.primaryGreen.withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
           ],
         ),
         child: FloatingActionButton.extended(
-          onPressed: () {
-            // Navigate to add service page
-            _showAddServiceDialog();
-          },
+          onPressed: _navigateToServices,
           backgroundColor: Colors.transparent,
           elevation: 0,
           icon: const Icon(Icons.add, color: Colors.white, size: 26),
@@ -338,9 +336,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                 ),
                 IconButton(
                   icon: const Icon(Icons.settings_outlined, color: Colors.white, size: 28),
-                  onPressed: () {
-                    // Navigate to settings
-                  },
+                  onPressed: () {},
                 ),
               ],
             ),
@@ -378,18 +374,11 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF00897B),
-            Color(0xFF1565C0),
-          ],
-        ),
+        gradient: AppColors.cardGradient,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1565C0).withValues(alpha: 0.3),
+            color: AppColors.primaryBlue.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -492,13 +481,13 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       physics: const NeverScrollableScrollPhysics(),
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
-      childAspectRatio: 1.1, // Adjusted from 1.4 to 1.1 to prevent overflow
+      childAspectRatio: 1.1,
       children: [
         _buildStatCard(
           'Total Bookings',
           _totalBookings.toString(),
           Icons.event_available,
-          const Color(0xFF00897B),
+          AppColors.primaryGreen,
         ),
         _buildStatCard(
           'Pending',
@@ -510,7 +499,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           'Completed',
           _completedBookings.toString(),
           Icons.check_circle,
-          const Color(0xFF1565C0),
+          AppColors.primaryBlue,
         ),
         _buildStatCard(
           'Rating',
@@ -524,17 +513,11 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16), // Reduced from 20 to 16
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: [AppColors.cardShadow()],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -556,18 +539,18 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                 Text(
                   value,
                   style: const TextStyle(
-                    fontSize: 24, // Slightly reduced from 26
+                    fontSize: 24,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF1A1F36),
+                    color: AppColors.textDark,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2), // Reduced from 4
+                const SizedBox(height: 2),
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 12, // Slightly reduced from 13
+                    fontSize: 12,
                     color: Colors.grey[600],
                     fontWeight: FontWeight.w500,
                   ),
@@ -592,7 +575,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF1A1F36),
+            color: AppColors.textDark,
             letterSpacing: -0.5,
           ),
         ),
@@ -603,10 +586,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               child: _buildActionButton(
                 'Manage\nServices',
                 Icons.tune,
-                const Color(0xFF00897B),
-                    () {
-                  // Navigate to manage services
-                },
+                AppColors.primaryGreen,
+                _navigateToServices,
               ),
             ),
             const SizedBox(width: 12),
@@ -614,8 +595,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               child: _buildActionButton(
                 'View\nBookings',
                 Icons.calendar_today,
-                const Color(0xFF1565C0),
-                    () {
+                AppColors.primaryBlue,
+                () {
                   // Navigate to bookings
                 },
               ),
@@ -626,7 +607,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                 'Analytics',
                 Icons.analytics,
                 const Color(0xFF26A69A),
-                    () {
+                () {
                   // Navigate to analytics
                 },
               ),
@@ -645,12 +626,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-            ),
-          ],
+          boxShadow: [AppColors.cardShadow()],
         ),
         child: Column(
           children: [
@@ -667,9 +643,9 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               label,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 11, // Reduced from 12
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF1A1F36),
+                color: AppColors.textDark,
                 height: 1.2,
               ),
               maxLines: 2,
@@ -694,17 +670,15 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF1A1F36),
+                color: AppColors.textDark,
               ),
             ),
             TextButton(
-              onPressed: () {
-                // View all bookings
-              },
+              onPressed: () {},
               child: const Text(
                 'View All',
                 style: TextStyle(
-                  color: Color(0xFF00897B),
+                  color: AppColors.primaryGreen,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -718,6 +692,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
+              boxShadow: [AppColors.cardShadow()],
             ),
             child: const Center(
               child: Text(
@@ -740,13 +715,13 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     Color statusColor;
     switch (status) {
       case 'confirmed':
-        statusColor = const Color(0xFF00897B);
+        statusColor = AppColors.primaryGreen;
         break;
       case 'completed':
-        statusColor = const Color(0xFF1565C0);
+        statusColor = AppColors.primaryBlue;
         break;
       case 'cancelled':
-        statusColor = const Color(0xFFFF3D00);
+        statusColor = Colors.redAccent;
         break;
       default:
         statusColor = const Color(0xFFFF6F00);
@@ -758,12 +733,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-          ),
-        ],
+        boxShadow: [AppColors.cardShadow()],
       ),
       child: Column(
         children: [
@@ -787,7 +757,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1F36),
+                        color: AppColors.textDark,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -841,8 +811,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                 '\$${(data['amount'] ?? 0).toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF00897B),
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.primaryGreen,
                 ),
               ),
             ],
@@ -862,7 +832,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF1A1F36),
+            color: AppColors.textDark,
           ),
         ),
         const SizedBox(height: 16),
@@ -872,6 +842,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
+              boxShadow: [AppColors.cardShadow()],
             ),
             child: const Center(
               child: Text(
@@ -888,9 +859,10 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF00897B), Color(0xFF26A69A)],
+                  colors: [AppColors.primaryGreen, Color(0xFF26A69A)],
                 ),
                 borderRadius: BorderRadius.circular(16),
+                boxShadow: [AppColors.cardShadow()],
               ),
               child: Row(
                 children: [
@@ -951,7 +923,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF1A1F36),
+            color: AppColors.textDark,
           ),
         ),
         const SizedBox(height: 16),
@@ -960,12 +932,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-              ),
-            ],
+            boxShadow: [AppColors.cardShadow()],
           ),
           child: Column(
             children: [
@@ -973,7 +940,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               const Divider(height: 24),
               _buildMetricRow('Average Rating', _averageRating.toStringAsFixed(1), Icons.star, Colors.amber),
               const Divider(height: 24),
-              _buildMetricRow('Total Reviews', _totalReviews.toString(), Icons.rate_review, const Color(0xFF1565C0)),
+              _buildMetricRow('Total Reviews', _totalReviews.toString(), Icons.rate_review, AppColors.primaryBlue),
             ],
           ),
         ),
@@ -999,7 +966,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
             style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1A1F36),
+              color: AppColors.textDark,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -1010,7 +977,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF1A1F36),
+            color: AppColors.textDark,
           ),
         ),
       ],
@@ -1030,21 +997,5 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     }
     final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
-  }
-
-  void _showAddServiceDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add New Service'),
-        content: const Text('Service management feature coming soon!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
   }
 }

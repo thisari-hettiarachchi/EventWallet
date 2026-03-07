@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../features/service_provider/dashboard/dashboard.dart';
 import '../../features/service_provider/profile/profile.dart';
 import '../../features/service_provider/bookings/bookings.dart';
+import '../../features/service_provider/services/my_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -30,7 +31,7 @@ class ProviderBottomNav extends StatelessWidget {
         page = const ServiceProviderBookingsPage();
         break;
       case 2:
-        page = const ProviderServicesPage();
+        page = const MyServicesPage();
         break;
       case 3:
         page = const ServiceProviderProfilePage();
@@ -92,19 +93,6 @@ class ProviderBottomNav extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-// Placeholder pages for Provider
-class ProviderServicesPage extends StatelessWidget {
-  const ProviderServicesPage({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('My Services')),
-      body: const Center(child: Text('Services Page')),
-      bottomNavigationBar: const ProviderBottomNav(currentIndex: 2),
     );
   }
 }

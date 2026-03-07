@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/widgets/bottom_nav.dart';
+import '../../../core/constants/colors.dart';
 import 'create_event.dart';
 import 'event_details_page.dart';
 
@@ -54,17 +55,13 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppColors.background,
       body: Column(
         children: [
           // Header with Gradient
           Container(
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF00897B), Color(0xFF1565C0)],
-              ),
+              gradient: AppColors.headerGradient,
             ),
             child: SafeArea(
               bottom: false,
@@ -81,15 +78,16 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                               fontSize: 28,
                               fontWeight: FontWeight.w900,
                               color: Colors.white,
+                              letterSpacing: -0.5,
                             ),
                           ),
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                               width: 1,
                             ),
                           ),
@@ -132,13 +130,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                        boxShadow: [AppColors.cardShadow()],
                       ),
                       child: TextField(
                         onChanged: (value) {
@@ -149,7 +141,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                         decoration: InputDecoration(
                           hintText: 'Search events...',
                           hintStyle: TextStyle(color: Colors.grey.shade400),
-                          prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
+                          prefixIcon: const Icon(Icons.search, color: AppColors.primaryGreen),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         ),
@@ -166,7 +158,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
             child: Container(
               transform: Matrix4.translationValues(0, -25, 0),
               decoration: const BoxDecoration(
-                color: Color(0xFFF5F7FA),
+                color: AppColors.background,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
               ),
               child: Column(
@@ -174,9 +166,9 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                   const SizedBox(height: 10),
                   TabBar(
                     controller: _tabController,
-                    labelColor: const Color(0xFF00897B),
+                    labelColor: AppColors.primaryGreen,
                     unselectedLabelColor: Colors.grey,
-                    indicatorColor: const Color(0xFF00897B),
+                    indicatorColor: AppColors.primaryGreen,
                     indicatorWeight: 3,
                     indicatorSize: TabBarIndicatorSize.label,
                     tabs: const [
@@ -210,7 +202,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
           .orderBy('date', descending: false)
           .snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen));
 
         final events = snapshot.data!.docs.where((doc) {
           final data = doc.data() as Map<String, dynamic>;
@@ -234,10 +226,10 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
             final Color color;
             switch (statusFilter) {
               case 'Completed':
-                color = const Color(0xFF00897B);
+                color = AppColors.primaryGreen;
                 break;
               default:
-                color = const Color(0xFF1565C0);
+                color = AppColors.primaryBlue;
             }
 
             return GestureDetector(
@@ -318,13 +310,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: [AppColors.cardShadow()],
       ),
       child: Material(
         color: Colors.transparent,
@@ -339,7 +325,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+                        colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
                       ),
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -355,7 +341,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                           style: const TextStyle(
                             fontSize: 19,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF1A1F36),
+                            color: AppColors.textDark,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -378,7 +364,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.1),
+                      color: color.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -414,7 +400,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Budget', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-                        Text(budget, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF1A1F36))),
+                        Text(budget, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppColors.textDark)),
                       ],
                     ),
                   ),
