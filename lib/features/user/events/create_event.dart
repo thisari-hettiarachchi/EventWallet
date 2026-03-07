@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../result/result_page.dart';
 import 'event.dart';
 
@@ -178,6 +179,15 @@ class _CreateEventPageState extends State<CreateEventPage> {
     try {
       await _db.collection('events').add(data);
 
+      // Add notification
+      await _db.collection('users').doc(user.uid).collection('notifications').add({
+        'title': 'Event Created',
+        'message': 'Your new event "${_eventNameController.text.trim()}" has been created successfully.',
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'type': 'event',
+      });
+
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -210,47 +220,48 @@ class _CreateEventPageState extends State<CreateEventPage> {
         elevation: 0,
         backgroundColor: const Color(0xFF00897B),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Create New Event',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
+            fontSize: 20.sp,
           ),
         ),
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20.r),
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20.r),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFF00897B), Color(0xFF1565C0)],
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(16.r),
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.r),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
-                    child: const Icon(Icons.event_available, color: Colors.white, size: 32),
+                    child: Icon(Icons.event_available, color: Colors.white, size: 32.sp),
                   ),
-                  const SizedBox(width: 16),
-                  const Expanded(
+                  SizedBox(width: 16.w),
+                  Expanded(
                     child: Text(
                       'Plan your perfect event with detailed budgeting',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -258,16 +269,16 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-            const Text(
+            SizedBox(height: 24.h),
+            Text(
               'Event Details',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1F36),
+                color: const Color(0xFF1A1F36),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             _buildTextField(
               controller: _eventNameController,
               label: 'Event Name',
@@ -278,29 +289,30 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 return null;
               },
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: DropdownButtonFormField<String>(
                 value: _selectedCategory,
                 decoration: InputDecoration(
                   labelText: 'Event Category',
-                  prefixIcon: Icon(_getCategoryIcon(_selectedCategory), color: const Color(0xFF00897B)),
+                  labelStyle: TextStyle(fontSize: 14.sp),
+                  prefixIcon: Icon(_getCategoryIcon(_selectedCategory), color: const Color(0xFF00897B), size: 24.sp),
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
                 ),
                 items: _categories.map((category) {
                   return DropdownMenuItem(
                     value: category,
                     child: Row(
                       children: [
-                        Icon(_getCategoryIcon(category), size: 20, color: Colors.grey.shade600),
-                        const SizedBox(width: 12),
-                        Text(category),
+                        Icon(_getCategoryIcon(category), size: 20.sp, color: Colors.grey.shade600),
+                        SizedBox(width: 12.w),
+                        Text(category, style: TextStyle(fontSize: 14.sp)),
                       ],
                     ),
                   );
@@ -312,7 +324,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 },
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Row(
               children: [
                 Expanded(
@@ -323,7 +335,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                     onTap: () => _selectDate(context),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12.w),
                 Expanded(
                   child: _buildDateTimePicker(
                     label: 'Event Time',
@@ -334,7 +346,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             _buildTextField(
               controller: _venueController,
               label: 'Venue',
@@ -345,16 +357,16 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 return null;
               },
             ),
-            const SizedBox(height: 24),
-            const Text(
+            SizedBox(height: 24.h),
+            Text(
               'Budget & Planning',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1F36),
+                color: const Color(0xFF1A1F36),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Row(
               children: [
                 Expanded(
@@ -370,7 +382,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                     },
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12.w),
                 Expanded(
                   child: _buildTextField(
                     controller: _guestCountController,
@@ -382,25 +394,26 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: DropdownButtonFormField<String>(
                 value: _selectedStatus,
                 decoration: InputDecoration(
                   labelText: 'Event Status',
-                  prefixIcon: const Icon(Icons.info, color: Color(0xFF00897B)),
+                  labelStyle: TextStyle(fontSize: 14.sp),
+                  prefixIcon: Icon(Icons.info, color: const Color(0xFF00897B), size: 24.sp),
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
                 ),
                 items: _statusOptions.map((status) {
                   return DropdownMenuItem(
                     value: status,
-                    child: Text(status),
+                    child: Text(status, style: TextStyle(fontSize: 14.sp)),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -410,40 +423,43 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 },
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: TextFormField(
                 controller: _notesController,
                 maxLines: 4,
+                style: TextStyle(fontSize: 14.sp),
                 decoration: InputDecoration(
                   labelText: 'Additional Notes',
+                  labelStyle: TextStyle(fontSize: 14.sp),
                   hintText: 'Add any special requirements or notes...',
+                  hintStyle: TextStyle(fontSize: 14.sp),
                   prefixIcon: Padding(
-                    padding: const EdgeInsets.only(bottom: 60),
-                    child: Icon(Icons.notes, color: const Color(0xFF00897B)),
+                    padding: EdgeInsets.only(bottom: 60.h),
+                    child: Icon(Icons.notes, color: const Color(0xFF00897B), size: 24.sp),
                   ),
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.all(16),
+                  contentPadding: EdgeInsets.all(16.r),
                 ),
               ),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32.h),
             Container(
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFF00897B), Color(0xFF1565C0)],
                 ),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF00897B).withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
+                    color: const Color(0xFF00897B).withOpacity(0.3),
+                    blurRadius: 12.r,
+                    offset: Offset(0, 6.h),
                   ),
                 ],
               ),
@@ -451,15 +467,15 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: _createEvent,
-                  borderRadius: BorderRadius.circular(12),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                  borderRadius: BorderRadius.circular(12.r),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.h),
                     child: Center(
                       child: Text(
                         'Create Event',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -468,7 +484,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
           ],
         ),
       ),
@@ -486,19 +502,22 @@ class _CreateEventPageState extends State<CreateEventPage> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: Colors.grey.shade300),
       ),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
         validator: validator,
+        style: TextStyle(fontSize: 14.sp),
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: TextStyle(fontSize: 14.sp),
           hintText: hint,
-          prefixIcon: Icon(icon, color: const Color(0xFF00897B)),
+          hintStyle: TextStyle(fontSize: 14.sp),
+          prefixIcon: Icon(icon, color: const Color(0xFF00897B), size: 24.sp),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
         ),
       ),
     );
@@ -513,20 +532,20 @@ class _CreateEventPageState extends State<CreateEventPage> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: Colors.grey.shade300),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16.r),
             child: Row(
               children: [
-                Icon(icon, color: const Color(0xFF00897B)),
-                const SizedBox(width: 12),
+                Icon(icon, color: const Color(0xFF00897B), size: 24.sp),
+                SizedBox(width: 12.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -534,17 +553,17 @@ class _CreateEventPageState extends State<CreateEventPage> {
                       Text(
                         label,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 12.sp,
                           color: Colors.grey.shade600,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Text(
                         value,
-                        style: const TextStyle(
-                          fontSize: 15,
+                        style: TextStyle(
+                          fontSize: 15.sp,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF1A1F36),
+                          color: const Color(0xFF1A1F36),
                         ),
                       ),
                     ],

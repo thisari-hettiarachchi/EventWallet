@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../features/user/home/home.dart';
 import '../../features/user/events/event.dart';
 import '../../features/user/discovery/discovery.dart';
@@ -44,9 +45,9 @@ class AppBottomNav extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10.r,
+            offset: Offset(0, -5.h),
           ),
         ],
       ),
@@ -56,7 +57,9 @@ class AppBottomNav extends StatelessWidget {
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF00897B),
         unselectedItemColor: Colors.grey,
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.sp),
+        unselectedLabelStyle: TextStyle(fontSize: 12.sp),
+        iconSize: 24.sp,
         elevation: 0,
         backgroundColor: Colors.transparent,
         items: const [

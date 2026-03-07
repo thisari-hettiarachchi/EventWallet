@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/constants/styles.dart';
+import 'provider_profile.dart';
 
 class DiscoveryPage extends StatefulWidget {
   final String initialCategory;
@@ -95,6 +98,20 @@ class _DiscoveryPageState extends State<DiscoveryPage>
             'providerId': providerId,
             'savedAt': FieldValue.serverTimestamp(),
           });
+          
+          // Add notification for adding service to event
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .collection('notifications')
+              .add({
+            'title': 'Service Added',
+            'message': '${data['businessName'] ?? data['name'] ?? 'A service'} has been added to your event.',
+            'timestamp': FieldValue.serverTimestamp(),
+            'isRead': false,
+            'type': 'service',
+          });
+
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -134,6 +151,20 @@ class _DiscoveryPageState extends State<DiscoveryPage>
           'providerId': providerId,
           'savedAt': FieldValue.serverTimestamp(),
         });
+
+        // Add notification for adding to favorites
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('notifications')
+            .add({
+          'title': 'New Favorite',
+          'message': '${data['businessName'] ?? data['name'] ?? 'A provider'} has been added to your favorites.',
+          'timestamp': FieldValue.serverTimestamp(),
+          'isRead': false,
+          'type': 'service',
+        });
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -160,42 +191,42 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   void _showFilterSheet() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25.r)),
       ),
       builder: (context) {
         return Container(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24.r),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Advanced Filters',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold, color: AppColors.textDark),
               ),
-              const SizedBox(height: 20),
-              const Text('Sort By', style: TextStyle(fontWeight: FontWeight.w600)),
-              const SizedBox(height: 10),
+              SizedBox(height: 20.h),
+              Text('Sort By', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp)),
+              SizedBox(height: 10.h),
               Wrap(
-                spacing: 10,
+                spacing: 10.w,
                 children: [
-                  ChoiceChip(label: const Text('Rating'), selected: true, onSelected: (_) {}),
-                  ChoiceChip(label: const Text('Price: Low to High'), selected: false, onSelected: (_) {}),
-                  ChoiceChip(label: const Text('Popularity'), selected: false, onSelected: (_) {}),
+                  ChoiceChip(label: Text('Rating', style: TextStyle(fontSize: 12.sp)), selected: true, onSelected: (_) {}),
+                  ChoiceChip(label: Text('Price: Low to High', style: TextStyle(fontSize: 12.sp)), selected: false, onSelected: (_) {}),
+                  ChoiceChip(label: Text('Popularity', style: TextStyle(fontSize: 12.sp)), selected: false, onSelected: (_) {}),
                 ],
               ),
-              const SizedBox(height: 30),
+              SizedBox(height: 30.h),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryGreen,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: EdgeInsets.symmetric(vertical: 15.h),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
-                  child: const Text('Apply Filters', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: Text('Apply Filters', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp)),
                 ),
               ),
             ],
@@ -221,9 +252,9 @@ class _DiscoveryPageState extends State<DiscoveryPage>
               Expanded(
                 child: Container(
                   width: double.infinity,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
                   ),
                   child: FadeTransition(
                     opacity: _fadeAnimation,
@@ -241,16 +272,24 @@ class _DiscoveryPageState extends State<DiscoveryPage>
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 10.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
-              if (widget.isEventSaving)
+              if (widget.isEventSaving || _showSavedOnly)
                 IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
-                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 20.sp),
+                  onPressed: () {
+                    if (widget.isEventSaving) {
+                      Navigator.pop(context);
+                    } else {
+                      setState(() {
+                        _showSavedOnly = false;
+                      });
+                    }
+                  },
                 ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,19 +298,19 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                     widget.isEventSaving
                         ? 'Add Services'
                         : (_showSavedOnly ? 'My Favorites' : 'Discovery'),
-                    style: const TextStyle(
-                      fontSize: 32,
+                    style: TextStyle(
+                      fontSize: 32.sp,
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
-                      letterSpacing: -1,
+                      letterSpacing: -1.w,
                     ),
                   ),
                   Text(
                     widget.isEventSaving
                         ? 'Select services for your event'
                         : 'Quality services for your events',
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: 14.sp,
                       color: Colors.white70,
                       fontWeight: FontWeight.w500,
                     ),
@@ -288,14 +327,15 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                 });
               },
               child: Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12.r),
                 decoration: BoxDecoration(
                   color: _showSavedOnly ? Colors.white : Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(15.r),
                 ),
                 child: Icon(
                   _showSavedOnly ? Icons.bookmark : Icons.bookmark_border,
                   color: _showSavedOnly ? AppColors.primaryBlue : Colors.white,
+                  size: 24.sp,
                 ),
               ),
             ),
@@ -306,7 +346,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
 
   Widget _buildSearchAndFilter() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
       child: Column(
         children: [
           Row(
@@ -315,24 +355,25 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(15.r),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                        blurRadius: 10.r,
+                        offset: Offset(0, 4.h),
                       ),
                     ],
                   ),
                   child: TextField(
                     controller: _searchController,
+                    style: TextStyle(fontSize: 15.sp),
                     decoration: InputDecoration(
                       hintText: 'Search services...',
-                      hintStyle: const TextStyle(color: Colors.grey, fontSize: 15),
-                      prefixIcon: const Icon(Icons.search, color: AppColors.primaryGreen),
+                      hintStyle: TextStyle(color: Colors.grey, fontSize: 15.sp),
+                      prefixIcon: Icon(Icons.search, color: AppColors.primaryGreen, size: 24.sp),
                       suffixIcon: _searchQuery.isNotEmpty
                           ? IconButton(
-                        icon: const Icon(Icons.clear, size: 20),
+                        icon: Icon(Icons.clear, size: 20.sp),
                         onPressed: () {
                           setState(() {
                             _searchController.clear();
@@ -342,7 +383,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                       )
                           : null,
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 15),
+                      contentPadding: EdgeInsets.symmetric(vertical: 15.h),
                     ),
                     onChanged: (value) {
                       setState(() {
@@ -352,27 +393,27 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12.w),
               GestureDetector(
                 onTap: _showFilterSheet,
                 child: Container(
-                  padding: const EdgeInsets.all(15),
+                  padding: EdgeInsets.all(15.r),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(15.r),
                   ),
-                  child: const Icon(Icons.tune, color: AppColors.primaryBlue, size: 24),
+                  child: Icon(Icons.tune, color: AppColors.primaryBlue, size: 24.sp),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18.h),
           SizedBox(
-            height: 38,
+            height: 38.h,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: _categories.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              separatorBuilder: (_, __) => SizedBox(width: 12.w),
               itemBuilder: (context, index) {
                 final category = _categories[index];
                 final isSelected = _selectedCategory == category;
@@ -384,10 +425,10 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    padding: const EdgeInsets.symmetric(horizontal: 22),
+                    padding: EdgeInsets.symmetric(horizontal: 22.w),
                     decoration: BoxDecoration(
                       color: isSelected ? Colors.white : Colors.white.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(20.r),
                       border: Border.all(
                         color: isSelected ? Colors.white : Colors.white.withOpacity(0.2),
                       ),
@@ -398,7 +439,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                       style: TextStyle(
                         color: isSelected ? AppColors.primaryBlue : Colors.white,
                         fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                        fontSize: 13,
+                        fontSize: 13.sp,
                       ),
                     ),
                   ),
@@ -471,7 +512,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.fromLTRB(20, 25, 20, 100),
+          padding: EdgeInsets.fromLTRB(20.w, 25.h, 20.w, 100.h),
           physics: const BouncingScrollPhysics(),
           itemCount: docs.length,
           itemBuilder: (context, index) {
@@ -489,19 +530,19 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     final rating = (data['rating'] ?? 0.0).toDouble();
     final price = (data['price'] ?? 0.0).toDouble();
     final imageUrl = data['imageUrl'] ?? '';
-    final location = data['location'] ?? 'Location not specified';
+    final availability = data['availability'] ?? 'Available';
     final user = FirebaseAuth.instance.currentUser;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 22),
+      margin: EdgeInsets.only(bottom: 22.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            blurRadius: 15.r,
+            offset: Offset(0, 8.h),
           ),
         ],
       ),
@@ -509,51 +550,51 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
             child: Stack(
               children: [
                 imageUrl.isNotEmpty
                     ? Image.network(
                   imageUrl,
-                  height: 200,
+                  height: 200.h,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
                 )
                     : _buildPlaceholderImage(),
                 Positioned(
-                  top: 15,
-                  right: 15,
+                  top: 15.h,
+                  right: 15.w,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.star_rounded, color: Colors.amber, size: 18),
-                        const SizedBox(width: 4),
+                        Icon(Icons.star_rounded, color: Colors.amber, size: 18.sp),
+                        SizedBox(width: 4.w),
                         Text(
                           rating > 0 ? rating.toStringAsFixed(1) : 'New',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13.sp),
                         ),
                       ],
                     ),
                   ),
                 ),
                 Positioned(
-                  bottom: 15,
-                  left: 15,
+                  bottom: 15.h,
+                  left: 15.w,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                    padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
                     decoration: BoxDecoration(
                       color: AppColors.primaryBlue,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: Text(
                       type,
-                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
+                      style: TextStyle(color: Colors.white, fontSize: 11.sp, fontWeight: FontWeight.w700),
                     ),
                   ),
                 ),
@@ -561,7 +602,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20.r),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -571,56 +612,67 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                     Expanded(
                       child: Text(
                         name,
-                        style: const TextStyle(
-                          fontSize: 22,
+                        style: TextStyle(
+                          fontSize: 22.sp,
                           fontWeight: FontWeight.w800,
                           color: AppColors.textDark,
-                          letterSpacing: -0.5,
+                          letterSpacing: -0.5.w,
                         ),
                       ),
                     ),
-                    Text(
-                      price > 0 ? '\$${price.toInt()}' : 'Quote',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.primaryGreen,
+                    if (price > 0)
+                      Text(
+                        '\$${price.toInt()}',
+                        style: TextStyle(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.primaryGreen,
+                        ),
                       ),
-                    ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 Row(
                   children: [
-                    const Icon(Icons.location_on_rounded, size: 16, color: Colors.grey),
-                    const SizedBox(width: 6),
+                    Icon(Icons.calendar_today_rounded, size: 16.sp, color: Colors.grey),
+                    SizedBox(width: 6.w),
                     Expanded(
                       child: Text(
-                        location,
-                        style: const TextStyle(color: Colors.grey, fontSize: 14, fontWeight: FontWeight.w500),
+                        availability,
+                        style: TextStyle(color: Colors.grey, fontSize: 14.sp, fontWeight: FontWeight.w500),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProviderProfilePage(
+                                providerId: id,
+                                providerData: data,
+                              ),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryGreen,
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
                           elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
                         ),
-                        child: const Text('View Profile', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                        child: Text('View Profile', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15.sp)),
                       ),
                     ),
-                    const SizedBox(width: 15),
+                    SizedBox(width: 15.w),
                     StreamBuilder<DocumentSnapshot>(
                         stream: user == null
                             ? null
@@ -643,19 +695,19 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                             onTap: () => _toggleSaveProvider(id, data),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 300),
-                              padding: const EdgeInsets.all(12),
+                              padding: EdgeInsets.all(12.r),
                               decoration: BoxDecoration(
                                 color: isSaved ? AppColors.primaryBlue.withOpacity(0.1) : Colors.transparent,
                                 border: Border.all(
                                   color: isSaved ? AppColors.primaryBlue : Colors.grey.withOpacity(0.3),
-                                  width: 1.5,
+                                  width: 1.5.w,
                                 ),
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(14.r),
                               ),
                               child: Icon(
                                 isSaved ? (widget.isEventSaving ? Icons.check_circle : Icons.bookmark) : (widget.isEventSaving ? Icons.add_circle_outline : Icons.bookmark_border_rounded),
                                 color: AppColors.primaryBlue,
-                                size: 24,
+                                size: 24.sp,
                               ),
                             ),
                           );
@@ -673,7 +725,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
 
   Widget _buildPlaceholderImage() {
     return Container(
-      height: 200,
+      height: 200.h,
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -685,7 +737,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
           ],
         ),
       ),
-      child: Icon(Icons.image_outlined, size: 60, color: AppColors.primaryBlue.withOpacity(0.3)),
+      child: Icon(Icons.image_outlined, size: 60.sp, color: AppColors.primaryBlue.withOpacity(0.3)),
     );
   }
 
@@ -694,25 +746,25 @@ class _DiscoveryPageState extends State<DiscoveryPage>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off_rounded, size: 100, color: Colors.grey[200]),
-          const SizedBox(height: 20),
+          Icon(Icons.search_off_rounded, size: 100.sp, color: Colors.grey[200]),
+          SizedBox(height: 20.h),
           Text(
             _showSavedOnly ? 'No favorites yet' : 'No results found',
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textDark,
-              fontSize: 18,
+              fontSize: 18.sp,
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Text(
             _showSavedOnly ? 'Start exploring and save your top picks' : 'Try a different keyword or category',
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.grey, fontSize: 14),
+            style: TextStyle(color: Colors.grey, fontSize: 14.sp),
           ),
           if (!_showSavedOnly && (_searchQuery.isNotEmpty || _selectedCategory != 'All'))
             Padding(
-              padding: const EdgeInsets.only(top: 24),
+              padding: EdgeInsets.only(top: 24.h),
               child: TextButton.icon(
                 onPressed: () {
                   setState(() {
@@ -721,8 +773,8 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                     _selectedCategory = 'All';
                   });
                 },
-                icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Reset Discovery', style: TextStyle(fontWeight: FontWeight.bold)),
+                icon: Icon(Icons.refresh_rounded, size: 24.sp),
+                label: Text('Reset Discovery', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)),
               ),
             ),
         ],
@@ -735,14 +787,14 @@ class _DiscoveryPageState extends State<DiscoveryPage>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.lock_outline, size: 80, color: Colors.grey),
-          const SizedBox(height: 16),
-          const Text('Login to see favorites', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          const SizedBox(height: 24),
+          Icon(Icons.lock_outline, size: 80.sp, color: Colors.grey),
+          SizedBox(height: 16.h),
+          Text('Login to see favorites', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp)),
+          SizedBox(height: 24.h),
           ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryGreen),
-            child: const Text('Go to Login', style: TextStyle(color: Colors.white)),
+            child: Text('Go to Login', style: TextStyle(color: Colors.white, fontSize: 14.sp)),
           ),
         ],
       ),

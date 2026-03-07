@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 
 class AddExpensePage extends StatefulWidget {
@@ -30,6 +31,14 @@ class _AddExpensePageState extends State<AddExpensePage> {
     _fetchEvents();
   }
 
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _amountController.dispose();
+    _categoryController.dispose();
+    super.dispose();
+  }
+
   void _fetchEvents() async {
     final snapshot = await FirebaseFirestore.instance.collection('events').get();
     setState(() {
@@ -55,9 +64,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      // Update event spent amount
       if (_selectedEventId != null) {
-        final eventRef = FirebaseFirestore.instance.collection('events').doc(_selectedEventId);
+        final eventRef =
+            FirebaseFirestore.instance.collection('events').doc(_selectedEventId);
         await FirebaseFirestore.instance.runTransaction((transaction) async {
           final snapshot = await transaction.get(eventRef);
           if (snapshot.exists) {
@@ -71,7 +80,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Expense added successfully'), backgroundColor: AppColors.success),
+          const SnackBar(
+            content: Text('Expense added successfully'),
+            backgroundColor: AppColors.success,
+          ),
         );
       }
     } catch (e) {
@@ -87,97 +99,282 @@ class _AddExpensePageState extends State<AddExpensePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.headerGradient,
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 20),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: const BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+      body: Stack(
+        children: [
+          // Background gradient header
+          Container(
+            height: 260.h,
+            decoration: const BoxDecoration(
+              gradient: AppColors.headerGradient,
+            ),
+          ),
+
+          // Decorative circles
+          Positioned(
+            top: -50.h,
+            right: -50.w,
+            child: Container(
+              width: 200.w,
+              height: 200.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.1),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 100.h,
+            left: -30.w,
+            child: Container(
+              width: 120.w,
+              height: 120.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.08),
+              ),
+            ),
+          ),
+
+          SafeArea(
+            child: Column(
+              children: [
+                // Custom App Bar
+                Padding(
+                  padding: EdgeInsets.all(16.r),
+                  child: Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 1.w,
+                          ),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => Navigator.pop(context),
+                            borderRadius: BorderRadius.circular(12.r),
+                            child: Padding(
+                              padding: EdgeInsets.all(12.r),
+                              child: Icon(
+                                Icons.arrow_back_ios_new,
+                                color: Colors.white,
+                                size: 20.sp,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        'Add Expense',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5.w,
+                        ),
+                      ),
+                      const Spacer(),
+                      SizedBox(width: 44.w),
+                    ],
                   ),
+                ),
+
+                // Header hero section
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 4.h),
+                      Container(
+                        padding: EdgeInsets.all(20.r),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20.r),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 2.w,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.account_balance_wallet_outlined,
+                          size: 48.sp,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      Text(
+                        widget.eventName != null
+                            ? 'Expense for ${widget.eventName}'
+                            : 'New Expense',
+                        style: TextStyle(
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: -0.5.w,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20.h),
+
+                // Scrollable form
+                Expanded(
                   child: Form(
                     key: _formKey,
                     child: ListView(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
                       children: [
-                        const Text(
-                          'Expense Details',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textDark),
-                        ),
-                        const SizedBox(height: 20),
-                        _buildTextField(
-                          controller: _titleController,
-                          label: 'Title',
-                          hint: 'e.g., Catering Deposit',
-                          icon: Icons.description,
-                          validator: (v) => v!.isEmpty ? 'Please enter a title' : null,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _amountController,
-                          label: 'Amount',
-                          hint: '0.00',
-                          icon: Icons.attach_money,
-                          keyboardType: TextInputType.number,
-                          validator: (v) => v!.isEmpty ? 'Please enter an amount' : null,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _categoryController,
-                          label: 'Category',
-                          hint: 'e.g., Food, Venue, Decor',
-                          icon: Icons.category,
-                          validator: (v) => v!.isEmpty ? 'Please enter a category' : null,
-                        ),
-                        const SizedBox(height: 16),
-                        if (widget.eventId == null) _buildEventPicker(),
-                        const SizedBox(height: 32),
-                        ElevatedButton(
-                          onPressed: _saveExpense,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryGreen,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        // Expense Details card
+                        _buildModernCard(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildCardHeader(Icons.receipt_long, 'Expense Details'),
+                              SizedBox(height: 20.h),
+                              _buildTextField(
+                                controller: _titleController,
+                                label: 'Title',
+                                hint: 'e.g., Catering Deposit',
+                                icon: Icons.description,
+                                validator: (v) =>
+                                    v!.isEmpty ? 'Please enter a title' : null,
+                              ),
+                              SizedBox(height: 16.h),
+                              _buildTextField(
+                                controller: _amountController,
+                                label: 'Amount',
+                                hint: '0.00',
+                                icon: Icons.attach_money,
+                                keyboardType: TextInputType.number,
+                                validator: (v) =>
+                                    v!.isEmpty ? 'Please enter an amount' : null,
+                              ),
+                              SizedBox(height: 16.h),
+                              _buildTextField(
+                                controller: _categoryController,
+                                label: 'Category',
+                                hint: 'e.g., Food, Venue, Decor',
+                                icon: Icons.category,
+                                validator: (v) =>
+                                    v!.isEmpty ? 'Please enter a category' : null,
+                              ),
+                            ],
                           ),
-                          child: const Text('Add Expense', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                         ),
+                        SizedBox(height: 16.h),
+
+                        // Event Picker card (only when no event passed in)
+                        if (widget.eventId == null)
+                          _buildModernCard(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildCardHeader(Icons.event, 'Select Event'),
+                                SizedBox(height: 20.h),
+                                _buildEventDropdown(),
+                              ],
+                            ),
+                          ),
+
+                        if (widget.eventId == null) SizedBox(height: 16.h),
+
+                        // Save button
+                        Container(
+                          width: double.infinity,
+                          height: 56.h,
+                          decoration: BoxDecoration(
+                            gradient: AppColors.primaryGradient,
+                            borderRadius: BorderRadius.circular(16.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primaryGreen.withOpacity(0.4),
+                                blurRadius: 16.r,
+                                offset: Offset(0, 6.h),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: _saveExpense,
+                              borderRadius: BorderRadius.circular(16.r),
+                              child: Center(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.add_circle_outline,
+                                        color: Colors.white, size: 22.sp),
+                                    SizedBox(width: 10.w),
+                                    Text(
+                                      'Add Expense',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5.w,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 40.h),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
-          const Expanded(
-            child: Text(
-              'Add Expense',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildModernCard({required Widget child}) {
+    return Container(
+      padding: EdgeInsets.all(20.r),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20.r),
+        boxShadow: [AppColors.cardShadow()],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildCardHeader(IconData icon, String title) {
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(10.r),
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient,
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: Icon(icon, color: Colors.white, size: 20.sp),
+        ),
+        SizedBox(width: 12.w),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textDark,
+          ),
+        ),
+      ],
     );
   }
 
@@ -193,54 +390,71 @@ class _AddExpensePageState extends State<AddExpensePage> {
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
+      style: TextStyle(fontSize: 15.sp),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
         hintText: hint,
-        prefixIcon: Icon(icon, color: AppColors.primaryGreen),
+        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14.sp),
+        prefixIcon: Icon(icon, color: AppColors.primaryGreen, size: 24.sp),
         filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+        fillColor: AppColors.background,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
     );
   }
 
-  Widget _buildEventPicker() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Select Event', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textDark)),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: _selectedEventId,
-              isExpanded: true,
-              items: _events.map((e) {
-                final data = e.data() as Map<String, dynamic>;
-                return DropdownMenuItem(
-                  value: e.id,
-                  child: Text(data['eventName'] ?? data['name'] ?? 'Unnamed Event'),
-                );
-              }).toList(),
-              onChanged: (v) {
-                setState(() {
-                  _selectedEventId = v;
-                  final event = _events.firstWhere((e) => e.id == v);
-                  final data = event.data() as Map<String, dynamic>;
-                  _selectedEventName = data['eventName'] ?? data['name'];
-                });
-              },
-            ),
-          ),
+  Widget _buildEventDropdown() {
+    return DropdownButtonFormField<String>(
+      value: _selectedEventId,
+      decoration: InputDecoration(
+        labelText: 'Event',
+        labelStyle: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
+        prefixIcon: Icon(Icons.event_note, color: AppColors.primaryGreen, size: 24.sp),
+        filled: true,
+        fillColor: AppColors.background,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
-      ],
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      ),
+      items: _events.map((e) {
+        final data = e.data() as Map<String, dynamic>;
+        return DropdownMenuItem(
+          value: e.id,
+          child: Text(data['eventName'] ?? data['name'] ?? 'Unnamed Event', style: TextStyle(fontSize: 15.sp)),
+        );
+      }).toList(),
+      onChanged: (v) {
+        setState(() {
+          _selectedEventId = v;
+          final event = _events.firstWhere((e) => e.id == v);
+          final data = event.data() as Map<String, dynamic>;
+          _selectedEventName = data['eventName'] ?? data['name'];
+        });
+      },
+      validator: (v) => v == null ? 'Please select an event' : null,
     );
   }
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../result/result_page.dart';
 import '../dashboard/dashboard.dart';
 import '../auth/signup.dart';
 import '../../../services/providers_auth.dart';
+import '../../user/auth/login.dart' as user_login;
 
 class ServiceProviderLoginPage extends StatefulWidget {
   const ServiceProviderLoginPage({super.key});
@@ -95,6 +96,7 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
         ),
       );
     } catch (e) {
+      if (!mounted) return;
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -123,174 +125,238 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height -
-                    MediaQuery.of(context).padding.top -
-                    MediaQuery.of(context).padding.bottom,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 60),
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: 0.2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              blurRadius: 30,
-                              spreadRadius: 10,
-                            ),
-                          ],
-                        ),
-                        child: Image.asset(
-                          'assets/images/logo.png',
-                          width: 100,
-                          height: 100,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: const Text(
-                          'EventWallet',
-                          style: TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            letterSpacing: 1.2,
-                            shadows: [
-                              Shadow(
-                                color: Colors.black26,
-                                offset: Offset(2, 2),
-                                blurRadius: 8,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 50),
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: _buildTextField(
-                            controller: _emailController,
-                            label: 'Email',
-                            icon: Icons.email),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: _buildTextField(
-                          controller: _passwordController,
-                          label: 'Password',
-                          icon: Icons.lock,
-                          obscure: true,
-                          suffix: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Container(
-                          width: double.infinity,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18),
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.white.withValues(alpha: 0.95),
-                                Colors.white.withValues(alpha: 0.85),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        FadeTransition(
+                          opacity: _fadeAnimation,
+                          child: Container(
+                            padding: EdgeInsets.all(16.r),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withOpacity(0.2),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.white.withOpacity(0.3),
+                                  blurRadius: 20.r,
+                                  spreadRadius: 5.r,
+                                ),
                               ],
                             ),
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              width: 80.w,
+                              height: 80.w,
+                            ),
                           ),
-                          child: ElevatedButton(
-                            onPressed: _loginServiceProvider,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
+                        ),
+
+                        SlideTransition(
+                          position: _slideAnimation,
+                          child: FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: Text(
+                              'EventWallet',
+                              style: TextStyle(
+                                fontSize: 32.sp,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                letterSpacing: 1.2,
+                                shadows: const [
+                                  Shadow(
+                                    color: Colors.black26,
+                                    offset: Offset(2, 2),
+                                    blurRadius: 8,
+                                  ),
+                                ],
                               ),
                             ),
-                            child: ShaderMask(
-                              shaderCallback: (bounds) => const LinearGradient(
-                                colors: [
-                                  Color(0xFF00897B),
-                                  Color(0xFF1565C0),
-                                ],
-                              ).createShader(bounds),
-                              child: const Text(
-                                'Login',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1,
+                          ),
+                        ),
+
+                        Column(
+                          children: [
+                            SlideTransition(
+                              position: _slideAnimation,
+                              child: FadeTransition(
+                                opacity: _fadeAnimation,
+                                child: _buildTextField(
+                                  controller: _emailController,
+                                  label: 'Email',
+                                  icon: Icons.email,
                                 ),
                               ),
                             ),
-                          ),
+                            SizedBox(height: 12.h),
+                            SlideTransition(
+                              position: _slideAnimation,
+                              child: FadeTransition(
+                                opacity: _fadeAnimation,
+                                child: _buildTextField(
+                                  controller: _passwordController,
+                                  label: 'Password',
+                                  icon: Icons.lock,
+                                  obscure: true,
+                                  suffix: IconButton(
+                                    icon: Icon(
+                                      _obscurePassword
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: Colors.white,
+                                      size: 20.sp,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscurePassword = !_obscurePassword;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const ServiceProviderSignupPage()),
-                          );
-                        },
-                        child: const Text(
-                          "Don't have an account? Sign Up",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
+
+                        Column(
+                          children: [
+                            SlideTransition(
+                              position: _slideAnimation,
+                              child: FadeTransition(
+                                opacity: _fadeAnimation,
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 56.h,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16.r),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.white.withOpacity(0.95),
+                                        Colors.white.withOpacity(0.85),
+                                      ],
+                                    ),
+                                  ),
+                                  child: ElevatedButton(
+                                    onPressed: _loginServiceProvider,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      shadowColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16.r),
+                                      ),
+                                    ),
+                                    child: ShaderMask(
+                                      shaderCallback: (bounds) => const LinearGradient(
+                                        colors: [
+                                          Color(0xFF00897B),
+                                          Color(0xFF1565C0),
+                                        ],
+                                      ).createShader(bounds),
+                                      child: Text(
+                                        'Login',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18.sp,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 1.w,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 12.h),
+                            FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const ServiceProviderSignupPage(),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  "Don't have an account? Sign Up",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14.sp,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 12.h),
+                            FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    height: 1.h,
+                                    width: 40.w,
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                                    child: Text(
+                                      'OR',
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(alpha: 0.7),
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 1.h,
+                                    width: 40.w,
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 12.h),
+                            FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const user_login.LoginPage(),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  'Want to login as a user? Sign In',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
+                      ],
                     ),
-                    const SizedBox(height: 40),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ),
@@ -306,24 +372,25 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.3),
-          width: 1.5,
+          color: Colors.white.withOpacity(0.3),
+          width: 1.w,
         ),
       ),
       child: TextField(
         controller: controller,
         obscureText: obscure ? _obscurePassword : false,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.white, fontSize: 15.sp),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.9)),
-          prefixIcon: Icon(icon, color: Colors.white),
+          labelStyle: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14.sp),
+          prefixIcon: Icon(icon, color: Colors.white, size: 20.sp),
           suffixIcon: suffix,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             borderSide: BorderSide.none,
           ),
         ),

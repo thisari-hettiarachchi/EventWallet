@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/strings.dart';
 import '../../../core/widgets/gradient.dart';
@@ -61,28 +62,28 @@ class _PhotographyPageState extends State<PhotographyPage> {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(20.r),
                     child: Row(
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
+                            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        SizedBox(width: 16.w),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Photography',
                                 style: TextStyle(
-                                  fontSize: 28,
+                                  fontSize: 28.sp,
                                   fontWeight: FontWeight.w900,
                                   color: Colors.white,
                                 ),
@@ -90,15 +91,15 @@ class _PhotographyPageState extends State<PhotographyPage> {
                               Text(
                                 '${_photographers.length} photographers available',
                                 style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  fontSize: 15,
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 15.sp,
                                 ),
                               ),
                             ],
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.search, color: Colors.white, size: 28),
+                          icon: Icon(Icons.search, color: Colors.white, size: 28.sp),
                           onPressed: () => _showSearchDialog(),
                         ),
                       ],
@@ -115,7 +116,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
                 : _filteredPhotographers.isEmpty
                 ? _buildEmptyState()
                 : ListView.builder(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20.r),
               itemCount: _filteredPhotographers.length,
               itemBuilder: (context, index) {
                 final doc = _filteredPhotographers[index];
@@ -131,13 +132,13 @@ class _PhotographyPageState extends State<PhotographyPage> {
 
   Widget _buildFilterChips() {
     return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      height: 60.h,
+      padding: EdgeInsets.symmetric(vertical: 12.h),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: EdgeInsets.symmetric(horizontal: 20.w),
         itemCount: _filters.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, __) => SizedBox(width: 12.w),
         itemBuilder: (context, index) {
           final filter = _filters[index];
           final isSelected = _selectedFilter == filter;
@@ -148,18 +149,19 @@ class _PhotographyPageState extends State<PhotographyPage> {
               style: TextStyle(
                 color: isSelected ? Colors.white : AppColors.textDark,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                fontSize: 13.sp,
               ),
             ),
             selected: isSelected,
             onSelected: (selected) {
               setState(() => _selectedFilter = filter);
             },
-            backgroundColor: Colors.white.withValues(alpha: 0.2),
-            selectedColor: Colors.white.withValues(alpha: 0.3),
+            backgroundColor: Colors.white.withOpacity(0.2),
+            selectedColor: Colors.white.withOpacity(0.3),
             checkmarkColor: Colors.white,
             side: BorderSide(
-              color: Colors.white.withValues(alpha: 0.3),
-              width: 1,
+              color: Colors.white.withOpacity(0.3),
+              width: 1.w,
             ),
           );
         },
@@ -177,10 +179,10 @@ class _PhotographyPageState extends State<PhotographyPage> {
     final location = data['location'] ?? 'Location not specified';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [AppColors.cardShadow()],
       ),
       child: Column(
@@ -188,31 +190,31 @@ class _PhotographyPageState extends State<PhotographyPage> {
         children: [
           // Image Section
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
             child: Stack(
               children: [
                 imageUrl.isNotEmpty
                     ? Image.network(
                   imageUrl,
-                  height: 200,
+                  height: 200.h,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
                 )
                     : _buildPlaceholderImage(),
                 Positioned(
-                  top: 12,
-                  right: 12,
+                  top: 12.h,
+                  right: 12.w,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.star, color: Colors.amber, size: 16),
-                        const SizedBox(width: 4),
+                        Icon(Icons.star, color: Colors.amber, size: 16.sp),
+                        SizedBox(width: 4.w),
                         Text(
                           rating.toStringAsFixed(1),
                           style: const TextStyle(
@@ -230,7 +232,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
 
           // Details Section
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16.r),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -239,8 +241,8 @@ class _PhotographyPageState extends State<PhotographyPage> {
                     Expanded(
                       child: Text(
                         name,
-                        style: const TextStyle(
-                          fontSize: 19,
+                        style: TextStyle(
+                          fontSize: 19.sp,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textDark,
                         ),
@@ -248,55 +250,55 @@ class _PhotographyPageState extends State<PhotographyPage> {
                     ),
                     Text(
                       '\$${hourlyRate.toStringAsFixed(0)}/hr',
-                      style: const TextStyle(
-                        fontSize: 18,
+                      style: TextStyle(
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primaryGreen,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 Row(
                   children: [
                     Icon(Icons.location_on,
-                      size: 16,
-                      color: AppColors.textGrey.withValues(alpha: 0.7),
+                      size: 16.sp,
+                      color: AppColors.textGrey.withOpacity(0.7),
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 4.w),
                     Expanded(
                       child: Text(
                         location,
                         style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textGrey.withValues(alpha: 0.8),
+                          fontSize: 13.sp,
+                          color: AppColors.textGrey.withOpacity(0.8),
                         ),
                       ),
                     ),
                     Text(
                       '$reviews reviews',
                       style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textGrey.withValues(alpha: 0.8),
+                        fontSize: 13.sp,
+                        color: AppColors.textGrey.withOpacity(0.8),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12.h),
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 8.w,
+                  runSpacing: 8.h,
                   children: specialties.map((specialty) {
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Text(
                         specialty,
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: TextStyle(
+                          fontSize: 12.sp,
                           color: AppColors.primaryGreen,
                           fontWeight: FontWeight.w600,
                         ),
@@ -304,35 +306,37 @@ class _PhotographyPageState extends State<PhotographyPage> {
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () => _viewDetails(id, data),
-                        icon: const Icon(Icons.info_outline, size: 18),
-                        label: const Text('Details'),
+                        icon: Icon(Icons.info_outline, size: 18.sp),
+                        label: Text('Details', style: TextStyle(fontSize: 14.sp)),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.primaryGreen,
                           side: const BorderSide(color: AppColors.primaryGreen),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(12.r),
                           ),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12.w),
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () => _bookPhotographer(id, data),
-                        icon: const Icon(Icons.calendar_today, size: 18),
-                        label: const Text('Book'),
+                        icon: Icon(Icons.calendar_today, size: 18.sp),
+                        label: Text('Book', style: TextStyle(fontSize: 14.sp)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryGreen,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(12.r),
                           ),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
                         ),
                       ),
                     ),
@@ -348,19 +352,19 @@ class _PhotographyPageState extends State<PhotographyPage> {
 
   Widget _buildPlaceholderImage() {
     return Container(
-      height: 200,
+      height: 200.h,
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primaryGreen.withValues(alpha: 0.3),
-            AppColors.primaryBlue.withValues(alpha: 0.3),
+            AppColors.primaryGreen.withOpacity(0.3),
+            AppColors.primaryBlue.withOpacity(0.3),
           ],
         ),
       ),
-      child: const Icon(
+      child: Icon(
         Icons.camera_alt,
-        size: 64,
+        size: 64.sp,
         color: Colors.white,
       ),
     );
@@ -373,24 +377,24 @@ class _PhotographyPageState extends State<PhotographyPage> {
         children: [
           Icon(
             Icons.photo_camera_outlined,
-            size: 80,
-            color: AppColors.textGrey.withValues(alpha: 0.3),
+            size: 80.sp,
+            color: AppColors.textGrey.withOpacity(0.3),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           Text(
             'No photographers found',
             style: TextStyle(
-              fontSize: 18,
-              color: AppColors.textGrey.withValues(alpha: 0.6),
+              fontSize: 18.sp,
+              color: AppColors.textGrey.withOpacity(0.6),
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Text(
             'Try changing your filter',
             style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textGrey.withValues(alpha: 0.5),
+              fontSize: 14.sp,
+              color: AppColors.textGrey.withOpacity(0.5),
             ),
           ),
         ],
@@ -402,11 +406,13 @@ class _PhotographyPageState extends State<PhotographyPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Search Photographers'),
+        title: Text('Search Photographers', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
         content: TextField(
-          decoration: const InputDecoration(
+          style: TextStyle(fontSize: 15.sp),
+          decoration: InputDecoration(
             hintText: 'Enter photographer name...',
-            prefixIcon: Icon(Icons.search),
+            hintStyle: TextStyle(fontSize: 14.sp),
+            prefixIcon: Icon(Icons.search, size: 24.sp),
           ),
           onSubmitted: (value) {
             Navigator.pop(context);
@@ -416,7 +422,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
           ),
         ],
       ),
@@ -429,51 +435,51 @@ class _PhotographyPageState extends State<PhotographyPage> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.75,
-        decoration: const BoxDecoration(
+        height: 0.75.sh,
+        decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
         ),
         child: Column(
           children: [
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              width: 40,
-              height: 4,
+              margin: EdgeInsets.symmetric(vertical: 12.h),
+              width: 40.w,
+              height: 4.h,
               decoration: BoxDecoration(
                 color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(2.r),
               ),
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(24.r),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       data['name'] ?? 'Photographer',
-                      style: const TextStyle(
-                        fontSize: 24,
+                      style: TextStyle(
+                        fontSize: 24.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     Text(
                       data['description'] ?? 'No description available.',
-                      style: const TextStyle(fontSize: 15),
+                      style: TextStyle(fontSize: 15.sp),
                     ),
-                    const SizedBox(height: 24),
-                    const Text(
+                    SizedBox(height: 24.h),
+                    Text(
                       'Portfolio',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12.h),
                     // Add portfolio images grid here
-                    const Text('Portfolio images coming soon...'),
+                    Text('Portfolio images coming soon...', style: TextStyle(fontSize: 14.sp)),
                   ],
                 ),
               ),
@@ -488,21 +494,21 @@ class _PhotographyPageState extends State<PhotographyPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Book ${data['name']}'),
+        title: Text('Book ${data['name']}', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Rate: \$${data['hourlyRate']}/hour'),
-            const SizedBox(height: 16),
-            const Text('Select a date and time for your event:'),
+            Text('Rate: \$${data['hourlyRate']}/hour', style: TextStyle(fontSize: 14.sp)),
+            SizedBox(height: 16.h),
+            Text('Select a date and time for your event:', style: TextStyle(fontSize: 14.sp)),
             // Add date picker here
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -517,7 +523,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryGreen,
             ),
-            child: const Text('Confirm'),
+            child: Text('Confirm', style: TextStyle(fontSize: 14.sp, color: Colors.white)),
           ),
         ],
       ),

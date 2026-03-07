@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../features/service_provider/dashboard/dashboard.dart';
 import '../../features/service_provider/profile/profile.dart';
 import '../../features/service_provider/bookings/bookings.dart';
+import '../../features/service_provider/services/my_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -30,7 +32,7 @@ class ProviderBottomNav extends StatelessWidget {
         page = const ServiceProviderBookingsPage();
         break;
       case 2:
-        page = const ProviderServicesPage();
+        page = const MyServicesPage();
         break;
       case 3:
         page = const ServiceProviderProfilePage();
@@ -54,9 +56,9 @@ class ProviderBottomNav extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10.r,
+            offset: Offset(0, -5.h),
           ),
         ],
       ),
@@ -66,7 +68,9 @@ class ProviderBottomNav extends StatelessWidget {
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF00897B),
         unselectedItemColor: Colors.grey,
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.sp),
+        unselectedLabelStyle: TextStyle(fontSize: 12.sp),
+        iconSize: 24.sp,
         elevation: 0,
         backgroundColor: Colors.transparent,
         items: const [
@@ -92,19 +96,6 @@ class ProviderBottomNav extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-// Placeholder pages for Provider
-class ProviderServicesPage extends StatelessWidget {
-  const ProviderServicesPage({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('My Services')),
-      body: const Center(child: Text('Services Page')),
-      bottomNavigationBar: const ProviderBottomNav(currentIndex: 2),
     );
   }
 }

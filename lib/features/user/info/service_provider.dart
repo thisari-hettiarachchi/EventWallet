@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../service_provider/auth/login.dart';
 import '../../service_provider/auth/signup.dart';
 
@@ -25,52 +26,52 @@ class ServiceProviderPage extends StatelessWidget {
               ),
               child: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: EdgeInsets.all(24.r),
                   child: Column(
                     children: [
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              width: 1.5,
+                              color: Colors.white.withOpacity(0.3),
+                              width: 1.5.w,
                             ),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      const Icon(
+                      SizedBox(height: 20.h),
+                      Icon(
                         Icons.business_center,
-                        size: 80,
+                        size: 80.sp,
                         color: Colors.white,
                       ),
-                      const SizedBox(height: 24),
-                      const Text(
+                      SizedBox(height: 24.h),
+                      Text(
                         'Become a Service Provider',
                         style: TextStyle(
-                          fontSize: 32,
+                          fontSize: 32.sp,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
+                      SizedBox(height: 16.h),
+                      Text(
                         'Join thousands of professionals growing their business with our platform',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           color: Colors.white70,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 40),
+                      SizedBox(height: 40.h),
                       Row(
                         children: [
                           Expanded(
@@ -84,22 +85,22 @@ class ServiceProviderPage extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 foregroundColor: const Color(0xFF1565C0),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: EdgeInsets.symmetric(vertical: 16.h),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(12.r),
                                 ),
                                 elevation: 4,
                               ),
-                              child: const Text(
+                              child: Text(
                                 'Login',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 18.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          SizedBox(width: 16.w),
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
@@ -111,16 +112,16 @@ class ServiceProviderPage extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF00897B),
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: EdgeInsets.symmetric(vertical: 16.h),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(12.r),
                                 ),
                                 elevation: 4,
                               ),
-                              child: const Text(
+                              child: Text(
                                 'Sign Up',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 18.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -128,7 +129,7 @@ class ServiceProviderPage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
                     ],
                   ),
                 ),
@@ -137,20 +138,20 @@ class ServiceProviderPage extends StatelessWidget {
 
             // Benefits Section
             Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: EdgeInsets.all(24.r),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
-                  const Text(
+                  SizedBox(height: 20.h),
+                  Text(
                     'Why Join Us?',
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 28.sp,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1F36),
+                      color: const Color(0xFF1A1F36),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
                   _buildBenefitCard(
                     icon: Icons.people,
                     title: 'Reach More Customers',
@@ -189,18 +190,18 @@ class ServiceProviderPage extends StatelessWidget {
               decoration: const BoxDecoration(
                 color: Color(0xFFF5F7FA),
               ),
-              padding: const EdgeInsets.all(24.0),
+              padding: EdgeInsets.all(24.r),
               child: Column(
                 children: [
-                  const Text(
+                  Text(
                     'How It Works',
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 28.sp,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1F36),
+                      color: const Color(0xFF1A1F36),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32.h),
                   _buildStepCard(
                     stepNumber: '1',
                     title: 'Create Your Profile',
@@ -239,30 +240,30 @@ class ServiceProviderPage extends StatelessWidget {
                   ],
                 ),
               ),
-              padding: const EdgeInsets.all(40.0),
+              padding: EdgeInsets.all(40.r),
               child: Column(
                 children: [
-                  const Text(
+                  Text(
                     'Ready to Get Started?',
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 28.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
+                  SizedBox(height: 16.h),
+                  Text(
                     'Join our platform today and start building your success story',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 16.sp,
                       color: Colors.white70,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32.h),
                   SizedBox(
-                    width: 200,
+                    width: 200.w,
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.push(
@@ -273,16 +274,16 @@ class ServiceProviderPage extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: const Color(0xFF00897B),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                         elevation: 4,
                       ),
-                      child: const Text(
+                      child: Text(
                         'Join Now',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -304,17 +305,17 @@ class ServiceProviderPage extends StatelessWidget {
     required Color color,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.shade200,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            blurRadius: 8.r,
+            offset: Offset(0, 4.h),
           ),
         ],
       ),
@@ -322,36 +323,36 @@ class ServiceProviderPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(12.r),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10.r),
             ),
             child: Icon(
               icon,
-              size: 32,
+              size: 32.sp,
               color: color,
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 18,
+                  style: TextStyle(
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A1F36),
+                    color: const Color(0xFF1A1F36),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 Text(
                   description,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF4A5568),
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: const Color(0xFF4A5568),
                     height: 1.5,
                   ),
                 ),
@@ -370,13 +371,13 @@ class ServiceProviderPage extends StatelessWidget {
     required Color color,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 24),
+      margin: EdgeInsets.only(bottom: 24.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 50,
-            height: 50,
+            width: 50.w,
+            height: 50.w,
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
@@ -384,33 +385,33 @@ class ServiceProviderPage extends StatelessWidget {
             child: Center(
               child: Text(
                 stepNumber,
-                style: const TextStyle(
-                  fontSize: 24,
+                style: TextStyle(
+                  fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 20),
+          SizedBox(width: 20.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 20,
+                  style: TextStyle(
+                    fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A1F36),
+                    color: const Color(0xFF1A1F36),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 Text(
                   description,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF4A5568),
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: const Color(0xFF4A5568),
                     height: 1.5,
                   ),
                 ),

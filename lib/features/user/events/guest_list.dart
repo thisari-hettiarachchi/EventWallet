@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 
 class GuestListPage extends StatefulWidget {
@@ -33,12 +34,12 @@ class _GuestListPageState extends State<GuestListPage> {
           child: Column(
             children: [
               _buildHeader(),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Expanded(
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
                   ),
                   child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
@@ -63,7 +64,7 @@ class _GuestListPageState extends State<GuestListPage> {
                           _buildSummary(guests),
                           Expanded(
                             child: ListView.builder(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              padding: EdgeInsets.symmetric(horizontal: 20.w),
                               itemCount: guests.length,
                               itemBuilder: (context, index) {
                                 final guest = guests[index];
@@ -85,30 +86,29 @@ class _GuestListPageState extends State<GuestListPage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showGuestDialog(),
         backgroundColor: AppColors.primaryGreen,
-        icon: const Icon(Icons.person_add, color: Colors.white),
-        label: const Text('Add Guest',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        icon: Icon(Icons.person_add, color: Colors.white, size: 24.sp),
+        label: Text('Add Guest',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp)),
       ),
     );
   }
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
             onPressed: () => Navigator.pop(context),
           ),
-          const Expanded(
-            child: Text(
-              'Guest List',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+          SizedBox(width: 16.w),
+          Text(
+            'Guest List',
+            style: TextStyle(
+              fontSize: 24.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
         ],
@@ -129,7 +129,7 @@ class _GuestListPageState extends State<GuestListPage> {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.r),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -148,16 +148,16 @@ class _GuestListPageState extends State<GuestListPage> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 20.sp,
             fontWeight: FontWeight.bold,
             color: color,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4.h),
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 12.sp,
             color: Colors.grey.shade600,
           ),
         ),
@@ -167,24 +167,26 @@ class _GuestListPageState extends State<GuestListPage> {
 
   Widget _buildGuestCard(String guestId, Map<String, dynamic> data) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [AppColors.cardShadow()],
       ),
       child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         leading: CircleAvatar(
           backgroundColor: AppColors.primaryGreen.withOpacity(0.1),
+          radius: 20.r,
           child: Text(
             (data['name'] ?? 'G').isNotEmpty ? data['name'][0].toUpperCase() : 'G',
-            style: const TextStyle(
-                color: AppColors.primaryGreen, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: AppColors.primaryGreen, fontWeight: FontWeight.bold, fontSize: 16.sp),
           ),
         ),
         title: Text(data['name'] ?? '',
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(data['email'] ?? 'No email'),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
+        subtitle: Text(data['email'] ?? 'No email', style: TextStyle(fontSize: 14.sp)),
         trailing: PopupMenuButton<String>(
           onSelected: (value) {
             if (value == 'delete') {
@@ -201,40 +203,40 @@ class _GuestListPageState extends State<GuestListPage> {
             }
           },
           itemBuilder: (context) => [
-            const PopupMenuItem(value: 'Pending', child: Text('Pending')),
-            const PopupMenuItem(value: 'Confirmed', child: Text('Confirmed')),
-            const PopupMenuItem(value: 'Declined', child: Text('Declined')),
+            PopupMenuItem(value: 'Pending', child: Text('Pending', style: TextStyle(fontSize: 14.sp))),
+            PopupMenuItem(value: 'Confirmed', child: Text('Confirmed', style: TextStyle(fontSize: 14.sp))),
+            PopupMenuItem(value: 'Declined', child: Text('Declined', style: TextStyle(fontSize: 14.sp))),
             const PopupMenuDivider(),
-            const PopupMenuItem(
+            PopupMenuItem(
                 value: 'edit',
                 child: Row(
                   children: [
-                    Icon(Icons.edit, size: 20),
-                    SizedBox(width: 8),
-                    Text('Edit'),
+                    Icon(Icons.edit, size: 20.sp),
+                    SizedBox(width: 8.w),
+                    Text('Edit', style: TextStyle(fontSize: 14.sp)),
                   ],
                 )),
-            const PopupMenuItem(
+            PopupMenuItem(
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(Icons.delete, color: Colors.red, size: 20),
-                    SizedBox(width: 8),
-                    Text('Remove', style: TextStyle(color: Colors.red)),
+                    Icon(Icons.delete, color: Colors.red, size: 20.sp),
+                    SizedBox(width: 8.w),
+                    Text('Remove', style: TextStyle(color: Colors.red, fontSize: 14.sp)),
                   ],
                 )),
           ],
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
             decoration: BoxDecoration(
               color: _getStatusColor(data['status']).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             child: Text(
               data['status'] ?? 'Pending',
               style: TextStyle(
                 color: _getStatusColor(data['status']),
-                fontSize: 12,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -261,12 +263,12 @@ class _GuestListPageState extends State<GuestListPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.people_outline,
-              size: 80, color: Colors.grey.withOpacity(0.3)),
-          const SizedBox(height: 16),
-          const Text(
+              size: 80.sp, color: Colors.grey.withOpacity(0.3)),
+          SizedBox(height: 16.h),
+          Text(
             'No guests added yet',
             style: TextStyle(
-                fontSize: 18, color: Colors.grey, fontWeight: FontWeight.bold),
+                fontSize: 18.sp, color: Colors.grey, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -277,12 +279,12 @@ class _GuestListPageState extends State<GuestListPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Remove Guest'),
-        content: const Text('Are you sure you want to remove this guest?'),
+        title: Text('Remove Guest', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        content: Text('Are you sure you want to remove this guest?', style: TextStyle(fontSize: 14.sp)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
+              child: Text('Cancel', style: TextStyle(fontSize: 14.sp))),
           TextButton(
             onPressed: () {
               FirebaseFirestore.instance
@@ -293,7 +295,7 @@ class _GuestListPageState extends State<GuestListPage> {
                   .delete();
               Navigator.pop(context);
             },
-            child: const Text('Remove', style: TextStyle(color: Colors.red)),
+            child: Text('Remove', style: TextStyle(color: Colors.red, fontSize: 14.sp)),
           ),
         ],
       ),
@@ -316,36 +318,45 @@ class _GuestListPageState extends State<GuestListPage> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text(isEditing ? 'Edit Guest' : 'Add Guest'),
+          title: Text(isEditing ? 'Edit Guest' : 'Add Guest', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
+                  style: TextStyle(fontSize: 15.sp),
+                  decoration: InputDecoration(
                     labelText: 'Name',
+                    labelStyle: TextStyle(fontSize: 14.sp),
                     hintText: 'Enter guest name',
+                    hintStyle: TextStyle(fontSize: 14.sp),
                   ),
                   textCapitalization: TextCapitalization.words,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 TextField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
+                  style: TextStyle(fontSize: 15.sp),
+                  decoration: InputDecoration(
                     labelText: 'Email',
+                    labelStyle: TextStyle(fontSize: 14.sp),
                     hintText: 'Enter guest email (optional)',
+                    hintStyle: TextStyle(fontSize: 14.sp),
                   ),
                   keyboardType: TextInputType.emailAddress,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 DropdownButtonFormField<String>(
                   value: selectedStatus,
-                  decoration: const InputDecoration(labelText: 'Status'),
+                  decoration: InputDecoration(
+                    labelText: 'Status',
+                    labelStyle: TextStyle(fontSize: 14.sp),
+                  ),
                   items: ['Pending', 'Confirmed', 'Declined'].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Text(value),
+                      child: Text(value, style: TextStyle(fontSize: 14.sp)),
                     );
                   }).toList(),
                   onChanged: (newValue) {
@@ -360,7 +371,7 @@ class _GuestListPageState extends State<GuestListPage> {
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel')),
+                child: Text('Cancel', style: TextStyle(fontSize: 14.sp))),
             ElevatedButton(
               onPressed: () {
                 if (_nameController.text.isNotEmpty) {
@@ -389,9 +400,10 @@ class _GuestListPageState extends State<GuestListPage> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen),
+                  backgroundColor: AppColors.primaryGreen,
+                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h)),
               child: Text(isEditing ? 'Update' : 'Add',
-                  style: const TextStyle(color: Colors.white)),
+                  style: TextStyle(color: Colors.white, fontSize: 14.sp)),
             ),
           ],
         ),

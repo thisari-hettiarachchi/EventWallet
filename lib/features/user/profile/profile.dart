@@ -3,7 +3,10 @@ import 'package:eventwallet/features/user/events/manage_event.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/bottom_nav.dart';
+import '../../../core/constants/colors.dart';
+import '../../../core/constants/styles.dart';
 import '../auth/login.dart';
 import '../../../services/auth_service.dart';
 import 'edit_profile.dart';
@@ -58,34 +61,24 @@ class ProfilePage extends StatelessWidget {
             : 'U';
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF5F7FA),
+          backgroundColor: AppColors.background,
           body: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF00897B), // Teal/Green
-                  Color(0xFF1565C0), // Blue
-                ],
-                stops: [0.0, 0.3], // Color covers top 30% like an app bar
-              ),
-            ),
+            decoration: AppDecorations.pageGradientHeader,
             child: SafeArea(
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
                   Container(
-                    width: 100,
-                    height: 100,
+                    width: 100.w,
+                    height: 100.w,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 4),
+                      border: Border.all(color: Colors.white, width: 4.w),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
+                          blurRadius: 10.r,
+                          offset: Offset(0, 5.h),
                         ),
                       ],
                     ),
@@ -93,41 +86,34 @@ class ProfilePage extends StatelessWidget {
                       backgroundColor: Colors.white,
                       child: Text(
                         initials,
-                        style: const TextStyle(
-                          fontSize: 36,
+                        style: TextStyle(
+                          fontSize: 36.sp,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF00897B),
+                          color: AppColors.primaryGreen,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   Text(
                     displayName,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                    style: AppTextStyles.whiteText(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4.h),
                   Text(
                     email,
-                    style: TextStyle(
-                      fontSize: 15,
+                    style: AppTextStyles.whiteText(fontSize: 15).copyWith(
                       color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
                   if (!isServiceProvider) Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(16),
+                    margin: AppSpacing.horizontalPadding,
+                    padding: EdgeInsets.all(20.r),
+                    decoration: AppDecorations.overlayButton.copyWith(
                       border: Border.all(
                         color: Colors.white.withValues(alpha: 0.3),
-                        width: 1.5,
+                        width: 1.5.w,
                       ),
                     ),
                     child: Row(
@@ -140,8 +126,8 @@ class ProfilePage extends StatelessWidget {
                         ),
 
                         Container(
-                          width: 1,
-                          height: 40,
+                          width: 1.w,
+                          height: 40.h,
                           color: Colors.white.withValues(alpha: 0.3),
                         ),
 
@@ -154,8 +140,8 @@ class ProfilePage extends StatelessWidget {
                         ),
 
                         Container(
-                          width: 1,
-                          height: 40,
+                          width: 1.w,
+                          height: 40.h,
                           color: Colors.white.withValues(alpha: 0.3),
                         ),
 
@@ -169,25 +155,18 @@ class ProfilePage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
                   Expanded(
                     child: Container(
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF5F7FA),
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
-                      ),
+                      decoration: AppDecorations.roundedContent(),
                       child: ListView(
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(20.r),
                         children: [
-                          const Text(
+                          Text(
                             'Account Settings',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1A1F36),
-                            ),
+                            style: AppTextStyles.sectionTitle,
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16.h),
                           _buildSettingsCard(
                             icon: Icons.person_outline,
                             title: 'Edit Profile',
@@ -204,7 +183,7 @@ class ProfilePage extends StatelessWidget {
                             },
                           ),
                           if (!isServiceProvider) ...[
-                            const SizedBox(height: 12),
+                            SizedBox(height: 12.h),
                             _buildSettingsCard(
                               icon: Icons.event_note_outlined,
                               title: 'Manage Events',
@@ -220,7 +199,7 @@ class ProfilePage extends StatelessWidget {
                               },
                             ),
                           ],
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12.h),
                           _buildSettingsCard(
                             icon: Icons.lock_outline,
                             title: 'Privacy & Security',
@@ -235,16 +214,16 @@ class ProfilePage extends StatelessWidget {
                               );
                             },
                           ),
-                          const SizedBox(height: 24),
-                          const Text(
+                          SizedBox(height: 24.h),
+                          Text(
                             'Support',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 20.sp,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1A1F36),
+                              color: const Color(0xFF1A1F36),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16.h),
                           _buildSettingsCard(
                             icon: Icons.help_outline,
                             title: 'Help & Support',
@@ -260,7 +239,7 @@ class ProfilePage extends StatelessWidget {
                             },
                           ),
                           if (!isServiceProvider) ...[
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16.h),
                             _buildSettingsCard(
                               icon: Icons.person_add_alt_1,
                               title: 'Become a Service Provider',
@@ -276,7 +255,7 @@ class ProfilePage extends StatelessWidget {
                               },
                             ),
                           ],
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12.h),
                           _buildSettingsCard(
                             icon: Icons.info_outline,
                             title: 'About',
@@ -291,11 +270,11 @@ class ProfilePage extends StatelessWidget {
                               );
                             },
                           ),
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24.h),
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.red.shade50,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(12.r),
                               border: Border.all(color: Colors.red.shade200),
                             ),
                             child: Material(
@@ -304,40 +283,40 @@ class ProfilePage extends StatelessWidget {
                                 onTap: () {
                                   _showLogoutDialog(context);
                                 },
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(12.r),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(16),
+                                  padding: EdgeInsets.all(16.r),
                                   child: Row(
                                     children: [
                                       Container(
-                                        padding: const EdgeInsets.all(10),
+                                        padding: EdgeInsets.all(10.r),
                                         decoration: BoxDecoration(
                                           color: Colors.red.shade100,
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10.r),
                                         ),
                                         child: Icon(Icons.logout,
-                                            color: Colors.red.shade700, size: 22),
+                                            color: Colors.red.shade700, size: 22.sp),
                                       ),
-                                      const SizedBox(width: 12),
+                                      SizedBox(width: 12.w),
                                       Expanded(
                                         child: Text(
                                           'Logout',
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 16.sp,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.red.shade700,
                                           ),
                                         ),
                                       ),
                                       Icon(Icons.arrow_forward_ios,
-                                          color: Colors.red.shade400, size: 16),
+                                          color: Colors.red.shade400, size: 16.sp),
                                     ],
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(height: 100),
+                          SizedBox(height: 100.h),
                         ],
                       ),
                     ),
@@ -366,19 +345,13 @@ class ProfilePage extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.whiteText(fontSize: 22, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4.h),
         Text(
           label,
-          style: TextStyle(
+          style: AppTextStyles.whiteText(fontSize: 13, fontWeight: FontWeight.w500).copyWith(
             color: Colors.white.withValues(alpha: 0.9),
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
           ),
         ),
       ],
@@ -393,60 +366,43 @@ class ProfilePage extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      decoration: AppDecorations.card(),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16.r),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10.r),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
-                  child: Icon(icon, color: color, size: 22),
+                  child: Icon(icon, color: color, size: 22.sp),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A1F36),
-                        ),
+                        style: AppTextStyles.bodyLarge,
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Text(
                         subtitle,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFF4A5568),
-                        ),
+                        style: AppTextStyles.bodyMedium,
                       ),
                     ],
                   ),
                 ),
                 Icon(Icons.arrow_forward_ios,
-                    color: Colors.grey.shade400, size: 16),
+                    color: AppColors.textGrey, size: 16.sp),
               ],
             ),
           ),
@@ -459,15 +415,15 @@ class ProfilePage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(
+        title: Text(
           'Logout',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
         ),
-        content: const Text('Are you sure you want to logout?'),
+        content: Text('Are you sure you want to logout?', style: TextStyle(fontSize: 14.sp)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -495,7 +451,7 @@ class ProfilePage extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red.shade700,
             ),
-            child: const Text('Logout'),
+            child: Text('Logout', style: TextStyle(fontSize: 14.sp, color: Colors.white)),
           ),
         ],
       ),

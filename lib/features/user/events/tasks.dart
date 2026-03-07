@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 
 class TasksPage extends StatefulWidget {
@@ -25,12 +26,12 @@ class _TasksPageState extends State<TasksPage> {
           child: Column(
             children: [
               _buildHeader(),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Expanded(
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
                   ),
                   child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
@@ -51,7 +52,7 @@ class _TasksPageState extends State<TasksPage> {
                       }
 
                       return ListView.builder(
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(20.r),
                         itemCount: tasks.length,
                         itemBuilder: (context, index) {
                           final task = tasks[index];
@@ -70,25 +71,26 @@ class _TasksPageState extends State<TasksPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddTaskDialog,
         backgroundColor: AppColors.primaryGreen,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add, color: Colors.white, size: 24.sp),
       ),
     );
   }
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
             onPressed: () => Navigator.pop(context),
           ),
-          const Expanded(
+          SizedBox(width: 16.w),
+          Expanded(
             child: Text(
               'Event Tasks',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -102,24 +104,27 @@ class _TasksPageState extends State<TasksPage> {
   Widget _buildTaskCard(String taskId, Map<String, dynamic> data) {
     final bool isDone = data['isDone'] ?? false;
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [AppColors.cardShadow()],
       ),
       child: ListTile(
-        leading: Checkbox(
-          value: isDone,
-          activeColor: AppColors.primaryGreen,
-          onChanged: (value) {
-            FirebaseFirestore.instance
-                .collection('events')
-                .doc(widget.eventId)
-                .collection('tasks')
-                .doc(taskId)
-                .update({'isDone': value});
-          },
+        leading: Transform.scale(
+          scale: 1.2.r,
+          child: Checkbox(
+            value: isDone,
+            activeColor: AppColors.primaryGreen,
+            onChanged: (value) {
+              FirebaseFirestore.instance
+                  .collection('events')
+                  .doc(widget.eventId)
+                  .collection('tasks')
+                  .doc(taskId)
+                  .update({'isDone': value});
+            },
+          ),
         ),
         title: Text(
           data['title'] ?? '',
@@ -127,10 +132,11 @@ class _TasksPageState extends State<TasksPage> {
             decoration: isDone ? TextDecoration.lineThrough : null,
             color: isDone ? Colors.grey : AppColors.textDark,
             fontWeight: FontWeight.w600,
+            fontSize: 16.sp,
           ),
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.delete_outline, color: Colors.red),
+          icon: Icon(Icons.delete_outline, color: Colors.red, size: 24.sp),
           onPressed: () {
             FirebaseFirestore.instance
                 .collection('events')
@@ -149,11 +155,11 @@ class _TasksPageState extends State<TasksPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.checklist, size: 80, color: Colors.grey.withOpacity(0.3)),
-          const SizedBox(height: 16),
-          const Text(
+          Icon(Icons.checklist, size: 80.sp, color: Colors.grey.withOpacity(0.3)),
+          SizedBox(height: 16.h),
+          Text(
             'No tasks yet',
-            style: TextStyle(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18.sp, color: Colors.grey, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -164,14 +170,18 @@ class _TasksPageState extends State<TasksPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add New Task'),
+        title: Text('Add New Task', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
         content: TextField(
           controller: _taskController,
-          decoration: const InputDecoration(hintText: 'Task description'),
+          style: TextStyle(fontSize: 16.sp),
+          decoration: InputDecoration(
+            hintText: 'Task description',
+            hintStyle: TextStyle(fontSize: 14.sp),
+          ),
           autofocus: true,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(fontSize: 14.sp))),
           ElevatedButton(
             onPressed: () {
               if (_taskController.text.isNotEmpty) {
@@ -189,7 +199,7 @@ class _TasksPageState extends State<TasksPage> {
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryGreen),
-            child: const Text('Add', style: TextStyle(color: Colors.white)),
+            child: Text('Add', style: TextStyle(color: Colors.white, fontSize: 14.sp)),
           ),
         ],
       ),
