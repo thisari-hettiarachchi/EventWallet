@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../result/result_page.dart';
 import '../dashboard/dashboard.dart';
 import '../auth/signup.dart';
@@ -94,6 +95,7 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
         ),
       );
     } catch (e) {
+      if (!mounted) return;
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -125,51 +127,49 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
           child: SingleChildScrollView(
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height -
-                    MediaQuery.of(context).padding.top -
-                    MediaQuery.of(context).padding.bottom,
+                minHeight: 1.sh - ScreenUtil().bottomBarHeight - ScreenUtil().statusBarHeight,
               ),
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(24.r),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 60),
+                    SizedBox(height: 60.h),
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: Container(
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(20.r),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: Colors.white.withOpacity(0.2),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              blurRadius: 30,
-                              spreadRadius: 10,
+                              color: Colors.white.withOpacity(0.3),
+                              blurRadius: 30.r,
+                              spreadRadius: 10.r,
                             ),
                           ],
                         ),
                         child: Image.asset(
                           'assets/images/logo.png',
-                          width: 100,
-                          height: 100,
+                          width: 100.w,
+                          height: 100.w,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20.h),
                     SlideTransition(
                       position: _slideAnimation,
                       child: FadeTransition(
                         opacity: _fadeAnimation,
-                        child: const Text(
+                        child: Text(
                           'EventWallet',
                           style: TextStyle(
-                            fontSize: 36,
+                            fontSize: 36.sp,
                             fontWeight: FontWeight.w900,
                             color: Colors.white,
-                            letterSpacing: 1.2,
-                            shadows: [
+                            letterSpacing: 1.2.w,
+                            shadows: const [
                               Shadow(
                                 color: Colors.black26,
                                 offset: Offset(2, 2),
@@ -180,7 +180,7 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                         ),
                       ),
                     ),
-                    const SizedBox(height: 50),
+                    SizedBox(height: 50.h),
                     SlideTransition(
                       position: _slideAnimation,
                       child: FadeTransition(
@@ -191,7 +191,7 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                             icon: Icons.email),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20.h),
                     SlideTransition(
                       position: _slideAnimation,
                       child: FadeTransition(
@@ -207,6 +207,7 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                                   ? Icons.visibility
                                   : Icons.visibility_off,
                               color: Colors.white,
+                              size: 24.sp,
                             ),
                             onPressed: () {
                               setState(() {
@@ -217,20 +218,20 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32.h),
                     SlideTransition(
                       position: _slideAnimation,
                       child: FadeTransition(
                         opacity: _fadeAnimation,
                         child: Container(
                           width: double.infinity,
-                          height: 60,
+                          height: 60.h,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(18.r),
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withValues(alpha: 0.95),
-                                Colors.white.withValues(alpha: 0.85),
+                                Colors.white.withOpacity(0.95),
+                                Colors.white.withOpacity(0.85),
                               ],
                             ),
                           ),
@@ -240,7 +241,7 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
+                                borderRadius: BorderRadius.circular(18.r),
                               ),
                             ),
                             child: ShaderMask(
@@ -250,13 +251,13 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                                   Color(0xFF1565C0),
                                 ],
                               ).createShader(bounds),
-                              child: const Text(
+                              child: Text(
                                 'Login',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 20,
+                                  fontSize: 20.sp,
                                   fontWeight: FontWeight.bold,
-                                  letterSpacing: 1,
+                                  letterSpacing: 1.w,
                                 ),
                               ),
                             ),
@@ -264,7 +265,7 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24.h),
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: TextButton(
@@ -275,17 +276,17 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                                 builder: (_) => const ServiceProviderSignupPage()),
                           );
                         },
-                        child: const Text(
+                        child: Text(
                           "Don't have an account? Sign Up",
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
-                            fontSize: 16,
+                            fontSize: 16.sp,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    SizedBox(height: 40.h),
                   ],
                 ),
               ),
@@ -305,24 +306,25 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.3),
-          width: 1.5,
+          color: Colors.white.withOpacity(0.3),
+          width: 1.5.w,
         ),
       ),
       child: TextField(
         controller: controller,
         obscureText: obscure ? _obscurePassword : false,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.white, fontSize: 16.sp),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.9)),
-          prefixIcon: Icon(icon, color: Colors.white),
+          labelStyle: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14.sp),
+          prefixIcon: Icon(icon, color: Colors.white, size: 24.sp),
           suffixIcon: suffix,
+          contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             borderSide: BorderSide.none,
           ),
         ),

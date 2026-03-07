@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../result/result_page.dart';
 
 class PrivacySecurityPage extends StatefulWidget {
@@ -123,9 +124,9 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Privacy & Security',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.sp),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -145,48 +146,48 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
         ),
         child: Column(
           children: [
-            const SizedBox(height: 100), // Space for AppBar
+            SizedBox(height: 100.h), // Space for AppBar
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF5F7FA),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F7FA),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
                 ),
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(24),
+                        padding: EdgeInsets.all(24.r),
                         child: Column(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(16),
+                              padding: EdgeInsets.all(16.r),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF00897B).withValues(alpha: 0.1),
+                                color: const Color(0xFF00897B).withOpacity(0.1),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.lock_outline,
-                                size: 50,
-                                color: Color(0xFF00897B),
+                                size: 50.sp,
+                                color: const Color(0xFF00897B),
                               ),
                             ),
-                            const SizedBox(height: 16),
-                            const Text(
+                            SizedBox(height: 16.h),
+                            Text(
                               'Keep Your Account Safe',
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: 22.sp,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1A1F36),
+                                color: const Color(0xFF1A1F36),
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            const Text(
+                            SizedBox(height: 8.h),
+                            Text(
                               'Manage your password and security settings',
                               style: TextStyle(
-                                fontSize: 14,
-                                color: Color(0xFF4A5568),
+                                fontSize: 14.sp,
+                                color: const Color(0xFF4A5568),
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -194,21 +195,21 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(24),
+                        padding: EdgeInsets.all(24.r),
                         child: Form(
                           key: _formKey,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Change Password',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 18.sp,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1A1F36),
+                                  color: const Color(0xFF1A1F36),
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20.h),
                               _buildPasswordField(
                                 controller: _currentPasswordController,
                                 label: 'Current Password',
@@ -218,7 +219,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                                 validator: (value) =>
                                 value!.isEmpty ? 'Enter current password' : null,
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               _buildPasswordField(
                                 controller: _newPasswordController,
                                 label: 'New Password',
@@ -235,7 +236,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                                   return null;
                                 },
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               _buildPasswordField(
                                 controller: _confirmPasswordController,
                                 label: 'Confirm New Password',
@@ -247,16 +248,16 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                                     ? 'Passwords do not match'
                                     : null,
                               ),
-                              const SizedBox(height: 32),
+                              SizedBox(height: 32.h),
                               SizedBox(
                                 width: double.infinity,
-                                height: 56,
+                                height: 56.h,
                                 child: Container(
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
                                       colors: [Color(0xFF00897B), Color(0xFF1565C0)],
                                     ),
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(12.r),
                                   ),
                                   child: ElevatedButton(
                                     onPressed: _isLoading ? null : _changePassword,
@@ -264,15 +265,15 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                                       backgroundColor: Colors.transparent,
                                       shadowColor: Colors.transparent,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(12.r),
                                       ),
                                     ),
                                     child: _isLoading
                                         ? const CircularProgressIndicator(color: Colors.white)
-                                        : const Text(
+                                        : Text(
                                       'Change Password',
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 16.sp,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
@@ -306,30 +307,32 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       controller: controller,
       obscureText: !isVisible,
       validator: validator,
-      style: const TextStyle(color: Color(0xFF1A1F36)),
+      style: TextStyle(color: const Color(0xFF1A1F36), fontSize: 15.sp),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Color(0xFF4A5568)),
-        prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF00897B)),
+        labelStyle: TextStyle(color: const Color(0xFF4A5568), fontSize: 14.sp),
+        prefixIcon: Icon(Icons.lock_outline, color: const Color(0xFF00897B), size: 24.sp),
         suffixIcon: IconButton(
           icon: Icon(
             isVisible ? Icons.visibility : Icons.visibility_off,
             color: const Color(0xFF4A5568),
+            size: 24.sp,
           ),
           onPressed: onToggle,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: Color(0xFF00897B), width: 2),
         ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
     );
   }

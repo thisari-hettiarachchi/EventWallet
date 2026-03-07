@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 import 'edit_event.dart';
 
@@ -26,15 +27,15 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
           child: Column(
             children: [
               _buildHeader(),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Expanded(
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
                   ),
                   child: user == null
-                      ? const Center(child: Text('Please login to view events'))
+                      ? Center(child: Text('Please login to view events', style: TextStyle(fontSize: 16.sp)))
                       : StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('events')
@@ -51,7 +52,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                       }
 
                       return ListView.builder(
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(20.r),
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
                           final doc = snapshot.data!.docs[index];
@@ -72,24 +73,24 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
       child: Row(
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12),
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12.r),
             ),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
               onPressed: () => Navigator.pop(context),
             ),
           ),
-          const SizedBox(width: 16),
-          const Text(
+          SizedBox(width: 16.w),
+          Text(
             'Manage Events',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 24.sp,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -106,14 +107,14 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
         children: [
           Icon(
             Icons.event_busy,
-            size: 80,
-            color: Colors.grey.withValues(alpha: 0.4),
+            size: 80.sp,
+            color: Colors.grey.withOpacity(0.4),
           ),
-          const SizedBox(height: 16),
-          const Text(
+          SizedBox(height: 16.h),
+          Text(
             'No events yet',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 20.sp,
               fontWeight: FontWeight.bold,
               color: Colors.grey,
             ),
@@ -130,49 +131,49 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
     final date = _formatDate(data['date']);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [AppColors.cardShadow()],
       ),
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
+            padding: EdgeInsets.all(16.r),
+            decoration: BoxDecoration(
               gradient: AppColors.cardGradient,
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+                topLeft: Radius.circular(20.r),
+                topRight: Radius.circular(20.r),
               ),
             ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10.r),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
-                  child: const Icon(Icons.event, color: Colors.white, size: 24),
+                  child: Icon(Icons.event, color: Colors.white, size: 24.sp),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         eventName,
-                        style: const TextStyle(
-                          fontSize: 18,
+                        style: TextStyle(
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                       Text(
                         date,
-                        style: const TextStyle(fontSize: 13, color: Colors.white70),
+                        style: TextStyle(fontSize: 13.sp, color: Colors.white70),
                       ),
                     ],
                   ),
@@ -181,7 +182,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16.r),
             child: Column(
               children: [
                 Row(
@@ -189,13 +190,13 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                     Expanded(
                       child: _buildStatBox('Budget', '\$$budget', AppColors.primaryGreen, Icons.account_balance_wallet),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12.w),
                     Expanded(
                       child: _buildStatBox('Spent', '\$$spent', AppColors.primaryBlue, Icons.shopping_cart),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 Row(
                   children: [
                     Expanded(
@@ -211,25 +212,27 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                             ),
                           );
                         },
-                        icon: const Icon(Icons.edit, size: 18),
-                        label: const Text('Edit'),
+                        icon: Icon(Icons.edit, size: 18.sp),
+                        label: Text('Edit', style: TextStyle(fontSize: 14.sp)),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.primaryBlue,
                           side: const BorderSide(color: AppColors.primaryBlue),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12.w),
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () => _deleteEvent(eventId, eventName),
-                        icon: const Icon(Icons.delete, size: 18),
-                        label: const Text('Delete'),
+                        icon: Icon(Icons.delete, size: 18.sp),
+                        label: Text('Delete', style: TextStyle(fontSize: 14.sp)),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.red.shade700,
                           side: BorderSide(color: Colors.red.shade700),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
                         ),
                       ),
                     ),
@@ -245,22 +248,22 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
 
   Widget _buildStatBox(String label, String value, Color color, IconData icon) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12.r),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Row(
         children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(width: 8),
+          Icon(icon, color: color, size: 20.sp),
+          SizedBox(width: 8.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
-                Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color)),
+                Text(label, style: TextStyle(fontSize: 11.sp, color: Colors.grey.shade600)),
+                Text(value, style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: color)),
               ],
             ),
           ),
@@ -287,10 +290,10 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Event'),
-        content: const Text('Are you sure you want to delete this event?'),
+        title: Text('Delete Event', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        content: Text('Are you sure you want to delete this event?', style: TextStyle(fontSize: 14.sp)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(fontSize: 14.sp))),
           ElevatedButton(
             onPressed: () async {
               final user = FirebaseAuth.instance.currentUser;
@@ -313,7 +316,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
               if (mounted) Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text('Delete', style: TextStyle(color: Colors.white, fontSize: 14.sp)),
           ),
         ],
       ),

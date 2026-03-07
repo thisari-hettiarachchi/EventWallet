@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/provider_bottom_nav.dart';
 import '../../../core/constants/colors.dart';
 
@@ -50,13 +51,13 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
           child: Column(
             children: [
               _buildHeader(),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Expanded(
                 child: Container(
                   width: double.infinity,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
                   ),
                   child: FadeTransition(
                     opacity: _fadeAnimation,
@@ -71,12 +72,12 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
       floatingActionButton: Container(
         decoration: BoxDecoration(
           gradient: AppColors.buttonGradient,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(30.r),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primaryGreen.withValues(alpha: 0.4),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
+              color: AppColors.primaryGreen.withOpacity(0.4),
+              blurRadius: 16.r,
+              offset: Offset(0, 8.h),
             ),
           ],
         ),
@@ -84,14 +85,14 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
           onPressed: () => _showAddServiceDialog(),
           backgroundColor: Colors.transparent,
           elevation: 0,
-          icon: const Icon(Icons.add, color: Colors.white, size: 26),
-          label: const Text(
+          icon: Icon(Icons.add, color: Colors.white, size: 26.sp),
+          label: Text(
             'Add Service',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
+              letterSpacing: 0.5.w,
             ),
           ),
         ),
@@ -102,26 +103,26 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+      padding: EdgeInsets.fromLTRB(24.w, 16.h, 24.w, 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'My Services',
                 style: TextStyle(
-                  fontSize: 32,
+                  fontSize: 32.sp,
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
-                  letterSpacing: -1,
+                  letterSpacing: -1.w,
                 ),
               ),
               Text(
                 'Manage your offerings',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 16.sp,
                   color: Colors.white70,
                   fontWeight: FontWeight.w500,
                 ),
@@ -130,12 +131,12 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
           ),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(15.r),
+              border: Border.all(color: Colors.white.withOpacity(0.3)),
             ),
             child: IconButton(
-              icon: const Icon(Icons.room_service_outlined, color: Colors.white),
+              icon: Icon(Icons.room_service_outlined, color: Colors.white, size: 24.sp),
               onPressed: () {},
             ),
           ),
@@ -145,7 +146,7 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
   }
 
   Widget _buildServicesList() {
-    if (userId == null) return const Center(child: Text('Please login'));
+    if (userId == null) return Center(child: Text('Please login', style: TextStyle(fontSize: 16.sp)));
 
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
@@ -163,7 +164,7 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
+          padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 100.h),
           physics: const BouncingScrollPhysics(),
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
@@ -178,34 +179,34 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
 
   Widget _buildServiceCard(String id, Map<String, dynamic> data) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: EdgeInsets.only(bottom: 20.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15.r,
+            offset: Offset(0, 8.h),
           ),
         ],
       ),
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20.r),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(12.r),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16),
+                    color: AppColors.primaryGreen.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16.r),
                   ),
-                  child: const Icon(Icons.room_service, color: AppColors.primaryGreen, size: 28),
+                  child: Icon(Icons.room_service, color: AppColors.primaryGreen, size: 28.sp),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,30 +217,30 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
                           Expanded(
                             child: Text(
                               data['name'] ?? 'Untitled Service',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w800,
-                                fontSize: 18,
+                                fontSize: 18.sp,
                                 color: AppColors.textDark,
-                                letterSpacing: -0.5,
+                                letterSpacing: -0.5.w,
                               ),
                             ),
                           ),
                           Text(
                             '\$${data['price'] ?? 0}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w900,
-                              fontSize: 20,
+                              fontSize: 20.sp,
                               color: AppColors.primaryGreen,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8.h),
                       Text(
                         data['description'] ?? 'No description provided',
                         style: TextStyle(
                           color: Colors.grey[600],
-                          fontSize: 14,
+                          fontSize: 14.sp,
                           height: 1.4,
                         ),
                         maxLines: 2,
@@ -252,10 +253,10 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
             decoration: BoxDecoration(
               color: Colors.grey[50],
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(24.r)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -266,7 +267,7 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
                   color: AppColors.primaryBlue,
                   onTap: () => _showEditServiceDialog(id, data),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 _buildCardAction(
                   icon: Icons.delete_outline,
                   label: 'Delete',
@@ -289,14 +290,14 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
   }) {
     return TextButton.icon(
       onPressed: onTap,
-      icon: Icon(icon, size: 18, color: color),
+      icon: Icon(icon, size: 18.sp, color: color),
       label: Text(
         label,
-        style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 13),
+        style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 13.sp),
       ),
       style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       ),
     );
   }
@@ -307,28 +308,28 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(30),
+            padding: EdgeInsets.all(30.r),
             decoration: BoxDecoration(
-              color: AppColors.primaryGreen.withValues(alpha: 0.05),
+              color: AppColors.primaryGreen.withOpacity(0.05),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.add_business_outlined, size: 80, color: AppColors.primaryGreen.withValues(alpha: 0.2)),
+            child: Icon(Icons.add_business_outlined, size: 80.sp, color: AppColors.primaryGreen.withOpacity(0.2)),
           ),
-          const SizedBox(height: 24),
-          const Text(
+          SizedBox(height: 24.h),
+          Text(
             'No services yet',
             style: TextStyle(
-              fontSize: 22,
+              fontSize: 22.sp,
               fontWeight: FontWeight.w800,
               color: AppColors.textDark,
-              letterSpacing: -0.5,
+              letterSpacing: -0.5.w,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Text(
             'Add your first service to start growing\nyour business on EventWallet',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey[600], fontSize: 15, height: 1.5),
+            style: TextStyle(color: Colors.grey[600], fontSize: 15.sp, height: 1.5),
           ),
         ],
       ),
@@ -415,44 +416,44 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
       ),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(30),
+        padding: EdgeInsets.all(30.r),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             Center(
               child: Container(
-                width: 50,
-                height: 5,
+                width: 50.w,
+                height: 5.h,
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
               ),
             ),
-            const SizedBox(height: 25),
+            SizedBox(height: 25.h),
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 24,
+              style: TextStyle(
+                fontSize: 24.sp,
                 fontWeight: FontWeight.w800,
                 color: AppColors.textDark,
-                letterSpacing: -0.5,
+                letterSpacing: -0.5.w,
               ),
             ),
-            const SizedBox(height: 25),
+            SizedBox(height: 25.h),
             _buildTextField(
               label: 'Service Name',
               hint: 'e.g. Wedding Photography Package',
               controller: nameController,
               icon: Icons.badge_outlined,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             _buildTextField(
               label: 'Price',
               hint: '0.00',
@@ -460,7 +461,7 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
               icon: Icons.attach_money_rounded,
               keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             _buildTextField(
               label: 'Description',
               hint: 'What does this service include?',
@@ -468,18 +469,18 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
               icon: Icons.description_outlined,
               maxLines: 4,
             ),
-            const SizedBox(height: 35),
+            SizedBox(height: 35.h),
             Container(
               width: double.infinity,
-              height: 60,
+              height: 60.h,
               decoration: BoxDecoration(
                 gradient: AppColors.buttonGradient,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(18.r),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
+                    color: AppColors.primaryGreen.withOpacity(0.3),
+                    blurRadius: 12.r,
+                    offset: Offset(0, 6.h),
                   ),
                 ],
               ),
@@ -488,19 +489,19 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.r)),
                 ),
                 child: Text(
                   buttonLabel,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
           ],
         ),
       ),
@@ -520,28 +521,29 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
+          style: TextStyle(
+            fontSize: 14.sp,
             fontWeight: FontWeight.bold,
             color: AppColors.textDark,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.h),
         Container(
           decoration: BoxDecoration(
             color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(15.r),
           ),
           child: TextField(
             controller: controller,
             keyboardType: keyboardType,
             maxLines: maxLines,
+            style: TextStyle(fontSize: 15.sp),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-              prefixIcon: Icon(icon, color: AppColors.primaryGreen, size: 22),
+              hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+              prefixIcon: Icon(icon, color: AppColors.primaryGreen, size: 22.sp),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.all(16),
+              contentPadding: EdgeInsets.all(16.r),
             ),
           ),
         ),
@@ -553,13 +555,13 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Service', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('Are you sure you want to delete this service? This action cannot be undone.'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        title: Text('Delete Service', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp)),
+        content: Text('Are you sure you want to delete this service? This action cannot be undone.', style: TextStyle(fontSize: 14.sp)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold)),
+            child: Text('Cancel', style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold, fontSize: 14.sp)),
           ),
           TextButton(
             onPressed: () async {
@@ -573,7 +575,7 @@ class _MyServicesPageState extends State<MyServicesPage> with SingleTickerProvid
                 if (mounted) Navigator.pop(context);
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            child: Text('Delete', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 14.sp)),
           ),
         ],
       ),

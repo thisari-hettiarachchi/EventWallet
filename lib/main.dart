@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'features/user/onboarding/splash_screen.dart';
 
 void main() async {
@@ -28,19 +29,26 @@ class EventWalletApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'EventWallet',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF00897B),
-          primary: const Color(0xFF00897B),
-          secondary: const Color(0xFF1565C0),
-        ),
-        scaffoldBackgroundColor: const Color(0xFFF5F7FA),
-      ),
-      home: const SplashScreen(),
+    return ScreenUtilInit(
+      designSize: const Size(360, 690),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'EventWallet',
+          theme: ThemeData(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF00897B),
+              primary: const Color(0xFF00897B),
+              secondary: const Color(0xFF1565C0),
+            ),
+            scaffoldBackgroundColor: const Color(0xFFF5F7FA),
+          ),
+          home: const SplashScreen(),
+        );
+      },
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/provider_bottom_nav.dart';
 import '../../../core/constants/colors.dart';
 import '../services/my_services.dart';
@@ -208,12 +209,12 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           child: Column(
             children: [
               _buildHeader(),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Expanded(
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
                   ),
                   child: RefreshIndicator(
                     onRefresh: () async {
@@ -223,20 +224,20 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                       await _fetchUpcomingEvents();
                     },
                     child: ListView(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
                       children: [
                         _buildRevenueOverview(),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24.h),
                         _buildStatsGrid(),
-                        const SizedBox(height: 28),
+                        SizedBox(height: 28.h),
                         _buildQuickActions(),
-                        const SizedBox(height: 28),
+                        SizedBox(height: 28.h),
                         _buildRecentBookings(),
-                        const SizedBox(height: 28),
+                        SizedBox(height: 28.h),
                         _buildUpcomingEvents(),
-                        const SizedBox(height: 28),
+                        SizedBox(height: 28.h),
                         _buildPerformanceMetrics(),
-                        const SizedBox(height: 100),
+                        SizedBox(height: 100.h),
                       ],
                     ),
                   ),
@@ -249,12 +250,12 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       floatingActionButton: Container(
         decoration: BoxDecoration(
           gradient: AppColors.buttonGradient,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(30.r),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primaryGreen.withValues(alpha: 0.4),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
+              color: AppColors.primaryGreen.withOpacity(0.4),
+              blurRadius: 16.r,
+              offset: Offset(0, 8.h),
             ),
           ],
         ),
@@ -262,14 +263,14 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           onPressed: _navigateToServices,
           backgroundColor: Colors.transparent,
           elevation: 0,
-          icon: const Icon(Icons.add, color: Colors.white, size: 26),
-          label: const Text(
+          icon: Icon(Icons.add, color: Colors.white, size: 26.sp),
+          label: Text(
             'Add Service',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
+              letterSpacing: 0.5.w,
             ),
           ),
         ),
@@ -280,8 +281,10 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
 
   // ================= HEADER =================
   Widget _buildHeader() {
+    final imageUrl = _providerData?['imageUrl'] ?? '';
+    
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: Column(
@@ -289,43 +292,45 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(14),
+                  width: 64.w,
+                  height: 64.w,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(16.r),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      width: 2,
+                      color: Colors.white.withOpacity(0.3),
+                      width: 2.w,
                     ),
+                    image: imageUrl.isNotEmpty 
+                      ? DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover)
+                      : null,
                   ),
-                  child: Icon(
-                    _getProviderIcon(),
-                    color: Colors.white,
-                    size: 32,
-                  ),
+                  child: imageUrl.isEmpty 
+                    ? Icon(_getProviderIcon(), color: Colors.white, size: 32.sp)
+                    : null,
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         _providerData?['businessName'] ?? 'Service Provider',
-                        style: const TextStyle(
-                          fontSize: 24,
+                        style: TextStyle(
+                          fontSize: 24.sp,
                           fontWeight: FontWeight.w800,
                           color: Colors.white,
-                          letterSpacing: -0.5,
+                          letterSpacing: -0.5.w,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Text(
                         _getProviderTitle(),
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                         ),
                         maxLines: 1,
@@ -335,30 +340,30 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.settings_outlined, color: Colors.white, size: 28),
+                  icon: Icon(Icons.settings_outlined, color: Colors.white, size: 28.sp),
                   onPressed: () {},
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Row(
               children: [
-                const Icon(Icons.star, color: Colors.amber, size: 20),
-                const SizedBox(width: 6),
+                Icon(Icons.star, color: Colors.amber, size: 20.sp),
+                SizedBox(width: 6.w),
                 Text(
                   _averageRating.toStringAsFixed(1),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(width: 4),
+                SizedBox(width: 4.w),
                 Text(
                   '($_totalReviews reviews)',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: 14,
+                    color: Colors.white.withOpacity(0.8),
+                    fontSize: 14.sp,
                   ),
                 ),
               ],
@@ -372,15 +377,15 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
   // ================= REVENUE OVERVIEW =================
   Widget _buildRevenueOverview() {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(24.r),
       decoration: BoxDecoration(
         gradient: AppColors.cardGradient,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryBlue.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: AppColors.primaryBlue.withOpacity(0.3),
+            blurRadius: 20.r,
+            offset: Offset(0, 10.h),
           ),
         ],
       ),
@@ -390,73 +395,73 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Total Revenue',
                 style: TextStyle(
                   color: Colors.white70,
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20.r),
                 ),
-                child: const Text(
+                child: Text(
                   'All Time',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Text(
             '\$${_totalRevenue.toStringAsFixed(2)}',
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 38,
+              fontSize: 38.sp,
               fontWeight: FontWeight.w800,
-              letterSpacing: -1,
+              letterSpacing: -1.w,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16.r),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.trending_up, color: Colors.white, size: 24),
-                const SizedBox(width: 12),
+                Icon(Icons.trending_up, color: Colors.white, size: 24.sp),
+                SizedBox(width: 12.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'This Month',
                         style: TextStyle(
                           color: Colors.white70,
-                          fontSize: 13,
+                          fontSize: 13.sp,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Text(
                         '\$${_monthlyRevenue.toStringAsFixed(2)}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
-                          fontSize: 22,
+                          fontSize: 22.sp,
                           fontWeight: FontWeight.w700,
                         ),
                         maxLines: 1,
@@ -479,8 +484,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       crossAxisCount: 2,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
+      crossAxisSpacing: 16.w,
+      mainAxisSpacing: 16.h,
       childAspectRatio: 1.1,
       children: [
         _buildStatCard(
@@ -513,10 +518,10 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [AppColors.cardShadow()],
       ),
       child: Column(
@@ -524,12 +529,12 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(10.r),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 24.sp),
           ),
           Flexible(
             child: Column(
@@ -538,19 +543,19 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               children: [
                 Text(
                   value,
-                  style: const TextStyle(
-                    fontSize: 24,
+                  style: TextStyle(
+                    fontSize: 24.sp,
                     fontWeight: FontWeight.w800,
                     color: AppColors.textDark,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2.h),
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 12.sp,
                     color: Colors.grey[600],
                     fontWeight: FontWeight.w500,
                   ),
@@ -570,16 +575,16 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Quick Actions',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 24.sp,
             fontWeight: FontWeight.w800,
             color: AppColors.textDark,
-            letterSpacing: -0.5,
+            letterSpacing: -0.5.w,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.h),
         Row(
           children: [
             Expanded(
@@ -590,7 +595,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                 _navigateToServices,
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
             Expanded(
               child: _buildActionButton(
                 'View\nBookings',
@@ -601,7 +606,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                 },
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
             Expanded(
               child: _buildActionButton(
                 'Analytics',
@@ -622,28 +627,28 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.symmetric(vertical: 20.h),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
           boxShadow: [AppColors.cardShadow()],
         ),
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12.r),
               ),
-              child: Icon(icon, color: color, size: 28),
+              child: Icon(icon, color: color, size: 28.sp),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 11,
+              style: TextStyle(
+                fontSize: 11.sp,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textDark,
                 height: 1.2,
@@ -665,33 +670,34 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Recent Bookings',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 24.sp,
                 fontWeight: FontWeight.w800,
                 color: AppColors.textDark,
               ),
             ),
             TextButton(
               onPressed: () {},
-              child: const Text(
+              child: Text(
                 'View All',
                 style: TextStyle(
                   color: AppColors.primaryGreen,
                   fontWeight: FontWeight.w600,
+                  fontSize: 14.sp,
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.h),
         if (_recentBookings.isEmpty)
           Container(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24.r),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
               boxShadow: [AppColors.cardShadow()],
             ),
             child: const Center(
@@ -728,11 +734,11 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [AppColors.cardShadow()],
       ),
       child: Column(
@@ -740,33 +746,33 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(10.r),
                 decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
-                child: Icon(Icons.event, color: statusColor, size: 24),
+                child: Icon(Icons.event, color: statusColor, size: 24.sp),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       data['eventName'] ?? 'Event Booking',
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: TextStyle(
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textDark,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4.h),
                     Text(
                       data['clientName'] ?? 'Client',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         color: Colors.grey[600],
                       ),
                       maxLines: 1,
@@ -776,41 +782,41 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                 decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Text(
                   status.toUpperCase(),
                   style: TextStyle(
                     color: statusColor,
-                    fontSize: 11,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
+                    letterSpacing: 0.5.w,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
-                  Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
-                  const SizedBox(width: 6),
+                  Icon(Icons.calendar_today, size: 16.sp, color: Colors.grey[600]),
+                  SizedBox(width: 6.w),
                   Text(
                     _formatDate(data['eventDate']),
-                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 13.sp, color: Colors.grey[600]),
                   ),
                 ],
               ),
               Text(
-                '\$${(data['amount'] ?? 0).toStringAsFixed(2)}',
-                style: const TextStyle(
-                  fontSize: 18,
+                '\$${(data['amount'] ?? 0).toDouble().toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.w900,
                   color: AppColors.primaryGreen,
                 ),
@@ -827,21 +833,21 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Upcoming Events',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 24.sp,
             fontWeight: FontWeight.w800,
             color: AppColors.textDark,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.h),
         if (_upcomingEvents.isEmpty)
           Container(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24.r),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
               boxShadow: [AppColors.cardShadow()],
             ),
             child: const Center(
@@ -855,52 +861,52 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           ..._upcomingEvents.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(16),
+              margin: EdgeInsets.only(bottom: 12.h),
+              padding: EdgeInsets.all(16.r),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [AppColors.primaryGreen, Color(0xFF26A69A)],
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(16.r),
                 boxShadow: [AppColors.cardShadow()],
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10.r),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
-                    child: const Icon(Icons.event, color: Colors.white, size: 24),
+                    child: Icon(Icons.event, color: Colors.white, size: 24.sp),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12.w),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           data['eventName'] ?? 'Event',
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: TextStyle(
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4.h),
                         Text(
                           _formatDate(data['eventDate']),
                           style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withValues(alpha: 0.8),
+                            fontSize: 14.sp,
+                            color: Colors.white.withOpacity(0.8),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+                  Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16.sp),
                 ],
               ),
             );
@@ -918,28 +924,28 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Performance',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 24.sp,
             fontWeight: FontWeight.w800,
             color: AppColors.textDark,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.h),
         Container(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20.r),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(20.r),
             boxShadow: [AppColors.cardShadow()],
           ),
           child: Column(
             children: [
               _buildMetricRow('Completion Rate', '$completionRate%', Icons.check_circle, Colors.green),
-              const Divider(height: 24),
+              Divider(height: 24.h),
               _buildMetricRow('Average Rating', _averageRating.toStringAsFixed(1), Icons.star, Colors.amber),
-              const Divider(height: 24),
+              Divider(height: 24.h),
               _buildMetricRow('Total Reviews', _totalReviews.toString(), Icons.rate_review, AppColors.primaryBlue),
             ],
           ),
@@ -952,19 +958,19 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(10.r),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12.r),
           ),
-          child: Icon(icon, color: color, size: 24),
+          child: Icon(icon, color: color, size: 24.sp),
         ),
-        const SizedBox(width: 16),
+        SizedBox(width: 16.w),
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(
-              fontSize: 15,
+            style: TextStyle(
+              fontSize: 15.sp,
               fontWeight: FontWeight.w600,
               color: AppColors.textDark,
             ),
@@ -974,8 +980,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
         ),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 20,
+          style: TextStyle(
+            fontSize: 20.sp,
             fontWeight: FontWeight.w800,
             color: AppColors.textDark,
           ),

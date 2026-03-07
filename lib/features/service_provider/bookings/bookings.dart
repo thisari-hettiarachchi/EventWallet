@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/provider_bottom_nav.dart';
 
 class ServiceProviderBookingsPage extends StatefulWidget {
@@ -42,10 +43,10 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Booking $status successfully'),
+            content: Text('Booking $status successfully', style: TextStyle(fontSize: 14.sp)),
             backgroundColor: status == 'confirmed' ? const Color(0xFF00897B) : Colors.red,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
           ),
         );
       }
@@ -53,7 +54,7 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'), 
+            content: Text('Error: $e', style: TextStyle(fontSize: 14.sp)), 
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
           ),
@@ -64,7 +65,7 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
 
   @override
   Widget build(BuildContext context) {
-    if (user == null) return const Scaffold(body: Center(child: Text('Please login')));
+    if (user == null) return Scaffold(body: Center(child: Text('Please login', style: TextStyle(fontSize: 16.sp))));
 
     return DefaultTabController(
       length: 3,
@@ -86,23 +87,23 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
             child: Column(
               children: [
                 _buildHeader(),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
                 Expanded(
                   child: Container(
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFF5F7FA),
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F7FA),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
                     ),
                     child: Column(
                       children: [
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10.h),
                         TabBar(
                           labelColor: const Color(0xFF00897B),
                           unselectedLabelColor: Colors.grey,
                           indicatorColor: const Color(0xFF00897B),
-                          indicatorWeight: 3,
+                          indicatorWeight: 3.h,
                           indicatorSize: TabBarIndicatorSize.label,
-                          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
                           tabs: const [
                             Tab(text: 'Pending'),
                             Tab(text: 'Confirmed'),
@@ -133,18 +134,18 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
       child: FadeTransition(
         opacity: _fadeAnimation,
-        child: const Row(
+        child: Row(
           children: [
             Text(
               'My Bookings',
               style: TextStyle(
-                fontSize: 32,
+                fontSize: 32.sp,
                 fontWeight: FontWeight.w800,
                 color: Colors.white,
-                letterSpacing: -0.5,
+                letterSpacing: -0.5.w,
               ),
             ),
           ],
@@ -176,11 +177,11 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.event_busy, size: 80, color: Colors.grey[300]),
-                const SizedBox(height: 16),
+                Icon(Icons.event_busy, size: 80.sp, color: Colors.grey[300]),
+                SizedBox(height: 16.h),
                 Text(
                   'No ${status.toLowerCase()} bookings', 
-                  style: const TextStyle(color: Colors.grey, fontSize: 16, fontWeight: FontWeight.w500)
+                  style: TextStyle(color: Colors.grey, fontSize: 16.sp, fontWeight: FontWeight.w500)
                 ),
               ],
             ),
@@ -188,7 +189,7 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+          padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 100.h),
           physics: const BouncingScrollPhysics(),
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
@@ -206,31 +207,31 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
     final String status = data['status'] ?? 'pending';
     
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: EdgeInsets.only(bottom: 20.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15.r,
+            offset: Offset(0, 5.h),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24.r),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Status Strip
             Container(
-              height: 4,
+              height: 4.h,
               width: double.infinity,
               color: _getStatusColor(status),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20.r),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -240,44 +241,44 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                       Expanded(
                         child: Text(
                           data['eventName'] ?? 'Special Event',
-                          style: const TextStyle(
-                            fontSize: 20, 
+                          style: TextStyle(
+                            fontSize: 20.sp, 
                             fontWeight: FontWeight.w800,
-                            color: Color(0xFF1A1F36),
+                            color: const Color(0xFF1A1F36),
                           ),
                         ),
                       ),
                       _buildStatusBadge(status),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   _buildInfoTile(Icons.person, 'Client', data['clientName'] ?? 'N/A', const Color(0xFF1565C0)),
                   _buildInfoTile(Icons.calendar_today, 'Date', _formatDate(eventDate), const Color(0xFF00897B)),
                   _buildInfoTile(Icons.location_on, 'Location', data['location'] ?? 'Not specified', Colors.orange),
                   _buildInfoTile(Icons.category, 'Event Type', data['eventType'] ?? 'N/A', Colors.purple),
                   
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Divider(height: 1),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.h),
+                    child: const Divider(height: 1),
                   ),
                   
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Total Revenue',
                         style: TextStyle(
-                          color: Color(0xFF4A5568),
-                          fontSize: 14,
+                          color: const Color(0xFF4A5568),
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       Text(
                         '\$${(data['amount'] ?? 0).toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 22,
+                        style: TextStyle(
+                          fontSize: 22.sp,
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF00897B),
+                          color: const Color(0xFF00897B),
                         ),
                       ),
                     ],
@@ -299,15 +300,15 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                         child: InkWell(
                           onTap: () => _updateBookingStatus(id, 'cancelled'),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            padding: EdgeInsets.symmetric(vertical: 16.h),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.close, size: 20, color: Colors.red[700]),
-                                const SizedBox(width: 8),
+                                Icon(Icons.close, size: 20.sp, color: Colors.red[700]),
+                                SizedBox(width: 8.w),
                                 Text(
                                   'Decline', 
-                                  style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.w700),
+                                  style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.w700, fontSize: 14.sp),
                                 ),
                               ],
                             ),
@@ -315,22 +316,22 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                         ),
                       ),
                     ),
-                    Container(width: 1, height: 30, color: Colors.grey[300]),
+                    Container(width: 1.w, height: 30.h, color: Colors.grey[300]),
                     Expanded(
                       child: Material(
                         color: Colors.transparent,
                         child: InkWell(
                           onTap: () => _updateBookingStatus(id, 'confirmed'),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            padding: EdgeInsets.symmetric(vertical: 16.h),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.check, size: 20, color: Color(0xFF00897B)),
-                                const SizedBox(width: 8),
-                                const Text(
+                                Icon(Icons.check, size: 20.sp, color: const Color(0xFF00897B)),
+                                SizedBox(width: 8.w),
+                                Text(
                                   'Approve', 
-                                  style: TextStyle(color: Color(0xFF00897B), fontWeight: FontWeight.w700),
+                                  style: TextStyle(color: const Color(0xFF00897B), fontWeight: FontWeight.w700, fontSize: 14.sp),
                                 ),
                               ],
                             ),
@@ -349,31 +350,31 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
 
   Widget _buildInfoTile(IconData icon, String label, String value, Color color) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: 12.h),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.all(8.r),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10.r),
             ),
-            child: Icon(icon, size: 18, color: color),
+            child: Icon(icon, size: 18.sp, color: color),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   label,
-                  style: TextStyle(color: Colors.grey[500], fontSize: 11, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: Colors.grey[500], fontSize: 11.sp, fontWeight: FontWeight.w600),
                 ),
                 Text(
                   value,
-                  style: const TextStyle(
-                    color: Color(0xFF1A1F36), 
-                    fontSize: 14, 
+                  style: TextStyle(
+                    color: const Color(0xFF1A1F36), 
+                    fontSize: 14.sp, 
                     fontWeight: FontWeight.w600,
                   ),
                   maxLines: 1,
@@ -400,15 +401,15 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
     final color = _getStatusColor(status);
     
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: color.withOpacity(0.2)),
       ),
       child: Text(
         status.toUpperCase(),
-        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+        style: TextStyle(color: color, fontSize: 11.sp, fontWeight: FontWeight.w800, letterSpacing: 0.5.w),
       ),
     );
   }

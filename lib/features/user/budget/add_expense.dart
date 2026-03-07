@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 
 class AddExpensePage extends StatefulWidget {
@@ -102,7 +103,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
         children: [
           // Background gradient header
           Container(
-            height: 260,
+            height: 260.h,
             decoration: const BoxDecoration(
               gradient: AppColors.headerGradient,
             ),
@@ -110,11 +111,11 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
           // Decorative circles
           Positioned(
-            top: -50,
-            right: -50,
+            top: -50.h,
+            right: -50.w,
             child: Container(
-              width: 200,
-              height: 200,
+              width: 200.w,
+              height: 200.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withOpacity(0.1),
@@ -122,11 +123,11 @@ class _AddExpensePageState extends State<AddExpensePage> {
             ),
           ),
           Positioned(
-            top: 100,
-            left: -30,
+            top: 100.h,
+            left: -30.w,
             child: Container(
-              width: 120,
-              height: 120,
+              width: 120.w,
+              height: 120.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withOpacity(0.08),
@@ -139,82 +140,82 @@ class _AddExpensePageState extends State<AddExpensePage> {
               children: [
                 // Custom App Bar
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16.r),
                   child: Row(
                     children: [
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                           border: Border.all(
                             color: Colors.white.withOpacity(0.3),
-                            width: 1,
+                            width: 1.w,
                           ),
                         ),
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
                             onTap: () => Navigator.pop(context),
-                            borderRadius: BorderRadius.circular(12),
-                            child: const Padding(
-                              padding: EdgeInsets.all(12),
+                            borderRadius: BorderRadius.circular(12.r),
+                            child: Padding(
+                              padding: EdgeInsets.all(12.r),
                               child: Icon(
                                 Icons.arrow_back_ios_new,
                                 color: Colors.white,
-                                size: 20,
+                                size: 20.sp,
                               ),
                             ),
                           ),
                         ),
                       ),
                       const Spacer(),
-                      const Text(
+                      Text(
                         'Add Expense',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
+                          fontSize: 20.sp,
                           fontWeight: FontWeight.bold,
-                          letterSpacing: -0.5,
+                          letterSpacing: -0.5.w,
                         ),
                       ),
                       const Spacer(),
-                      const SizedBox(width: 44),
+                      SizedBox(width: 44.w),
                     ],
                   ),
                 ),
 
                 // Header hero section
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
                   child: Column(
                     children: [
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Container(
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(20.r),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
                             color: Colors.white.withOpacity(0.3),
-                            width: 2,
+                            width: 2.w,
                           ),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.account_balance_wallet_outlined,
-                          size: 48,
+                          size: 48.sp,
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12.h),
                       Text(
                         widget.eventName != null
                             ? 'Expense for ${widget.eventName}'
                             : 'New Expense',
-                        style: const TextStyle(
-                          fontSize: 22,
+                        style: TextStyle(
+                          fontSize: 22.sp,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
-                          letterSpacing: -0.5,
+                          letterSpacing: -0.5.w,
                         ),
                         textAlign: TextAlign.center,
                         maxLines: 1,
@@ -223,14 +224,14 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
 
                 // Scrollable form
                 Expanded(
                   child: Form(
                     key: _formKey,
                     child: ListView(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
                       children: [
                         // Expense Details card
                         _buildModernCard(
@@ -238,7 +239,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildCardHeader(Icons.receipt_long, 'Expense Details'),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20.h),
                               _buildTextField(
                                 controller: _titleController,
                                 label: 'Title',
@@ -247,7 +248,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                 validator: (v) =>
                                     v!.isEmpty ? 'Please enter a title' : null,
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               _buildTextField(
                                 controller: _amountController,
                                 label: 'Amount',
@@ -257,7 +258,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                 validator: (v) =>
                                     v!.isEmpty ? 'Please enter an amount' : null,
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               _buildTextField(
                                 controller: _categoryController,
                                 label: 'Category',
@@ -269,7 +270,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
 
                         // Event Picker card (only when no event passed in)
                         if (widget.eventId == null)
@@ -278,26 +279,26 @@ class _AddExpensePageState extends State<AddExpensePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildCardHeader(Icons.event, 'Select Event'),
-                                const SizedBox(height: 20),
+                                SizedBox(height: 20.h),
                                 _buildEventDropdown(),
                               ],
                             ),
                           ),
 
-                        if (widget.eventId == null) const SizedBox(height: 16),
+                        if (widget.eventId == null) SizedBox(height: 16.h),
 
                         // Save button
                         Container(
                           width: double.infinity,
-                          height: 56,
+                          height: 56.h,
                           decoration: BoxDecoration(
                             gradient: AppColors.primaryGradient,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(16.r),
                             boxShadow: [
                               BoxShadow(
                                 color: AppColors.primaryGreen.withOpacity(0.4),
-                                blurRadius: 16,
-                                offset: const Offset(0, 6),
+                                blurRadius: 16.r,
+                                offset: Offset(0, 6.h),
                               ),
                             ],
                           ),
@@ -305,21 +306,21 @@ class _AddExpensePageState extends State<AddExpensePage> {
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: _saveExpense,
-                              borderRadius: BorderRadius.circular(16),
-                              child: const Center(
+                              borderRadius: BorderRadius.circular(16.r),
+                              child: Center(
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(Icons.add_circle_outline,
-                                        color: Colors.white, size: 22),
-                                    SizedBox(width: 10),
+                                        color: Colors.white, size: 22.sp),
+                                    SizedBox(width: 10.w),
                                     Text(
                                       'Add Expense',
                                       style: TextStyle(
                                         color: Colors.white,
-                                        fontSize: 18,
+                                        fontSize: 18.sp,
                                         fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
+                                        letterSpacing: 0.5.w,
                                       ),
                                     ),
                                   ],
@@ -328,7 +329,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 40),
+                        SizedBox(height: 40.h),
                       ],
                     ),
                   ),
@@ -343,10 +344,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
   Widget _buildModernCard({required Widget child}) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [AppColors.cardShadow()],
       ),
       child: child,
@@ -357,18 +358,18 @@ class _AddExpensePageState extends State<AddExpensePage> {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(10.r),
           decoration: BoxDecoration(
             gradient: AppColors.primaryGradient,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
           ),
-          child: Icon(icon, color: Colors.white, size: 20),
+          child: Icon(icon, color: Colors.white, size: 20.sp),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12.w),
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 18,
+          style: TextStyle(
+            fontSize: 18.sp,
             fontWeight: FontWeight.bold,
             color: AppColors.textDark,
           ),
@@ -389,25 +390,28 @@ class _AddExpensePageState extends State<AddExpensePage> {
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
+      style: TextStyle(fontSize: 15.sp),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
         hintText: hint,
-        prefixIcon: Icon(icon, color: AppColors.primaryGreen),
+        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14.sp),
+        prefixIcon: Icon(icon, color: AppColors.primaryGreen, size: 24.sp),
         filled: true,
         fillColor: AppColors.background,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
         ),
-        labelStyle: TextStyle(color: AppColors.textGrey),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
     );
   }
@@ -417,28 +421,29 @@ class _AddExpensePageState extends State<AddExpensePage> {
       value: _selectedEventId,
       decoration: InputDecoration(
         labelText: 'Event',
-        prefixIcon: const Icon(Icons.event_note, color: AppColors.primaryGreen),
+        labelStyle: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
+        prefixIcon: Icon(Icons.event_note, color: AppColors.primaryGreen, size: 24.sp),
         filled: true,
         fillColor: AppColors.background,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
         ),
-        labelStyle: TextStyle(color: AppColors.textGrey),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
       items: _events.map((e) {
         final data = e.data() as Map<String, dynamic>;
         return DropdownMenuItem(
           value: e.id,
-          child: Text(data['eventName'] ?? data['name'] ?? 'Unnamed Event'),
+          child: Text(data['eventName'] ?? data['name'] ?? 'Unnamed Event', style: TextStyle(fontSize: 15.sp)),
         );
       }).toList(),
       onChanged: (v) {

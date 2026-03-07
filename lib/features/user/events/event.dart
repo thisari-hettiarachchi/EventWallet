@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/colors.dart';
 import 'create_event.dart';
@@ -68,27 +69,27 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                    padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 20.h),
                     child: Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Text(
                             'My Events',
                             style: TextStyle(
-                              fontSize: 28,
+                              fontSize: 28.sp,
                               fontWeight: FontWeight.w900,
                               color: Colors.white,
-                              letterSpacing: -0.5,
+                              letterSpacing: -0.5.w,
                             ),
                           ),
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              width: 1,
+                              color: Colors.white.withOpacity(0.3),
+                              width: 1.w,
                             ),
                           ),
                           child: Material(
@@ -100,19 +101,19 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                                   MaterialPageRoute(builder: (_) => const CreateEventPage()),
                                 );
                               },
-                              borderRadius: BorderRadius.circular(12),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              borderRadius: BorderRadius.circular(12.r),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
                                 child: Row(
                                   children: [
-                                    Icon(Icons.add, color: Colors.white, size: 20),
-                                    SizedBox(width: 6),
+                                    Icon(Icons.add, color: Colors.white, size: 20.sp),
+                                    SizedBox(width: 6.w),
                                     Text(
                                       'New Event',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 15,
+                                        fontSize: 15.sp,
                                       ),
                                     ),
                                   ],
@@ -125,11 +126,11 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                         boxShadow: [AppColors.cardShadow()],
                       ),
                       child: TextField(
@@ -138,17 +139,18 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                             _searchQuery = value.toLowerCase();
                           });
                         },
+                        style: TextStyle(fontSize: 15.sp),
                         decoration: InputDecoration(
                           hintText: 'Search events...',
-                          hintStyle: TextStyle(color: Colors.grey.shade400),
-                          prefixIcon: const Icon(Icons.search, color: AppColors.primaryGreen),
+                          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15.sp),
+                          prefixIcon: Icon(Icons.search, color: AppColors.primaryGreen, size: 24.sp),
                           border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 55),
+                  SizedBox(height: 55.h),
                 ],
               ),
             ),
@@ -156,21 +158,23 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
           // Main Content
           Expanded(
             child: Container(
-              transform: Matrix4.translationValues(0, -25, 0),
-              decoration: const BoxDecoration(
+              transform: Matrix4.translationValues(0, -25.h, 0),
+              decoration: BoxDecoration(
                 color: AppColors.background,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
               ),
               child: Column(
                 children: [
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10.h),
                   TabBar(
                     controller: _tabController,
                     labelColor: AppColors.primaryGreen,
                     unselectedLabelColor: Colors.grey,
                     indicatorColor: AppColors.primaryGreen,
-                    indicatorWeight: 3,
+                    indicatorWeight: 3.h,
                     indicatorSize: TabBarIndicatorSize.label,
+                    labelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+                    unselectedLabelStyle: TextStyle(fontSize: 14.sp),
                     tabs: const [
                       Tab(text: 'Upcoming'),
                       Tab(text: 'Completed'),
@@ -212,14 +216,14 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
         }).toList();
 
         if (events.isEmpty) {
-          return Center(child: Text('No $statusFilter events found.', style: const TextStyle(color: Colors.grey)));
+          return Center(child: Text('No $statusFilter events found.', style: TextStyle(color: Colors.grey, fontSize: 14.sp)));
         }
 
         return ListView.separated(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.r),
           itemCount: events.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 16),
+          separatorBuilder: (_, __) => SizedBox(height: 16.h),
           itemBuilder: (context, index) {
             final event = events[index];
             final data = event.data() as Map<String, dynamic>;
@@ -309,50 +313,50 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [AppColors.cardShadow()],
       ),
       child: Material(
         color: Colors.transparent,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.r),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(14),
+                    padding: EdgeInsets.all(14.r),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
+                        colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
                       ),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(14.r),
                     ),
-                    child: Icon(icon, color: color, size: 28),
+                    child: Icon(icon, color: color, size: 28.sp),
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14.w),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(
-                            fontSize: 19,
+                          style: TextStyle(
+                            fontSize: 19.sp,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textDark,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6.h),
                         Row(
                           children: [
-                            Icon(Icons.calendar_today, size: 14, color: Colors.grey.shade600),
-                            const SizedBox(width: 6),
+                            Icon(Icons.calendar_today, size: 14.sp, color: Colors.grey.shade600),
+                            SizedBox(width: 6.w),
                             Text(
                               date,
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 13.sp,
                                 color: Colors.grey.shade600,
                               ),
                             ),
@@ -362,45 +366,45 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                     decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      color: color.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Text(
                       status,
                       style: TextStyle(
                         color: color,
-                        fontSize: 12,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               Row(
                 children: [
-                  Icon(Icons.location_on, size: 14, color: Colors.grey.shade600),
-                  const SizedBox(width: 6),
+                  Icon(Icons.location_on, size: 14.sp, color: Colors.grey.shade600),
+                  SizedBox(width: 6.w),
                   Text(
                     venue,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 13.sp,
                       color: Colors.grey.shade700,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Budget', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-                        Text(budget, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppColors.textDark)),
+                        Text('Budget', style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600)),
+                        Text(budget, style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold, color: AppColors.textDark)),
                       ],
                     ),
                   ),
@@ -408,8 +412,8 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Spent', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-                        Text(spent, style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: color)),
+                        Text('Spent', style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600)),
+                        Text(spent, style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold, color: color)),
                       ],
                     ),
                   ),
@@ -417,19 +421,19 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
-                        Text('of budget', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+                        Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: color)),
+                        Text('of budget', style: TextStyle(fontSize: 11.sp, color: Colors.grey.shade600)),
                       ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(8.r),
                 child: LinearProgressIndicator(
                   value: progress,
-                  minHeight: 8,
+                  minHeight: 8.h,
                   backgroundColor: Colors.grey.shade200,
                   valueColor: AlwaysStoppedAnimation<Color>(color),
                 ),

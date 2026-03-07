@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HelpSupportPage extends StatelessWidget {
   const HelpSupportPage({super.key});
@@ -9,7 +10,7 @@ class HelpSupportPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Help & Support', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text('Help & Support', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.sp)),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -26,7 +27,7 @@ class HelpSupportPage extends StatelessWidget {
           children: [
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20.r),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFF00897B), Color(0xFF1565C0)],
@@ -35,32 +36,32 @@ class HelpSupportPage extends StatelessWidget {
               child: Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.r),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: Colors.white.withOpacity(0.2),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.support_agent,
-                      size: 50,
+                      size: 50.sp,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
+                  SizedBox(height: 16.h),
+                  Text(
                     'We\'re Here to Help',
                     style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 22.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   Text(
                     'Get assistance for your events and queries',
                     style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 14.sp,
+                      color: Colors.white.withOpacity(0.9),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -68,19 +69,19 @@ class HelpSupportPage extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20.r),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Contact Us',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1F36),
+                      color: const Color(0xFF1A1F36),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   _buildContactCard(
                     icon: Icons.email_outlined,
                     title: 'Email',
@@ -88,7 +89,7 @@ class HelpSupportPage extends StatelessWidget {
                     color: const Color(0xFF1565C0),
                     onTap: () => _launchEmail('support@eventwallet.com'),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
                   _buildContactCard(
                     icon: Icons.phone_outlined,
                     title: 'Phone',
@@ -96,16 +97,16 @@ class HelpSupportPage extends StatelessWidget {
                     color: const Color(0xFF00897B),
                     onTap: () => _launchPhone('+15551234567'),
                   ),
-                  const SizedBox(height: 32),
-                  const Text(
+                  SizedBox(height: 32.h),
+                  Text(
                     'Frequently Asked Questions',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1F36),
+                      color: const Color(0xFF1A1F36),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   _buildFAQItem(
                     question: 'How do I create an event?',
                     answer: 'To create an event, go to the Home screen and tap the "+" button. Fill in the event details like name, date, and budget, then tap "Create Event".',
@@ -126,7 +127,7 @@ class HelpSupportPage extends StatelessWidget {
                     question: 'Is my data secure?',
                     answer: 'Yes, all your data is securely stored using Firebase encryption. We follow industry-standard security practices to protect your information.',
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32.h),
                 ],
               ),
             ),
@@ -146,12 +147,12 @@ class HelpSupportPage extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10.r,
+            offset: Offset(0, 4.h),
           ),
         ],
       ),
@@ -159,45 +160,45 @@ class HelpSupportPage extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16.r),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(12.r),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
-                  child: Icon(icon, color: color, size: 24),
+                  child: Icon(icon, color: color, size: 24.sp),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: TextStyle(
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A1F36),
+                          color: const Color(0xFF1A1F36),
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Text(
                         subtitle,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF4A5568),
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: const Color(0xFF4A5568),
                         ),
                       ),
                     ],
                   ),
                 ),
                 Icon(Icons.arrow_forward_ios,
-                    color: Colors.grey.shade400, size: 16),
+                    color: Colors.grey.shade400, size: 16.sp),
               ],
             ),
           ),
@@ -208,45 +209,45 @@ class HelpSupportPage extends StatelessWidget {
 
   Widget _buildFAQItem({required String question, required String answer}) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10.r,
+            offset: Offset(0, 4.h),
           ),
         ],
       ),
       child: Theme(
         data: ThemeData(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          tilePadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          childrenPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
           leading: Container(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.all(8.r),
             decoration: BoxDecoration(
-              color: const Color(0xFF00897B).withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(8),
+              color: const Color(0xFF00897B).withOpacity(0.05),
+              borderRadius: BorderRadius.circular(8.r),
             ),
-            child: const Icon(Icons.help_outline, color: Color(0xFF00897B), size: 20),
+            child: Icon(Icons.help_outline, color: const Color(0xFF00897B), size: 20.sp),
           ),
           title: Text(
             question,
-            style: const TextStyle(
-              fontSize: 15,
+            style: TextStyle(
+              fontSize: 15.sp,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1F36),
+              color: const Color(0xFF1A1F36),
             ),
           ),
           children: [
             Text(
               answer,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF4A5568),
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: const Color(0xFF4A5568),
                 height: 1.5,
               ),
             ),

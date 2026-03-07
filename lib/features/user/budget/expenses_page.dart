@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'add_expense.dart';
 import '../../../core/constants/colors.dart';
 
@@ -22,7 +23,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
         children: [
           // Background gradient header
           Container(
-            height: 280,
+            height: 280.h,
             decoration: const BoxDecoration(
               gradient: AppColors.headerGradient,
             ),
@@ -30,11 +31,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
 
           // Decorative circles
           Positioned(
-            top: -50,
-            right: -50,
+            top: -50.h,
+            right: -50.w,
             child: Container(
-              width: 200,
-              height: 200,
+              width: 200.w,
+              height: 200.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withOpacity(0.1),
@@ -42,11 +43,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
             ),
           ),
           Positioned(
-            top: 100,
-            left: -30,
+            top: 100.h,
+            left: -30.w,
             child: Container(
-              width: 120,
-              height: 120,
+              width: 120.w,
+              height: 120.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withOpacity(0.08),
@@ -59,29 +60,29 @@ class _ExpensesPageState extends State<ExpensesPage> {
               children: [
                 // Custom App Bar
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16.r),
                   child: Row(
                     children: [
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                           border: Border.all(
                             color: Colors.white.withOpacity(0.3),
-                            width: 1,
+                            width: 1.w,
                           ),
                         ),
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
                             onTap: () => Navigator.pop(context),
-                            borderRadius: BorderRadius.circular(12),
-                            child: const Padding(
-                              padding: EdgeInsets.all(12),
+                            borderRadius: BorderRadius.circular(12.r),
+                            child: Padding(
+                              padding: EdgeInsets.all(12.r),
                               child: Icon(
                                 Icons.arrow_back_ios_new,
                                 color: Colors.white,
-                                size: 20,
+                                size: 20.sp,
                               ),
                             ),
                           ),
@@ -91,10 +92,10 @@ class _ExpensesPageState extends State<ExpensesPage> {
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                           border: Border.all(
                             color: Colors.white.withOpacity(0.3),
-                            width: 1,
+                            width: 1.w,
                           ),
                         ),
                         child: Material(
@@ -109,13 +110,13 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                 ),
                               ),
                             ),
-                            borderRadius: BorderRadius.circular(12),
-                            child: const Padding(
-                              padding: EdgeInsets.all(12),
+                            borderRadius: BorderRadius.circular(12.r),
+                            child: Padding(
+                              padding: EdgeInsets.all(12.r),
                               child: Icon(
                                 Icons.add,
                                 color: Colors.white,
-                                size: 20,
+                                size: 20.sp,
                               ),
                             ),
                           ),
@@ -127,51 +128,51 @@ class _ExpensesPageState extends State<ExpensesPage> {
 
                 // Header hero section
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
                   child: Column(
                     children: [
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Container(
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(20.r),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
                             color: Colors.white.withOpacity(0.3),
-                            width: 2,
+                            width: 2.w,
                           ),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.account_balance_wallet_outlined,
-                          size: 48,
+                          size: 48.sp,
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12.h),
                       Text(
                         widget.eventName,
-                        style: const TextStyle(
-                          fontSize: 26,
+                        style: TextStyle(
+                          fontSize: 26.sp,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
-                          letterSpacing: -0.5,
+                          letterSpacing: -0.5.w,
                         ),
                         textAlign: TextAlign.center,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6.h),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20.r),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Expenses',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 13,
+                            fontSize: 13.sp,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -179,7 +180,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
 
                 // Scrollable content
                 Expanded(
@@ -190,7 +191,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
+                        return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(fontSize: 14.sp)));
                       }
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(
@@ -213,7 +214,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                       });
 
                       return ListView(
-                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                        padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 100.h),
                         children: [
                           // Summary card
                           _buildModernCard(
@@ -221,7 +222,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildCardHeader(Icons.trending_up, 'Summary'),
-                                const SizedBox(height: 20),
+                                SizedBox(height: 20.h),
                                 StreamBuilder<DocumentSnapshot>(
                                   stream: FirebaseFirestore.instance
                                       .collection('events')
@@ -246,7 +247,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                                 AppColors.primaryGreen,
                                               ),
                                             ),
-                                            const SizedBox(width: 12),
+                                            SizedBox(width: 12.w),
                                             Expanded(
                                               child: _buildSummaryItem(
                                                 'Transactions',
@@ -258,33 +259,33 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                           ],
                                         ),
                                         if (budget > 0) ...[
-                                          const SizedBox(height: 20),
+                                          SizedBox(height: 20.h),
                                           Stack(
                                             children: [
                                               Container(
-                                                height: 20,
+                                                height: 20.h,
                                                 decoration: BoxDecoration(
                                                   color: Colors.grey.shade200,
-                                                  borderRadius: BorderRadius.circular(10),
+                                                  borderRadius: BorderRadius.circular(10.r),
                                                 ),
                                               ),
                                               FractionallySizedBox(
                                                 widthFactor: progress,
                                                 child: Container(
-                                                  height: 20,
+                                                  height: 20.h,
                                                   decoration: BoxDecoration(
                                                     gradient: LinearGradient(
                                                       colors: isOver
                                                           ? [Colors.orange.shade400, Colors.red.shade400]
                                                           : [const Color(0xFF00897B), const Color(0xFF1565C0)],
                                                     ),
-                                                    borderRadius: BorderRadius.circular(10),
+                                                    borderRadius: BorderRadius.circular(10.r),
                                                     boxShadow: [
                                                       BoxShadow(
                                                         color: (isOver ? Colors.orange : const Color(0xFF00897B))
                                                             .withOpacity(0.4),
-                                                        blurRadius: 8,
-                                                        offset: const Offset(0, 2),
+                                                        blurRadius: 8.r,
+                                                        offset: Offset(0, 2.h),
                                                       ),
                                                     ],
                                                   ),
@@ -292,14 +293,14 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                               ),
                                             ],
                                           ),
-                                          const SizedBox(height: 10),
+                                          SizedBox(height: 10.h),
                                           Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
                                                 '\$${totalSpent.toStringAsFixed(2)} spent',
                                                 style: TextStyle(
-                                                  fontSize: 13,
+                                                  fontSize: 13.sp,
                                                   color: Colors.grey.shade600,
                                                   fontWeight: FontWeight.w600,
                                                 ),
@@ -307,7 +308,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                               Text(
                                                 '\$${budget.toStringAsFixed(2)} budget',
                                                 style: TextStyle(
-                                                  fontSize: 13,
+                                                  fontSize: 13.sp,
                                                   color: Colors.grey.shade600,
                                                   fontWeight: FontWeight.w600,
                                                 ),
@@ -322,18 +323,18 @@ class _ExpensesPageState extends State<ExpensesPage> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24.h),
 
                           // Expenses list header
-                          const Text(
+                          Text(
                             'All Expenses',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 20.sp,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textDark,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16.h),
 
                           if (docs.isEmpty)
                             _buildEmptyState()
@@ -357,10 +358,10 @@ class _ExpensesPageState extends State<ExpensesPage> {
 
   Widget _buildModernCard({required Widget child}) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [AppColors.cardShadow()],
       ),
       child: child,
@@ -371,18 +372,18 @@ class _ExpensesPageState extends State<ExpensesPage> {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(10.r),
           decoration: BoxDecoration(
             gradient: AppColors.primaryGradient,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
           ),
-          child: Icon(icon, color: Colors.white, size: 20),
+          child: Icon(icon, color: Colors.white, size: 20.sp),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12.w),
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 18,
+          style: TextStyle(
+            fontSize: 18.sp,
             fontWeight: FontWeight.bold,
             color: AppColors.textDark,
           ),
@@ -393,22 +394,22 @@ class _ExpensesPageState extends State<ExpensesPage> {
 
   Widget _buildSummaryItem(String label, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14.r),
       decoration: BoxDecoration(
         color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.r),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.all(8.r),
             decoration: BoxDecoration(
               color: color.withOpacity(0.15),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: color, size: 18),
+            child: Icon(icon, color: color, size: 18.sp),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -416,16 +417,16 @@ class _ExpensesPageState extends State<ExpensesPage> {
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 11.sp,
                     color: AppColors.textGrey,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2.h),
                 Text(
                   value,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
@@ -440,28 +441,28 @@ class _ExpensesPageState extends State<ExpensesPage> {
 
   Widget _buildEmptyState() {
     return Container(
-      padding: const EdgeInsets.all(32),
+      padding: EdgeInsets.all(32.r),
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
         children: [
-          Icon(Icons.money_off, size: 48, color: Colors.grey.shade400),
-          const SizedBox(height: 16),
+          Icon(Icons.money_off, size: 48.sp, color: Colors.grey.shade400),
+          SizedBox(height: 16.h),
           Text(
             'No expenses yet',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.w600,
               color: Colors.grey.shade600,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Text(
             'Tap + to add your first expense',
-            style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+            style: TextStyle(fontSize: 13.sp, color: Colors.grey.shade500),
             textAlign: TextAlign.center,
           ),
         ],
@@ -476,59 +477,59 @@ class _ExpensesPageState extends State<ExpensesPage> {
     final timestamp = data['timestamp'] as Timestamp?;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [AppColors.cardShadow()],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(10.r),
             decoration: BoxDecoration(
               color: AppColors.primaryBlue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12.r),
             ),
-            child: const Icon(Icons.receipt, color: AppColors.primaryBlue, size: 22),
+            child: Icon(Icons.receipt, color: AppColors.primaryBlue, size: 22.sp),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 15,
+                  style: TextStyle(
+                    fontSize: 15.sp,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textDark,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4.h),
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Text(
                         category,
-                        style: const TextStyle(
-                          fontSize: 11,
+                        style: TextStyle(
+                          fontSize: 11.sp,
                           color: AppColors.primaryGreen,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                     if (timestamp != null) ...[
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8.w),
                       Text(
                         _formatDate(timestamp),
-                        style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                        style: TextStyle(fontSize: 11.sp, color: Colors.grey.shade500),
                       ),
                     ],
                   ],
@@ -541,16 +542,16 @@ class _ExpensesPageState extends State<ExpensesPage> {
             children: [
               Text(
                 '\$${amount.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  fontSize: 16,
+                style: TextStyle(
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryBlue,
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4.h),
               GestureDetector(
                 onTap: () => _deleteExpense(docId, amount),
-                child: Icon(Icons.delete_outline, color: Colors.red.shade400, size: 20),
+                child: Icon(Icons.delete_outline, color: Colors.red.shade400, size: 20.sp),
               ),
             ],
           ),
@@ -563,14 +564,14 @@ class _ExpensesPageState extends State<ExpensesPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Expense'),
-        content: const Text('Are you sure you want to delete this expense?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        title: Text('Delete Expense', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        content: Text('Are you sure you want to delete this expense?', style: TextStyle(fontSize: 14.sp)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel', style: TextStyle(fontSize: 14.sp))),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text('Delete', style: TextStyle(color: Colors.red, fontSize: 14.sp)),
           ),
         ],
       ),

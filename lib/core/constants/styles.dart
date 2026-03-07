@@ -1,89 +1,90 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'colors.dart';
 
 class AppTextStyles {
   // ===== HEADER STYLES =====
-  static const TextStyle pageTitle = TextStyle(
-    fontSize: 28,
+  static TextStyle pageTitle = TextStyle(
+    fontSize: 24.sp,
     fontWeight: FontWeight.w900,
     color: AppColors.textLight,
   );
 
-  static const TextStyle sectionTitle = TextStyle(
-    fontSize: 24,
+  static TextStyle sectionTitle = TextStyle(
+    fontSize: 20.sp,
     fontWeight: FontWeight.w800,
     color: AppColors.textDark,
-    letterSpacing: -0.5,
+    letterSpacing: -0.5.w,
   );
 
-  static const TextStyle cardTitle = TextStyle(
-    fontSize: 19,
+  static TextStyle cardTitle = TextStyle(
+    fontSize: 16.sp,
     fontWeight: FontWeight.bold,
     color: AppColors.textDark,
   );
 
   // ===== BODY STYLES =====
-  static const TextStyle heading = TextStyle(
-    fontSize: 24,
+  static TextStyle heading = TextStyle(
+    fontSize: 20.sp,
     fontWeight: FontWeight.bold,
   );
 
-  static const TextStyle subHeading = TextStyle(
-    fontSize: 16,
+  static TextStyle subHeading = TextStyle(
+    fontSize: 14.sp,
     fontWeight: FontWeight.w500,
   );
 
-  static const TextStyle body = TextStyle(
-    fontSize: 14,
+  static TextStyle body = TextStyle(
+    fontSize: 13.sp,
   );
 
-  static const TextStyle bodyLarge = TextStyle(
-    fontSize: 16,
+  static TextStyle bodyLarge = TextStyle(
+    fontSize: 15.sp,
     fontWeight: FontWeight.w600,
     color: AppColors.textDark,
   );
 
-  static const TextStyle bodyMedium = TextStyle(
-    fontSize: 15,
+  static TextStyle bodyMedium = TextStyle(
+    fontSize: 14.sp,
     color: AppColors.textGrey,
   );
 
-  static const TextStyle bodySmall = TextStyle(
-    fontSize: 13,
+  static TextStyle bodySmall = TextStyle(
+    fontSize: 12.sp,
     color: AppColors.textGrey,
   );
 
   // ===== SPECIAL STYLES =====
-  static TextStyle whiteText({double fontSize = 15, FontWeight? fontWeight}) {
+  static TextStyle whiteText({double fontSize = 14, FontWeight? fontWeight}) {
     return TextStyle(
-      fontSize: fontSize,
+      fontSize: fontSize.sp,
       fontWeight: fontWeight,
       color: AppColors.textLight,
     );
   }
 
-  static TextStyle greyText({double fontSize = 13}) {
+  static TextStyle greyText({double fontSize = 12}) {
     return TextStyle(
-      fontSize: fontSize,
+      fontSize: fontSize.sp,
       color: AppColors.textGrey,
     );
   }
 
-  static const TextStyle budgetAmount = TextStyle(
+  static TextStyle budgetAmount = TextStyle(
     color: AppColors.textLight,
-    fontSize: 38,
+    fontSize: 32.sp,
     fontWeight: FontWeight.w800,
-    letterSpacing: -1,
+    letterSpacing: -1.w,
   );
 
-  static const TextStyle statsNumber = TextStyle(
+  static TextStyle statsNumber = TextStyle(
     color: AppColors.textLight,
-    fontSize: 22,
+    fontSize: 20.sp,
     fontWeight: FontWeight.bold,
   );
 
-  static const TextStyle statsLabel = TextStyle(
-    fontSize: 13,
+  static TextStyle statsLabel = TextStyle(
+    fontSize: 12.sp,
     fontWeight: FontWeight.w500,
   );
 }

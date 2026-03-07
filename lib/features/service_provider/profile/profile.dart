@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/provider_bottom_nav.dart';
 import '../../../services/auth_service.dart';
 import '../../user/auth/login.dart';
+import '../services/my_services.dart';
+import 'edit_business_profile.dart';
+import '../../user/info/privacy.dart';
+import '../../user/info/help.dart';
+import '../../../core/constants/colors.dart';
 
 class ServiceProviderProfilePage extends StatelessWidget {
   const ServiceProviderProfilePage({super.key});
@@ -14,10 +20,12 @@ class ServiceProviderProfilePage extends StatelessWidget {
 
     if (user == null) {
       Future.microtask(() {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const LoginPage()),
-        );
+        if (context.mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const LoginPage()),
+          );
+        }
       });
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -42,41 +50,34 @@ class ServiceProviderProfilePage extends StatelessWidget {
         final providerData = snapshot.data!.data() as Map<String, dynamic>;
         final String businessName = providerData['businessName'] ?? 'Business Name';
         final String email = providerData['email'] ?? 'No email';
-        final String providerType = providerData['providerType'] ?? 'Service Provider';
         
         final initials = businessName.isNotEmpty
             ? businessName.trim().split(' ').map((e) => e[0]).take(2).join()
             : 'SP';
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF5F7FA),
+          backgroundColor: AppColors.background,
           body: Container(
+            width: double.infinity,
+            height: double.infinity,
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF00897B),
-                  Color(0xFF1565C0),
-                ],
-                stops: [0.0, 0.3],
-              ),
+              gradient: AppColors.primaryGradient,
             ),
             child: SafeArea(
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
                   Container(
-                    width: 100,
-                    height: 100,
+                    width: 100.w,
+                    height: 100.w,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 4),
+                      border: Border.all(color: Colors.white, width: 4.w),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 10.r,
+                          offset: Offset(0, 5.h),
                         ),
                       ],
                     ),
@@ -84,160 +85,172 @@ class ServiceProviderProfilePage extends StatelessWidget {
                       backgroundColor: Colors.white,
                       child: Text(
                         initials,
-                        style: const TextStyle(
-                          fontSize: 36,
+                        style: TextStyle(
+                          fontSize: 36.sp,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF00897B),
+                          color: AppColors.primaryGreen,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   Text(
                     businessName,
-                    style: const TextStyle(
-                      fontSize: 24,
+                    style: TextStyle(
+                      fontSize: 24.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4.h),
                   Text(
                     email,
                     style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 15.sp,
+                      color: Colors.white.withOpacity(0.9),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
                   
                   // Stats Section
                   _buildProviderStats(user.uid),
                   
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
                   Expanded(
                     child: Container(
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF5F7FA),
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
                       ),
                       child: ListView(
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(20.r),
                         children: [
-                          const Text(
+                          Text(
                             'Business Settings',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 20.sp,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1A1F36),
+                              color: AppColors.textDark,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16.h),
                           _buildSettingsCard(
                             icon: Icons.business_outlined,
                             title: 'Edit Business Profile',
-                            subtitle: 'Update your business info and services',
-                            color: const Color(0xFF1565C0),
+                            subtitle: 'Update your business info and category',
+                            color: AppColors.primaryBlue,
                             onTap: () {
-                              // Navigate to Edit Provider Profile
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const EditBusinessProfilePage()),
+                              );
                             },
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12.h),
                           _buildSettingsCard(
                             icon: Icons.room_service_outlined,
                             title: 'Manage Services',
                             subtitle: 'Add or update your service offerings',
                             color: Colors.orange.shade800,
                             onTap: () {
-                              // Navigate to Manage Services
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const MyServicesPage()),
+                              );
                             },
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12.h),
                           _buildSettingsCard(
                             icon: Icons.analytics_outlined,
                             title: 'Earnings & Analytics',
                             subtitle: 'View your detailed revenue reports',
-                            color: const Color(0xFF00897B),
+                            color: AppColors.primaryGreen,
                             onTap: () {
-                              // Navigate to Analytics
+                              // Coming soon
                             },
                           ),
-                          const SizedBox(height: 24),
-                          const Text(
+                          SizedBox(height: 24.h),
+                          Text(
                             'Account & Support',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 20.sp,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1A1F36),
+                              color: AppColors.textDark,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16.h),
                           _buildSettingsCard(
                             icon: Icons.lock_outline,
                             title: 'Privacy & Security',
                             subtitle: 'Password and security settings',
                             color: Colors.blueGrey,
                             onTap: () {
-                              // Navigate to Privacy
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const PrivacySecurityPage()),
+                              );
                             },
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12.h),
                           _buildSettingsCard(
                             icon: Icons.help_outline,
                             title: 'Help & Support',
                             subtitle: 'Get assistance for your business',
                             color: Colors.cyan.shade800,
                             onTap: () {
-                              // Navigate to Help
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const HelpSupportPage()),
+                              );
                             },
                           ),
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24.h),
                           
                           // Logout Button
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.red.shade50,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(12.r),
                               border: Border.all(color: Colors.red.shade200),
                             ),
                             child: Material(
                               color: Colors.transparent,
                               child: InkWell(
                                 onTap: () => _showLogoutDialog(context),
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(12.r),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(16),
+                                  padding: EdgeInsets.all(16.r),
                                   child: Row(
                                     children: [
                                       Container(
-                                        padding: const EdgeInsets.all(10),
+                                        padding: EdgeInsets.all(10.r),
                                         decoration: BoxDecoration(
                                           color: Colors.red.shade100,
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10.r),
                                         ),
                                         child: Icon(Icons.logout,
-                                            color: Colors.red.shade700, size: 22),
+                                            color: Colors.red.shade700, size: 22.sp),
                                       ),
-                                      const SizedBox(width: 12),
+                                      SizedBox(width: 12.w),
                                       Expanded(
                                         child: Text(
                                           'Logout',
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 16.sp,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.red.shade700,
                                           ),
                                         ),
                                       ),
                                       Icon(Icons.arrow_forward_ios,
-                                          color: Colors.red.shade400, size: 16),
+                                          color: Colors.red.shade400, size: 16.sp),
                                     ],
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(height: 100),
+                          SizedBox(height: 100.h),
                         ],
                       ),
                     ),
@@ -278,14 +291,14 @@ class ServiceProviderProfilePage extends StatelessWidget {
         }
 
         return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          padding: const EdgeInsets.all(20),
+          margin: EdgeInsets.symmetric(horizontal: 20.w),
+          padding: EdgeInsets.all(20.r),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(16),
+            color: Colors.white.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.3),
-              width: 1.5,
+              color: Colors.white.withOpacity(0.3),
+              width: 1.5.w,
             ),
           ),
           child: Row(
@@ -308,18 +321,18 @@ class ServiceProviderProfilePage extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
-            fontSize: 20,
+            fontSize: 20.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4.h),
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.9),
-            fontSize: 12,
+            color: Colors.white.withOpacity(0.9),
+            fontSize: 12.sp,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -329,9 +342,9 @@ class ServiceProviderProfilePage extends StatelessWidget {
 
   Widget _buildDivider() {
     return Container(
-      width: 1,
-      height: 35,
-      color: Colors.white.withValues(alpha: 0.3),
+      width: 1.w,
+      height: 35.h,
+      color: Colors.white.withOpacity(0.3),
     );
   }
 
@@ -345,12 +358,12 @@ class ServiceProviderProfilePage extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10.r,
+            offset: Offset(0, 4.h),
           ),
         ],
       ),
@@ -358,45 +371,45 @@ class ServiceProviderProfilePage extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16.r),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10.r),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
-                  child: Icon(icon, color: color, size: 22),
+                  child: Icon(icon, color: color, size: 22.sp),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: TextStyle(
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A1F36),
+                          color: AppColors.textDark,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Text(
                         subtitle,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFF4A5568),
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color: AppColors.textGrey,
                         ),
                       ),
                     ],
                   ),
                 ),
                 Icon(Icons.arrow_forward_ios,
-                    color: Colors.grey.shade400, size: 16),
+                    color: Colors.grey.shade400, size: 16.sp),
               ],
             ),
           ),
@@ -409,12 +422,12 @@ class ServiceProviderProfilePage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Logout', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('Are you sure you want to logout from your business account?'),
+        title: Text('Logout', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp)),
+        content: Text('Are you sure you want to logout from your business account?', style: TextStyle(fontSize: 14.sp)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -437,7 +450,7 @@ class ServiceProviderProfilePage extends StatelessWidget {
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700),
-            child: const Text('Logout'),
+            child: Text('Logout', style: TextStyle(color: Colors.white, fontSize: 14.sp)),
           ),
         ],
       ),

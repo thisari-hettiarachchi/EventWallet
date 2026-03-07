@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 import 'package:intl/intl.dart';
 
@@ -21,12 +22,12 @@ class NotificationsPage extends StatelessWidget {
           child: Column(
             children: [
               _buildHeader(context),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Expanded(
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
                   ),
                   child: user == null
                       ? _buildLoginPrompt()
@@ -47,7 +48,7 @@ class NotificationsPage extends StatelessWidget {
                             }
 
                             return ListView.builder(
-                              padding: const EdgeInsets.all(20),
+                              padding: EdgeInsets.all(20.r),
                               itemCount: snapshot.data!.docs.length,
                               itemBuilder: (context, index) {
                                 final doc = snapshot.data!.docs[index];
@@ -68,25 +69,25 @@ class NotificationsPage extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+            icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 20.sp),
             onPressed: () => Navigator.pop(context),
           ),
-          const Expanded(
+          Expanded(
             child: Text(
               'Notifications',
               style: TextStyle(
-                fontSize: 28,
+                fontSize: 28.sp,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.done_all, color: Colors.white),
+            icon: Icon(Icons.done_all, color: Colors.white, size: 24.sp),
             onPressed: () => _markAllAsRead(),
             tooltip: 'Mark all as read',
           ),
@@ -101,20 +102,21 @@ class NotificationsPage extends StatelessWidget {
     final String timeAgo = _formatTimestamp(timestamp);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
         color: isRead ? Colors.white : AppColors.primaryGreen.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: isRead ? null : Border.all(color: AppColors.primaryGreen.withOpacity(0.2)),
         boxShadow: [AppColors.cardShadow()],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         leading: CircleAvatar(
           backgroundColor: _getIconColor(data['type']).withOpacity(0.1),
           child: Icon(
             _getIcon(data['type']),
             color: _getIconColor(data['type']),
+            size: 24.sp,
           ),
         ),
         title: Row(
@@ -125,14 +127,14 @@ class NotificationsPage extends StatelessWidget {
                 data['title'] ?? 'Notification',
                 style: TextStyle(
                   fontWeight: isRead ? FontWeight.w500 : FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: 16.sp,
                 ),
               ),
             ),
             if (!isRead)
               Container(
-                width: 8,
-                height: 8,
+                width: 8.w,
+                height: 8.w,
                 decoration: const BoxDecoration(
                   color: AppColors.primaryGreen,
                   shape: BoxShape.circle,
@@ -143,20 +145,20 @@ class NotificationsPage extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 4),
+            SizedBox(height: 4.h),
             Text(
               data['message'] ?? '',
               style: TextStyle(
                 color: Colors.grey.shade700,
-                fontSize: 14,
+                fontSize: 14.sp,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Text(
               timeAgo,
               style: TextStyle(
                 color: Colors.grey.shade500,
-                fontSize: 12,
+                fontSize: 12.sp,
               ),
             ),
           ],
@@ -208,16 +210,16 @@ class NotificationsPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.notifications_none_rounded, size: 80, color: Colors.grey.shade300),
-          const SizedBox(height: 16),
+          Icon(Icons.notifications_none_rounded, size: 80.sp, color: Colors.grey.shade300),
+          SizedBox(height: 16.h),
           Text(
             'All caught up!',
-            style: TextStyle(fontSize: 18, color: Colors.grey.shade600, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18.sp, color: Colors.grey.shade600, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Text(
             'No new notifications at the moment.',
-            style: TextStyle(color: Colors.grey.shade500),
+            style: TextStyle(color: Colors.grey.shade500, fontSize: 14.sp),
           ),
         ],
       ),
@@ -225,7 +227,7 @@ class NotificationsPage extends StatelessWidget {
   }
 
   Widget _buildLoginPrompt() {
-    return const Center(child: Text('Please login to view notifications'));
+    return Center(child: Text('Please login to view notifications', style: TextStyle(fontSize: 16.sp)));
   }
 
   Future<void> _markAsRead(String id) async {

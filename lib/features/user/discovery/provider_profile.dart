@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 
 class ProviderProfilePage extends StatelessWidget {
@@ -25,6 +27,11 @@ class ProviderProfilePage extends StatelessWidget {
     final location = providerData['location'] ?? 'Location not specified';
     final phone = providerData['phone'] ?? 'Not provided';
     final email = providerData['email'] ?? 'Not provided';
+    
+    // Social Links
+    final website = providerData['website'] ?? '';
+    final facebook = providerData['facebook'] ?? '';
+    final instagram = providerData['instagram'] ?? '';
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -33,32 +40,43 @@ class ProviderProfilePage extends StatelessWidget {
           _buildSliverAppBar(context, imageUrl, name),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20.r),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildHeaderInfo(name, type, rating, price),
-                  const SizedBox(height: 25),
+                  SizedBox(height: 25.h),
                   _buildQuickStats(availability, location),
-                  const SizedBox(height: 30),
-                  const Text(
+                  SizedBox(height: 30.h),
+                  
+                  if (website.isNotEmpty || facebook.isNotEmpty || instagram.isNotEmpty) ...[
+                    Text(
+                      'Social Media & Links',
+                      style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                    ),
+                    SizedBox(height: 15.h),
+                    _buildSocialLinks(website, facebook, instagram),
+                    SizedBox(height: 30.h),
+                  ],
+
+                  Text(
                     'About',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                    style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: AppColors.textDark),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10.h),
                   Text(
                     description,
-                    style: TextStyle(fontSize: 16, color: Colors.grey.shade700, height: 1.5),
+                    style: TextStyle(fontSize: 16.sp, color: Colors.grey.shade700, height: 1.5),
                   ),
-                  const SizedBox(height: 30),
-                  const Text(
+                  SizedBox(height: 30.h),
+                  Text(
                     'Contact Information',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                    style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: AppColors.textDark),
                   ),
-                  const SizedBox(height: 15),
-                  _buildContactTile(Icons.phone, phone),
-                  _buildContactTile(Icons.email, email),
-                  const SizedBox(height: 100),
+                  SizedBox(height: 15.h),
+                  _buildContactTile(Icons.phone, phone, 'tel:$phone'),
+                  _buildContactTile(Icons.email, email, 'mailto:$email'),
+                  SizedBox(height: 100.h),
                 ],
               ),
             ),
@@ -71,24 +89,34 @@ class ProviderProfilePage extends StatelessWidget {
 
   Widget _buildSliverAppBar(BuildContext context, String imageUrl, String name) {
     return SliverAppBar(
-      expandedHeight: 300,
+      expandedHeight: 300.h,
       pinned: true,
       backgroundColor: AppColors.primaryGreen,
-      leading: CircleAvatar(
-        backgroundColor: Colors.black26,
-        child: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+      leading: Padding(
+        padding: EdgeInsets.all(8.r),
+        child: CircleAvatar(
+          backgroundColor: Colors.black26,
+          child: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
       ),
       flexibleSpace: FlexibleSpaceBar(
         background: imageUrl.isNotEmpty
-            ? Image.network(imageUrl, fit: BoxFit.cover)
+            ? Image.network(
+                imageUrl, 
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  decoration: const BoxDecoration(gradient: AppColors.headerGradient),
+                  child: Icon(Icons.broken_image, size: 100.sp, color: Colors.white54),
+                ),
+              )
             : Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.headerGradient,
                 ),
-                child: const Icon(Icons.business, size: 100, color: Colors.white54),
+                child: Icon(Icons.business, size: 100.sp, color: Colors.white54),
               ),
       ),
     );
@@ -107,11 +135,11 @@ class ProviderProfilePage extends StatelessWidget {
                 children: [
                   Text(
                     name,
-                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                    style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold, color: AppColors.textDark),
                   ),
                   Text(
-                    type,
-                    style: const TextStyle(fontSize: 16, color: AppColors.primaryBlue, fontWeight: FontWeight.w600),
+                    type.toUpperCase(),
+                    style: TextStyle(fontSize: 14.sp, color: AppColors.primaryBlue, fontWeight: FontWeight.w700, letterSpacing: 1.w),
                   ),
                 ],
               ),
@@ -119,21 +147,21 @@ class ProviderProfilePage extends StatelessWidget {
             if (price > 0)
               Text(
                 '\$${price.toInt()}',
-                style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.primaryGreen),
+                style: TextStyle(fontSize: 26.sp, fontWeight: FontWeight.bold, color: AppColors.primaryGreen),
               ),
           ],
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10.h),
         Row(
           children: [
-            const Icon(Icons.star_rounded, color: Colors.amber, size: 24),
-            const SizedBox(width: 4),
+            Icon(Icons.star_rounded, color: Colors.amber, size: 24.sp),
+            SizedBox(width: 4.w),
             Text(
               rating > 0 ? rating.toStringAsFixed(1) : 'New',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(width: 10),
-            Text('(24 Reviews)', style: TextStyle(color: Colors.grey.shade600)),
+            SizedBox(width: 10.w),
+            Text('(24 Reviews)', style: TextStyle(color: Colors.grey.shade600, fontSize: 14.sp)),
           ],
         ),
       ],
@@ -144,7 +172,7 @@ class ProviderProfilePage extends StatelessWidget {
     return Row(
       children: [
         _statItem(Icons.calendar_today_rounded, 'Availability', availability),
-        const SizedBox(width: 15),
+        SizedBox(width: 15.w),
         _statItem(Icons.location_on_rounded, 'Location', location),
       ],
     );
@@ -153,55 +181,102 @@ class ProviderProfilePage extends StatelessWidget {
   Widget _statItem(IconData icon, String label, String value) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(15),
+        padding: EdgeInsets.all(15.r),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10.r, offset: Offset(0, 4.h)),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: AppColors.primaryGreen, size: 20),
-            const SizedBox(height: 8),
-            Text(label, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-            const SizedBox(height: 2),
-            Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+            Icon(icon, color: AppColors.primaryGreen, size: 20.sp),
+            SizedBox(height: 8.h),
+            Text(label, style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600)),
+            SizedBox(height: 2.h),
+            Text(value, style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildContactTile(IconData icon, String value) {
+  Widget _buildSocialLinks(String website, String facebook, String instagram) {
+    return Row(
+      children: [
+        if (website.isNotEmpty)
+          _socialIcon(Icons.language, website, Colors.blue),
+        if (facebook.isNotEmpty)
+          _socialIcon(Icons.facebook, facebook, const Color(0xFF1877F2)),
+        if (instagram.isNotEmpty)
+          _socialIcon(Icons.camera_alt, instagram, const Color(0xFFE4405F)),
+      ],
+    );
+  }
+
+  Widget _socialIcon(IconData icon, String url, Color color) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.primaryGreen.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: AppColors.primaryGreen, size: 20),
+      padding: EdgeInsets.only(right: 15.w),
+      child: InkWell(
+        onTap: () async {
+          String finalUrl = url;
+          if (!url.startsWith('http')) {
+            finalUrl = 'https://$url';
+          }
+          final Uri uri = Uri.parse(finalUrl);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri);
+          }
+        },
+        child: Container(
+          padding: EdgeInsets.all(12.r),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            shape: BoxShape.circle,
           ),
-          const SizedBox(width: 15),
-          Text(value, style: const TextStyle(fontSize: 16)),
-        ],
+          child: Icon(icon, color: color, size: 24.sp),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContactTile(IconData icon, String value, String url) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: InkWell(
+        onTap: () async {
+          final Uri uri = Uri.parse(url);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri);
+          }
+        },
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10.r),
+              decoration: BoxDecoration(
+                color: AppColors.primaryGreen.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Icon(icon, color: AppColors.primaryGreen, size: 20.sp),
+            ),
+            SizedBox(width: 15.w),
+            Text(value, style: TextStyle(fontSize: 16.sp)),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildBottomAction(BuildContext context, String providerName) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, -5)),
+          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20.r, offset: Offset(0, -5.h)),
         ],
       ),
       child: SafeArea(
@@ -210,10 +285,10 @@ class ProviderProfilePage extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primaryGreen,
             foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 56),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            minimumSize: Size(double.infinity, 56.h),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
           ),
-          child: const Text('Book Now', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          child: Text('Book Now', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
         ),
       ),
     );
@@ -228,18 +303,17 @@ class ProviderProfilePage extends StatelessWidget {
       return;
     }
 
-    // Show a simple confirmation dialog or date picker
     final bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirm Booking'),
-        content: Text('Do you want to request a booking from $providerName?'),
+        title: Text('Confirm Booking', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        content: Text('Do you want to request a booking from $providerName?', style: TextStyle(fontSize: 14.sp)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel', style: TextStyle(fontSize: 14.sp))),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryGreen),
-            child: const Text('Confirm', style: TextStyle(color: Colors.white)),
+            child: Text('Confirm', style: TextStyle(color: Colors.white, fontSize: 14.sp)),
           ),
         ],
       ),
@@ -256,7 +330,6 @@ class ProviderProfilePage extends StatelessWidget {
           'providerData': providerData,
         });
 
-        // Add notification for the user
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)

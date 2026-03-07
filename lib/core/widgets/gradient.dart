@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/colors.dart';
 
 // Gradient Container Widget
@@ -24,7 +25,7 @@ class GradientContainer extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         gradient: gradient ?? AppColors.primaryGradient,
-        borderRadius: borderRadius ?? BorderRadius.circular(24),
+        borderRadius: borderRadius ?? BorderRadius.circular(24.r),
         boxShadow: boxShadow ?? [AppColors.primaryShadow()],
       ),
       child: child,
@@ -56,8 +57,8 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: AppBar(
         title: Text(
           title,
-          style: const TextStyle(
-            fontSize: 24,
+          style: TextStyle(
+            fontSize: 24.sp,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -73,7 +74,7 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => Size.fromHeight(kToolbarHeight.h);
 }
 
 // Gradient Card Widget
@@ -100,16 +101,16 @@ class GradientCard extends StatelessWidget {
       width: width,
       decoration: BoxDecoration(
         gradient: AppColors.cardGradient,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [AppColors.primaryShadow()],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
           child: Padding(
-            padding: padding ?? const EdgeInsets.all(20),
+            padding: padding ?? EdgeInsets.all(20.r),
             child: child,
           ),
         ),
@@ -145,7 +146,7 @@ class GradientHeader extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20.r),
               child: Row(
                 children: [
                   Expanded(
@@ -154,14 +155,14 @@ class GradientHeader extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(
-                            fontSize: 28,
+                          style: TextStyle(
+                            fontSize: 28.sp,
                             fontWeight: FontWeight.w900,
                             color: Colors.white,
                           ),
                         ),
                         if (subtitle != null) ...[
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8.h),
                           subtitle!,
                         ],
                       ],
@@ -182,35 +183,35 @@ class GradientHeader extends StatelessWidget {
 // Gradient Icon Container
 class GradientIconContainer extends StatelessWidget {
   final IconData icon;
-  final double size;
+  final double? size;
   final Color? iconColor;
-  final double padding;
+  final double? padding;
 
   const GradientIconContainer({
     super.key,
     required this.icon,
-    this.size = 28,
+    this.size,
     this.iconColor,
-    this.padding = 14,
+    this.padding,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(padding),
+      padding: EdgeInsets.all(padding ?? 14.r),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primaryGreen.withValues(alpha: 0.2),
-            AppColors.primaryBlue.withValues(alpha: 0.1),
+            AppColors.primaryGreen.withOpacity(0.2),
+            AppColors.primaryBlue.withOpacity(0.1),
           ],
         ),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.r),
       ),
       child: Icon(
         icon,
         color: iconColor ?? AppColors.primaryGreen,
-        size: size,
+        size: size ?? 28.sp,
       ),
     );
   }
@@ -234,12 +235,12 @@ class GradientFAB extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.buttonGradient,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(30.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryGreen.withValues(alpha: 0.4),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
+            color: AppColors.primaryGreen.withOpacity(0.4),
+            blurRadius: 16.r,
+            offset: Offset(0, 8.h),
           ),
         ],
       ),
@@ -247,14 +248,14 @@ class GradientFAB extends StatelessWidget {
         onPressed: onPressed,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        icon: Icon(icon, color: Colors.white, size: 26),
+        icon: Icon(icon, color: Colors.white, size: 26.sp),
         label: Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 16.sp,
             fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
+            letterSpacing: 0.5.w,
           ),
         ),
       ),

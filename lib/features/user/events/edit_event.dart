@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 
 class EditEventPage extends StatefulWidget {
@@ -158,7 +159,7 @@ class _EditEventPageState extends State<EditEventPage> {
         children: [
           // Background gradient header
           Container(
-            height: 300,
+            height: 300.h,
             decoration: const BoxDecoration(
               gradient: AppColors.headerGradient,
             ),
@@ -166,11 +167,11 @@ class _EditEventPageState extends State<EditEventPage> {
 
           // Decorative circles
           Positioned(
-            top: -50,
-            right: -50,
+            top: -50.h,
+            right: -50.w,
             child: Container(
-              width: 200,
-              height: 200,
+              width: 200.w,
+              height: 200.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withOpacity(0.1),
@@ -178,11 +179,11 @@ class _EditEventPageState extends State<EditEventPage> {
             ),
           ),
           Positioned(
-            top: 100,
-            left: -30,
+            top: 100.h,
+            left: -30.w,
             child: Container(
-              width: 120,
-              height: 120,
+              width: 120.w,
+              height: 120.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withOpacity(0.08),
@@ -195,98 +196,98 @@ class _EditEventPageState extends State<EditEventPage> {
               children: [
                 // Custom App Bar
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16.r),
                   child: Row(
                     children: [
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                           border: Border.all(
                             color: Colors.white.withOpacity(0.3),
-                            width: 1,
+                            width: 1.w,
                           ),
                         ),
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
                             onTap: () => Navigator.pop(context),
-                            borderRadius: BorderRadius.circular(12),
-                            child: const Padding(
-                              padding: EdgeInsets.all(12),
+                            borderRadius: BorderRadius.circular(12.r),
+                            child: Padding(
+                              padding: EdgeInsets.all(12.r),
                               child: Icon(
                                 Icons.arrow_back_ios_new,
                                 color: Colors.white,
-                                size: 20,
+                                size: 20.sp,
                               ),
                             ),
                           ),
                         ),
                       ),
                       const Spacer(),
-                      const Text(
+                      Text(
                         'Edit Event',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
+                          fontSize: 20.sp,
                           fontWeight: FontWeight.bold,
-                          letterSpacing: -0.5,
+                          letterSpacing: -0.5.w,
                         ),
                       ),
                       const Spacer(),
-                      const SizedBox(width: 44), // balance the back button
+                      SizedBox(width: 44.w), // balance the back button
                     ],
                   ),
                 ),
 
                 // Header content — category icon + event name + status badge
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
                   child: Column(
                     children: [
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Container(
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(20.r),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
                             color: Colors.white.withOpacity(0.3),
-                            width: 2,
+                            width: 2.w,
                           ),
                         ),
                         child: Icon(
                           _getCategoryIcon(_selectedCategory),
-                          size: 48,
+                          size: 48.sp,
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12.h),
                       Text(
                         _nameController.text.isNotEmpty
                             ? _nameController.text
                             : 'Edit Event',
-                        style: const TextStyle(
-                          fontSize: 24,
+                        style: TextStyle(
+                          fontSize: 24.sp,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
-                          letterSpacing: -0.5,
+                          letterSpacing: -0.5.w,
                         ),
                         textAlign: TextAlign.center,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10.h),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20.r),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.1),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
+                              blurRadius: 10.r,
+                              offset: Offset(0, 4.h),
                             ),
                           ],
                         ),
@@ -294,19 +295,19 @@ class _EditEventPageState extends State<EditEventPage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              width: 8,
-                              height: 8,
+                              width: 8.w,
+                              height: 8.w,
                               decoration: BoxDecoration(
                                 color: statusColor,
                                 shape: BoxShape.circle,
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8.w),
                             Text(
                               _selectedStatus,
                               style: TextStyle(
                                 color: statusColor,
-                                fontSize: 14,
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -316,14 +317,14 @@ class _EditEventPageState extends State<EditEventPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
 
                 // Scrollable form content
                 Expanded(
                   child: Form(
                     key: _formKey,
                     child: ListView(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
                       children: [
                         // Event Details card
                         _buildModernCard(
@@ -331,17 +332,17 @@ class _EditEventPageState extends State<EditEventPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildCardHeader(Icons.event_note, 'Event Details'),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20.h),
                               _buildTextField('Event Name', _nameController, Icons.event,
                                   onChanged: (_) => setState(() {})),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               _buildCategoryDropdown(),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               _buildDatePicker(),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
 
                         // Location & Capacity card
                         _buildModernCard(
@@ -349,15 +350,15 @@ class _EditEventPageState extends State<EditEventPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildCardHeader(Icons.location_on, 'Location & Capacity'),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20.h),
                               _buildTextField('Venue', _venueController, Icons.location_on),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               _buildTextField('Attendees', _attendeesController, Icons.people,
                                   isNumber: true),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
 
                         // Budget & Status card
                         _buildModernCard(
@@ -365,15 +366,15 @@ class _EditEventPageState extends State<EditEventPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildCardHeader(Icons.account_balance_wallet, 'Budget & Status'),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20.h),
                               _buildTextField('Budget', _budgetController, Icons.attach_money,
                                   isNumber: true),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               _buildStatusDropdown(),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
 
                         // Description card
                         _buildModernCard(
@@ -381,7 +382,7 @@ class _EditEventPageState extends State<EditEventPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildCardHeader(Icons.description, 'Description'),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20.h),
                               _buildTextField(
                                 'Description (optional)',
                                 _descriptionController,
@@ -392,20 +393,20 @@ class _EditEventPageState extends State<EditEventPage> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 28),
+                        SizedBox(height: 28.h),
 
                         // Save button
                         Container(
                           width: double.infinity,
-                          height: 56,
+                          height: 56.h,
                           decoration: BoxDecoration(
                             gradient: AppColors.primaryGradient,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(16.r),
                             boxShadow: [
                               BoxShadow(
                                 color: AppColors.primaryGreen.withOpacity(0.4),
-                                blurRadius: 16,
-                                offset: const Offset(0, 6),
+                                blurRadius: 16.r,
+                                offset: Offset(0, 6.h),
                               ),
                             ],
                           ),
@@ -413,20 +414,20 @@ class _EditEventPageState extends State<EditEventPage> {
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: _updateEvent,
-                              borderRadius: BorderRadius.circular(16),
-                              child: const Center(
+                              borderRadius: BorderRadius.circular(16.r),
+                              child: Center(
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.save_rounded, color: Colors.white, size: 22),
-                                    SizedBox(width: 10),
+                                    Icon(Icons.save_rounded, color: Colors.white, size: 22.sp),
+                                    SizedBox(width: 10.w),
                                     Text(
                                       'Save Changes',
                                       style: TextStyle(
                                         color: Colors.white,
-                                        fontSize: 18,
+                                        fontSize: 18.sp,
                                         fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
+                                        letterSpacing: 0.5.w,
                                       ),
                                     ),
                                   ],
@@ -435,7 +436,7 @@ class _EditEventPageState extends State<EditEventPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 40),
+                        SizedBox(height: 40.h),
                       ],
                     ),
                   ),
@@ -450,10 +451,10 @@ class _EditEventPageState extends State<EditEventPage> {
 
   Widget _buildModernCard({required Widget child}) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [AppColors.cardShadow()],
       ),
       child: child,
@@ -464,18 +465,18 @@ class _EditEventPageState extends State<EditEventPage> {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(10.r),
           decoration: BoxDecoration(
             gradient: AppColors.primaryGradient,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
           ),
-          child: Icon(icon, color: Colors.white, size: 20),
+          child: Icon(icon, color: Colors.white, size: 20.sp),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12.w),
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 18,
+          style: TextStyle(
+            fontSize: 18.sp,
             fontWeight: FontWeight.bold,
             color: AppColors.textDark,
           ),
@@ -498,24 +499,26 @@ class _EditEventPageState extends State<EditEventPage> {
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
       maxLines: maxLines,
       onChanged: onChanged,
+      style: TextStyle(fontSize: 15.sp),
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: AppColors.primaryGreen),
+        labelStyle: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
+        prefixIcon: Icon(icon, color: AppColors.primaryGreen, size: 24.sp),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
         ),
         filled: true,
         fillColor: AppColors.background,
-        labelStyle: TextStyle(color: AppColors.textGrey),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
       validator: (value) {
         if (isRequired && (value == null || value.isEmpty)) {
@@ -531,24 +534,25 @@ class _EditEventPageState extends State<EditEventPage> {
       value: _selectedCategory,
       decoration: InputDecoration(
         labelText: 'Category',
-        prefixIcon: const Icon(Icons.category, color: AppColors.primaryGreen),
+        labelStyle: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
+        prefixIcon: Icon(Icons.category, color: AppColors.primaryGreen, size: 24.sp),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
         ),
         filled: true,
         fillColor: AppColors.background,
-        labelStyle: TextStyle(color: AppColors.textGrey),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
-      items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+      items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c, style: TextStyle(fontSize: 15.sp)))).toList(),
       onChanged: (val) => setState(() => _selectedCategory = val!),
     );
   }
@@ -558,24 +562,25 @@ class _EditEventPageState extends State<EditEventPage> {
       value: _selectedStatus,
       decoration: InputDecoration(
         labelText: 'Status',
-        prefixIcon: const Icon(Icons.info_outline, color: AppColors.primaryGreen),
+        labelStyle: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
+        prefixIcon: Icon(Icons.info_outline, color: AppColors.primaryGreen, size: 24.sp),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
         ),
         filled: true,
         fillColor: AppColors.background,
-        labelStyle: TextStyle(color: AppColors.textGrey),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
-      items: _statuses.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+      items: _statuses.map((s) => DropdownMenuItem(value: s, child: Text(s, style: TextStyle(fontSize: 15.sp)))).toList(),
       onChanged: (val) => setState(() => _selectedStatus = val!),
     );
   }
@@ -605,27 +610,28 @@ class _EditEventPageState extends State<EditEventPage> {
         );
         if (date != null) setState(() => _selectedDate = date);
       },
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(12.r),
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: 'Date',
-          prefixIcon: const Icon(Icons.calendar_today, color: AppColors.primaryGreen),
+          labelStyle: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
+          prefixIcon: Icon(Icons.calendar_today, color: AppColors.primaryGreen, size: 24.sp),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
             borderSide: BorderSide(color: Colors.grey.shade300),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
             borderSide: BorderSide(color: Colors.grey.shade300),
           ),
           filled: true,
           fillColor: AppColors.background,
-          labelStyle: TextStyle(color: AppColors.textGrey),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
         ),
         child: Text(
           formatted,
-          style: const TextStyle(
-            fontSize: 15,
+          style: TextStyle(
+            fontSize: 15.sp,
             fontWeight: FontWeight.w600,
             color: AppColors.textDark,
           ),

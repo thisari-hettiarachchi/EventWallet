@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/colors.dart';
 
 class CustomButton extends StatelessWidget {
@@ -7,8 +8,8 @@ class CustomButton extends StatelessWidget {
   final Gradient? gradient;
   final Color? backgroundColor;
   final Color? textColor;
-  final double height;
-  final double borderRadius;
+  final double? height;
+  final double? borderRadius;
   final bool isLoading;
   final IconData? icon;
 
@@ -19,8 +20,8 @@ class CustomButton extends StatelessWidget {
     this.gradient,
     this.backgroundColor,
     this.textColor,
-    this.height = 55,
-    this.borderRadius = 30,
+    this.height,
+    this.borderRadius,
     this.isLoading = false,
     this.icon,
   });
@@ -28,16 +29,16 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height,
+      height: height ?? 55.h,
       decoration: BoxDecoration(
         gradient: gradient ?? AppColors.primaryGradient,
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: BorderRadius.circular(borderRadius ?? 30.r),
         boxShadow: [
           BoxShadow(
             color: AppColors.primaryGreen.withOpacity(0.4),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
+            blurRadius: 16.r,
+            offset: Offset(0, 8.h),
           ),
         ],
       ),
@@ -47,14 +48,14 @@ class CustomButton extends StatelessWidget {
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
+            borderRadius: BorderRadius.circular(borderRadius ?? 30.r),
           ),
         ),
         child: isLoading
-            ? const SizedBox(
-          width: 20,
-          height: 20,
-          child: CircularProgressIndicator(
+            ? SizedBox(
+          width: 20.w,
+          height: 20.w,
+          child: const CircularProgressIndicator(
             color: Colors.white,
             strokeWidth: 2,
           ),
@@ -63,13 +64,13 @@ class CustomButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (icon != null) ...[
-              Icon(icon, color: textColor ?? Colors.white),
-              const SizedBox(width: 8),
+              Icon(icon, color: textColor ?? Colors.white, size: 24.sp),
+              SizedBox(width: 8.w),
             ],
             Text(
               text,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
                 color: textColor ?? Colors.white,
               ),
@@ -86,8 +87,8 @@ class CustomOutlineButton extends StatelessWidget {
   final VoidCallback onPressed;
   final Color? borderColor;
   final Color? textColor;
-  final double height;
-  final double borderRadius;
+  final double? height;
+  final double? borderRadius;
   final IconData? icon;
 
   const CustomOutlineButton({
@@ -96,21 +97,21 @@ class CustomOutlineButton extends StatelessWidget {
     required this.onPressed,
     this.borderColor,
     this.textColor,
-    this.height = 55,
-    this.borderRadius = 30,
+    this.height,
+    this.borderRadius,
     this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height,
+      height: height ?? 55.h,
       decoration: BoxDecoration(
         border: Border.all(
           color: borderColor ?? AppColors.primaryGreen,
-          width: 2,
+          width: 2.w,
         ),
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: BorderRadius.circular(borderRadius ?? 30.r),
       ),
       child: ElevatedButton(
         onPressed: onPressed,
@@ -118,20 +119,20 @@ class CustomOutlineButton extends StatelessWidget {
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
+            borderRadius: BorderRadius.circular(borderRadius ?? 30.r),
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (icon != null) ...[
-              Icon(icon, color: textColor ?? AppColors.primaryGreen),
-              const SizedBox(width: 8),
+              Icon(icon, color: textColor ?? AppColors.primaryGreen, size: 24.sp),
+              SizedBox(width: 8.w),
             ],
             Text(
               text,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
                 color: textColor ?? AppColors.primaryGreen,
               ),

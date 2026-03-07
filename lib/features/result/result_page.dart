@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ResultPage extends StatelessWidget {
   final bool isSuccess;
@@ -34,14 +35,20 @@ class ResultPage extends StatelessWidget {
           ),
         ),
         child: Center(
-          child: ResultCard(
-            isSuccess: isSuccess,
-            message: message,
-            color: color,
-            bgColor: bgColor,
-            title: title,
-            buttonText: buttonText,
-            onButtonPressed: onButtonPressed,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.h),
+              child: ResultCard(
+                isSuccess: isSuccess,
+                message: message,
+                color: color,
+                bgColor: bgColor,
+                title: title,
+                buttonText: buttonText,
+                onButtonPressed: onButtonPressed,
+              ),
+            ),
           ),
         ),
       ),
@@ -72,16 +79,16 @@ class ResultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 280,
-      padding: const EdgeInsets.all(24),
+      width: 300.w,
+      padding: EdgeInsets.all(24.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 50,
-            offset: const Offset(0, 10),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 30.r,
+            offset: Offset(0, 10.h),
           ),
         ],
       ),
@@ -89,34 +96,34 @@ class ResultCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            height: 20,
+            height: 20.h,
             child: Stack(
               children: [
                 ...List.generate(12, (i) => _buildDecorativeIcon(i, color)),
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
           Text(
             title,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 22.sp,
               fontWeight: FontWeight.bold,
               color: Colors.grey[800],
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           Container(
-            width: 120,
-            height: 120,
+            width: 100.w,
+            height: 100.w,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: bgColor,
             ),
             child: Center(
               child: Container(
-                width: 80,
-                height: 80,
+                width: 70.w,
+                height: 70.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: color,
@@ -124,38 +131,38 @@ class ResultCard extends StatelessWidget {
                 child: Icon(
                   isSuccess ? Icons.check : Icons.close,
                   color: Colors.white,
-                  size: 48,
+                  size: 40.sp,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           Text(
             message,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 14.sp,
               color: Colors.grey[600],
               height: 1.5,
             ),
           ),
-          const SizedBox(height: 40),
+          SizedBox(height: 30.h),
           SizedBox(
             width: double.infinity,
-            height: 50,
+            height: 50.h,
             child: ElevatedButton(
               onPressed: onButtonPressed,
               style: ElevatedButton.styleFrom(
                 backgroundColor: color,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
                 elevation: 0,
               ),
               child: Text(
                 buttonText,
-                style: const TextStyle(
-                  fontSize: 16,
+                style: TextStyle(
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -175,18 +182,18 @@ class ResultCard extends StatelessWidget {
       Icons.change_history_outlined,
     ];
     final positions = [
-      const Offset(10, 10),
-      const Offset(50, 5),
-      const Offset(90, 15),
-      const Offset(130, 8),
-      const Offset(170, 20),
-      const Offset(210, 12),
-      const Offset(5, 45),
-      const Offset(220, 50),
-      const Offset(30, 55),
-      const Offset(150, 48),
-      const Offset(70, 40),
-      const Offset(190, 42),
+      Offset(10.w, 10.h),
+      Offset(50.w, 5.h),
+      Offset(90.w, 15.h),
+      Offset(130.w, 8.h),
+      Offset(170.w, 20.h),
+      Offset(210.w, 12.h),
+      Offset(5.w, 45.h),
+      Offset(220.w, 50.h),
+      Offset(30.w, 55.h),
+      Offset(150.w, 48.h),
+      Offset(70.w, 40.h),
+      Offset(190.w, 42.h),
     ];
     final opacities = [0.4, 0.25, 0.35, 0.3, 0.4, 0.28, 0.32, 0.38, 0.26, 0.33, 0.29, 0.36];
 
@@ -195,8 +202,8 @@ class ResultCard extends StatelessWidget {
       top: positions[index].dy,
       child: Icon(
         icons[index % icons.length],
-        color: color.withValues(alpha: opacities[index]),
-        size: 16,
+        color: color.withOpacity(opacities[index]),
+        size: 14.sp,
       ),
     );
   }

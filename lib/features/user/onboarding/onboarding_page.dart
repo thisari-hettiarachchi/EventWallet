@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../auth/welcome_back.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -135,34 +136,34 @@ class _OnboardingPageState extends State<OnboardingPage>
           children: [
             // Decorative shapes
             Positioned(
-              top: -80,
-              right: -80,
+              top: -80.h,
+              right: -80.w,
               child: Container(
-                width: 200,
-                height: 200,
+                width: 180.w,
+                height: 180.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFF1565C0).withValues(alpha: 0.3),
-                      const Color(0xFF00897B).withValues(alpha: 0.3),
+                      const Color(0xFF1565C0).withOpacity(0.3),
+                      const Color(0xFF00897B).withOpacity(0.3),
                     ],
                   ),
                 ),
               ),
             ),
             Positioned(
-              bottom: -100,
-              left: -100,
+              bottom: -100.h,
+              left: -100.w,
               child: Container(
-                width: 250,
-                height: 250,
+                width: 220.w,
+                height: 220.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFF00897B).withValues(alpha: 0.2),
-                      const Color(0xFF1565C0).withValues(alpha: 0.2),
+                      const Color(0xFF00897B).withOpacity(0.2),
+                      const Color(0xFF1565C0).withOpacity(0.2),
                     ],
                   ),
                 ),
@@ -171,8 +172,6 @@ class _OnboardingPageState extends State<OnboardingPage>
 
             Column(
               children: [
-                const SizedBox(height: 20),
-
                 Expanded(
                   child: PageView.builder(
                     controller: _controller,
@@ -187,23 +186,21 @@ class _OnboardingPageState extends State<OnboardingPage>
                         child: SlideTransition(
                           position: _slideAnimation,
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 32),
+                            padding: EdgeInsets.symmetric(horizontal: 32.w),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const SizedBox(height: 20),
-
-                                // Image container with gradient border
+                                // Reduced image size
                                 Image.asset(
                                   onboardingData[index]['image']!,
-                                  width: 300,
-                                  height: 300,
+                                  width: 200.w,
+                                  height: 200.w,
                                   fit: BoxFit.contain,
                                 ),
 
-                                const SizedBox(height: 60),
+                                SizedBox(height: 30.h),
 
-                                // Title with gradient
+                                // Reduced title font size
                                 ShaderMask(
                                   shaderCallback: (bounds) => const LinearGradient(
                                     colors: [
@@ -214,37 +211,32 @@ class _OnboardingPageState extends State<OnboardingPage>
                                   child: Text(
                                     onboardingData[index]['title']!,
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontSize: 32,
+                                    style: TextStyle(
+                                      fontSize: 24.sp,
                                       fontWeight: FontWeight.w900,
                                       color: Colors.white,
-                                      letterSpacing: 0.5,
+                                      letterSpacing: 0.5.w,
                                       height: 1.2,
                                     ),
                                   ),
                                 ),
 
-                                const SizedBox(height: 20),
+                                SizedBox(height: 12.h),
 
-                                // Subtitle
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 12,
-                                  ),
+                                // Reduced subtitle font size
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 20.w),
                                   child: Text(
                                     onboardingData[index]['subtitle']!,
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      color: Color(0xFF4A5568),
+                                    style: TextStyle(
+                                      fontSize: 13.sp,
+                                      color: const Color(0xFF4A5568),
                                       fontWeight: FontWeight.w500,
-                                      height: 1.5,
+                                      height: 1.4,
                                     ),
                                   ),
                                 ),
-
-                                const SizedBox(height: 40),
                               ],
                             ),
                           ),
@@ -254,18 +246,18 @@ class _OnboardingPageState extends State<OnboardingPage>
                   ),
                 ),
 
-                // Page indicators - Modern dots
+                // Page indicators
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
+                  padding: EdgeInsets.only(bottom: 16.h),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
                       onboardingData.length,
                           (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        height: 10,
-                        width: _currentIndex == index ? 30 : 10,
+                        margin: EdgeInsets.symmetric(horizontal: 4.w),
+                        height: 6.h,
+                        width: _currentIndex == index ? 20.w : 6.w,
                         decoration: BoxDecoration(
                           gradient: _currentIndex == index
                               ? const LinearGradient(
@@ -278,16 +270,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                           color: _currentIndex == index
                               ? null
                               : Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: _currentIndex == index
-                              ? [
-                            BoxShadow(
-                              color: const Color(0xFF00897B).withValues(alpha: 0.4),
-                              blurRadius: 8,
-                              spreadRadius: 1,
-                            ),
-                          ]
-                              : null,
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                       ),
                     ),
@@ -296,46 +279,38 @@ class _OnboardingPageState extends State<OnboardingPage>
 
                 // Navigation buttons
                 Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
                   child: Row(
                     children: [
                       // Back button
                       if (_currentIndex > 0)
                         Container(
-                          width: 60,
-                          height: 60,
+                          width: 48.w,
+                          height: 48.w,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: const Color(0xFF00897B).withValues(alpha: 0.3),
-                              width: 2,
+                              color: const Color(0xFF00897B).withOpacity(0.3),
+                              width: 1.5.w,
                             ),
                             color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF00897B).withValues(alpha: 0.1),
-                                blurRadius: 10,
-                                spreadRadius: 2,
-                              ),
-                            ],
                           ),
                           child: IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.arrow_back_ios_new_rounded,
-                              color: Color(0xFF00897B),
-                              size: 20,
+                              color: const Color(0xFF00897B),
+                              size: 16.sp,
                             ),
                             onPressed: _back,
                           ),
                         ),
 
-                      const SizedBox(width: 12),
+                      if (_currentIndex > 0) SizedBox(width: 12.w),
 
-                      // Next/Get Started button
+                      // Next button
                       Expanded(
                         child: Container(
-                          height: 60,
+                          height: 50.h,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
                               colors: [
@@ -343,12 +318,12 @@ class _OnboardingPageState extends State<OnboardingPage>
                                 Color(0xFF1565C0),
                               ],
                             ),
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(25.r),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF00897B).withValues(alpha: 0.4),
-                                blurRadius: 20,
-                                offset: const Offset(0, 8),
+                                color: const Color(0xFF00897B).withOpacity(0.2),
+                                blurRadius: 10.r,
+                                offset: Offset(0, 4.h),
                               ),
                             ],
                           ),
@@ -359,7 +334,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
+                                borderRadius: BorderRadius.circular(25.r),
                               ),
                             ),
                             child: Row(
@@ -369,18 +344,18 @@ class _OnboardingPageState extends State<OnboardingPage>
                                   _currentIndex == onboardingData.length - 1
                                       ? 'Get Started'
                                       : 'Next',
-                                  style: const TextStyle(
-                                    fontSize: 18,
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
-                                    letterSpacing: 1,
+                                    letterSpacing: 0.5.w,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                const Icon(
+                                SizedBox(width: 6.w),
+                                Icon(
                                   Icons.arrow_forward_rounded,
                                   color: Colors.white,
-                                  size: 24,
+                                  size: 18.sp,
                                 ),
                               ],
                             ),
@@ -393,68 +368,38 @@ class _OnboardingPageState extends State<OnboardingPage>
               ],
             ),
 
-            // Skip button - top right
+            // Skip button
             Positioned(
-              top: 10,
-              right: 10,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: const Color(0xFF00897B).withValues(alpha: 0.2),
-                    width: 1.5,
+              top: 10.h,
+              right: 10.w,
+              child: TextButton(
+                onPressed: _skip,
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                  backgroundColor: Colors.white.withOpacity(0.8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.r),
+                    side: BorderSide(color: const Color(0xFF00897B).withOpacity(0.2)),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF00897B).withValues(alpha: 0.1),
-                      blurRadius: 8,
-                      spreadRadius: 1,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Skip',
+                      style: TextStyle(
+                        color: const Color(0xFF00897B),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12.sp,
+                      ),
+                    ),
+                    SizedBox(width: 4.w),
+                    Icon(
+                      Icons.double_arrow_rounded,
+                      color: const Color(0xFF00897B),
+                      size: 14.sp,
                     ),
                   ],
-                ),
-                child: TextButton(
-                  onPressed: _skip,
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [
-                            Color(0xFF00897B),
-                            Color(0xFF1565C0),
-                          ],
-                        ).createShader(bounds),
-                        child: const Text(
-                          'Skip',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [
-                            Color(0xFF00897B),
-                            Color(0xFF1565C0),
-                          ],
-                        ).createShader(bounds),
-                        child: const Icon(
-                          Icons.double_arrow_rounded,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ),

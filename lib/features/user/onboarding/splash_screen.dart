@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../onboarding/onboarding_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../home/home.dart';
 import '../../service_provider/dashboard/dashboard.dart';
 
@@ -128,38 +129,42 @@ class _SplashScreenState extends State<SplashScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(16.r),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: Colors.white.withOpacity(0.2),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.white.withValues(alpha: 0.3),
-                          blurRadius: 30,
-                          spreadRadius: 10,
+                          color: Colors.white.withOpacity(0.3),
+                          blurRadius: 20.r,
+                          spreadRadius: 5.r,
                         ),
                       ],
                     ),
                     child: Image.asset(
                       'assets/images/logo.png',
-                      width: 100,
-                      height: 100,
+                      width: 80.w,
+                      height: 80.w,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  const Text(
+                  SizedBox(height: 16.h),
+                  Text(
                     'EventWallet',
                     style: TextStyle(
-                      fontSize: 36,
+                      fontSize: 32.sp,
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
-                      letterSpacing: 2,
+                      letterSpacing: 2.w,
                     ),
                   ),
-                  const SizedBox(height: 30),
-                  const CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 3,
+                  SizedBox(height: 24.h),
+                  SizedBox(
+                    width: 24.w,
+                    height: 24.w,
+                    child: const CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 3,
+                    ),
                   ),
                 ],
               ),
