@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/provider_bottom_nav.dart';
+import '../../../services/booking_service.dart';
 
 class ServiceProviderBookingsPage extends StatefulWidget {
   const ServiceProviderBookingsPage({super.key});
@@ -34,17 +35,22 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
   }
 
   Future<void> _updateBookingStatus(String bookingId, String status) async {
+    final normalizedStatus = BookingStatuses.normalize(status);
+
     try {
       await FirebaseFirestore.instance
           .collection('bookings')
           .doc(bookingId)
-          .update({'status': status});
-      
+          .update({
+        'status': normalizedStatus,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Booking $status successfully', style: TextStyle(fontSize: 14.sp)),
-            backgroundColor: status == 'confirmed' ? const Color(0xFF00897B) : Colors.red,
+            content: Text('Booking ${BookingStatuses.label(normalizedStatus).toLowerCase()} successfully', style: TextStyle(fontSize: 14.sp)),
+            backgroundColor: _getStatusColor(normalizedStatus),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
           ),
@@ -54,7 +60,7 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e', style: TextStyle(fontSize: 14.sp)), 
+            content: Text('Error: $e', style: TextStyle(fontSize: 14.sp)),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
           ),
@@ -106,16 +112,16 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                           labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
                           tabs: const [
                             Tab(text: 'Pending'),
-                            Tab(text: 'Confirmed'),
+                            Tab(text: 'Accepted'),
                             Tab(text: 'History'),
                           ],
                         ),
                         Expanded(
                           child: TabBarView(
                             children: [
-                              _buildBookingList('pending'),
-                              _buildBookingList('confirmed'),
-                              _buildBookingList('completed', otherStatus: 'cancelled'),
+                              _buildBookingList(BookingStatuses.pending),
+                              _buildBookingList(BookingStatuses.accepted),
+                              _buildBookingList(BookingStatuses.completed, otherStatus: BookingStatuses.rejected),
                             ],
                           ),
                         ),
@@ -155,24 +161,36 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
   }
 
   Widget _buildBookingList(String status, {String? otherStatus}) {
-    Query query = FirebaseFirestore.instance
-        .collection('bookings')
-        .where('providerId', isEqualTo: user!.uid);
-
-    if (otherStatus != null) {
-      query = query.where('status', whereIn: [status, otherStatus]);
-    } else {
-      query = query.where('status', isEqualTo: status);
-    }
+    final statusFilters = {
+      ...BookingStatuses.aliasesFor(status),
+      if (otherStatus != null) ...BookingStatuses.aliasesFor(otherStatus),
+    }.toList();
 
     return StreamBuilder<QuerySnapshot>(
-      stream: query.orderBy('eventDate', descending: false).snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('bookings')
+          .where('providerId', isEqualTo: user!.uid)
+          .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator(color: Color(0xFF00897B)));
         }
 
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+        final docs = (snapshot.data?.docs ?? const <QueryDocumentSnapshot>[])
+            .where((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return statusFilters.contains(BookingStatuses.normalize(data['status']));
+            })
+            .toList()
+          ..sort((a, b) {
+            final aData = a.data() as Map<String, dynamic>;
+            final bData = b.data() as Map<String, dynamic>;
+            final aDate = bookingEventDateFromMap(aData) ?? DateTime.fromMillisecondsSinceEpoch(0);
+            final bDate = bookingEventDateFromMap(bData) ?? DateTime.fromMillisecondsSinceEpoch(0);
+            return aDate.compareTo(bDate);
+          });
+
+        if (docs.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -180,8 +198,8 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                 Icon(Icons.event_busy, size: 80.sp, color: Colors.grey[300]),
                 SizedBox(height: 16.h),
                 Text(
-                  'No ${status.toLowerCase()} bookings', 
-                  style: TextStyle(color: Colors.grey, fontSize: 16.sp, fontWeight: FontWeight.w500)
+                  'No ${BookingStatuses.label(status).toLowerCase()} bookings',
+                  style: TextStyle(color: Colors.grey, fontSize: 16.sp, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -191,9 +209,9 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
         return ListView.builder(
           padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 100.h),
           physics: const BouncingScrollPhysics(),
-          itemCount: snapshot.data!.docs.length,
+          itemCount: docs.length,
           itemBuilder: (context, index) {
-            final doc = snapshot.data!.docs[index];
+            final doc = docs[index];
             final data = doc.data() as Map<String, dynamic>;
             return _buildBookingCard(doc.id, data);
           },
@@ -203,9 +221,11 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
   }
 
   Widget _buildBookingCard(String id, Map<String, dynamic> data) {
-    final DateTime eventDate = (data['eventDate'] as Timestamp).toDate();
-    final String status = data['status'] ?? 'pending';
-    
+    final DateTime? eventDate = bookingEventDateFromMap(data);
+    final String status = BookingStatuses.normalize(data['status']);
+    final double amount = bookingAmountFrom(data['amount']);
+    final String packageName = bookingPackageNameFrom(data);
+
     return Container(
       margin: EdgeInsets.only(bottom: 20.h),
       decoration: BoxDecoration(
@@ -213,7 +233,7 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
         borderRadius: BorderRadius.circular(24.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 15.r,
             offset: Offset(0, 5.h),
           ),
@@ -224,7 +244,6 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Status Strip
             Container(
               height: 4.h,
               width: double.infinity,
@@ -240,9 +259,9 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                     children: [
                       Expanded(
                         child: Text(
-                          data['eventName'] ?? 'Special Event',
+                          bookingEventNameFrom(data),
                           style: TextStyle(
-                            fontSize: 20.sp, 
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.w800,
                             color: const Color(0xFF1A1F36),
                           ),
@@ -252,21 +271,27 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                     ],
                   ),
                   SizedBox(height: 16.h),
-                  _buildInfoTile(Icons.person, 'Client', data['clientName'] ?? 'N/A', const Color(0xFF1565C0)),
-                  _buildInfoTile(Icons.calendar_today, 'Date', _formatDate(eventDate), const Color(0xFF00897B)),
-                  _buildInfoTile(Icons.location_on, 'Location', data['location'] ?? 'Not specified', Colors.orange),
-                  _buildInfoTile(Icons.category, 'Event Type', data['eventType'] ?? 'N/A', Colors.purple),
-                  
+                  _buildInfoTile(Icons.person, 'Client', bookingClientNameFrom(data), const Color(0xFF1565C0)),
+                  _buildInfoTile(
+                    Icons.calendar_today,
+                    'Date',
+                    eventDate != null ? _formatDate(eventDate) : 'Date not set',
+                    const Color(0xFF00897B),
+                  ),
+                  _buildInfoTile(Icons.location_on, 'Location', bookingLocationFrom(data), Colors.orange),
+                  _buildInfoTile(Icons.category, 'Event Type', firstNonEmpty([data['eventType']], fallback: 'N/A'), Colors.purple),
+                  _buildInfoTile(Icons.inventory_2_outlined, 'Package', packageName, const Color(0xFF00897B)),
+
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 16.h),
                     child: const Divider(height: 1),
                   ),
-                  
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Total Revenue',
+                        'Amount Selected',
                         style: TextStyle(
                           color: const Color(0xFF4A5568),
                           fontSize: 14.sp,
@@ -274,7 +299,7 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                         ),
                       ),
                       Text(
-                        '\$${(data['amount'] ?? 0).toStringAsFixed(2)}',
+                        amount > 0 ? '\$${amount.toStringAsFixed(2)}' : 'TBD',
                         style: TextStyle(
                           fontSize: 22.sp,
                           fontWeight: FontWeight.w800,
@@ -286,64 +311,128 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                 ],
               ),
             ),
-            if (status == 'pending')
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  border: Border(top: BorderSide(color: Colors.grey[200]!)),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => _updateBookingStatus(id, 'cancelled'),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.h),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.close, size: 20.sp, color: Colors.red[700]),
-                                SizedBox(width: 8.w),
-                                Text(
-                                  'Decline', 
-                                  style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.w700, fontSize: 14.sp),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(width: 1.w, height: 30.h, color: Colors.grey[300]),
-                    Expanded(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => _updateBookingStatus(id, 'confirmed'),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.h),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.check, size: 20.sp, color: const Color(0xFF00897B)),
-                                SizedBox(width: 8.w),
-                                Text(
-                                  'Approve', 
-                                  style: TextStyle(color: const Color(0xFF00897B), fontWeight: FontWeight.w700, fontSize: 14.sp),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            if (status == BookingStatuses.pending)
+              _buildPendingActions(id)
+            else if (status == BookingStatuses.accepted)
+              _buildAcceptedActions(id),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPendingActions(String id) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        border: Border(top: BorderSide(color: Colors.grey[200]!)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _updateBookingStatus(id, BookingStatuses.rejected),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.close, size: 20.sp, color: Colors.red[700]),
+                      SizedBox(width: 8.w),
+                      Text(
+                        'Reject',
+                        style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.w700, fontSize: 14.sp),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Container(width: 1.w, height: 30.h, color: Colors.grey[300]),
+          Expanded(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _updateBookingStatus(id, BookingStatuses.accepted),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check, size: 20.sp, color: const Color(0xFF00897B)),
+                      SizedBox(width: 8.w),
+                      Text(
+                        'Accept',
+                        style: TextStyle(color: const Color(0xFF00897B), fontWeight: FontWeight.w700, fontSize: 14.sp),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAcceptedActions(String id) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        border: Border(top: BorderSide(color: Colors.grey[200]!)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _updateBookingStatus(id, BookingStatuses.rejected),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.cancel_outlined, size: 20.sp, color: Colors.red[700]),
+                      SizedBox(width: 8.w),
+                      Text(
+                        'Cancel',
+                        style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.w700, fontSize: 14.sp),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Container(width: 1.w, height: 30.h, color: Colors.grey[300]),
+          Expanded(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _updateBookingStatus(id, BookingStatuses.completed),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.task_alt, size: 20.sp, color: const Color(0xFF1565C0)),
+                      SizedBox(width: 8.w),
+                      Text(
+                        'Complete',
+                        style: TextStyle(color: const Color(0xFF1565C0), fontWeight: FontWeight.w700, fontSize: 14.sp),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -356,7 +445,7 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
           Container(
             padding: EdgeInsets.all(8.r),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: Icon(icon, size: 18.sp, color: color),
@@ -373,11 +462,11 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                 Text(
                   value,
                   style: TextStyle(
-                    color: const Color(0xFF1A1F36), 
-                    fontSize: 14.sp, 
+                    color: const Color(0xFF1A1F36),
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
                   ),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -389,26 +478,31 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
   }
 
   Color _getStatusColor(String status) {
-    switch (status) {
-      case 'confirmed': return const Color(0xFF00897B);
-      case 'cancelled': return Colors.red;
-      case 'completed': return const Color(0xFF1565C0);
-      default: return Colors.orange;
+    switch (BookingStatuses.normalize(status)) {
+      case BookingStatuses.accepted:
+        return const Color(0xFF00897B);
+      case BookingStatuses.rejected:
+        return Colors.red;
+      case BookingStatuses.completed:
+        return const Color(0xFF1565C0);
+      case BookingStatuses.pending:
+      default:
+        return Colors.orange;
     }
   }
 
   Widget _buildStatusBadge(String status) {
     final color = _getStatusColor(status);
-    
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(
-        status.toUpperCase(),
+        BookingStatuses.label(status).toUpperCase(),
         style: TextStyle(color: color, fontSize: 11.sp, fontWeight: FontWeight.w800, letterSpacing: 0.5.w),
       ),
     );
