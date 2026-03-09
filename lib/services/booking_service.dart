@@ -92,6 +92,15 @@ String bookingClientNameFrom(Map<String, dynamic> data) {
   ], fallback: 'Client');
 }
 
+String bookingProviderNameFrom(Map<String, dynamic> data) {
+  final providerData = data['providerData'];
+  return firstNonEmpty([
+    data['providerName'],
+    providerData is Map<String, dynamic> ? providerData['businessName'] : null,
+    providerData is Map ? providerData['businessName'] : null,
+  ], fallback: 'Service Provider');
+}
+
 String bookingLocationFrom(Map<String, dynamic> data) {
   return firstNonEmpty([
     data['location'],
@@ -107,6 +116,30 @@ String bookingPackageNameFrom(Map<String, dynamic> data) {
     data['packageName'],
     data['providerType'],
   ], fallback: 'Custom Package');
+}
+
+bool bookingWasCancelled(Map<String, dynamic> data) {
+  final rawStatus = data['status']?.toString().trim().toLowerCase();
+  final normalizedStatus = BookingStatuses.normalize(rawStatus);
+  final statusReason = data['statusReason']?.toString().trim().toLowerCase();
+  final cancelledBy = data['cancelledBy']?.toString().trim().toLowerCase();
+
+  if (rawStatus == 'cancelled') return true;
+  if (normalizedStatus != BookingStatuses.rejected) return false;
+  if (statusReason == 'cancelled') return true;
+  if ((cancelledBy ?? '').isNotEmpty) return true;
+  return false;
+}
+
+String bookingStatusLabelFrom(Map<String, dynamic> data) {
+  if (bookingWasCancelled(data)) return 'Cancelled';
+  return BookingStatuses.label(data['status']);
+}
+
+bool bookingCanBeCancelledByUser(Map<String, dynamic> data) {
+  final normalizedStatus = BookingStatuses.normalize(data['status']);
+  return normalizedStatus == BookingStatuses.pending ||
+      normalizedStatus == BookingStatuses.accepted;
 }
 
 Map<String, dynamic> buildBookingPayload({
@@ -151,4 +184,3 @@ Map<String, dynamic> buildBookingPayload({
     if (providerData != null) 'providerData': providerData,
   };
 }
-

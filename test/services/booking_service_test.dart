@@ -13,6 +13,14 @@ void main() {
       expect(BookingStatuses.normalize('completed'), BookingStatuses.completed);
     });
 
+    test('returns pending for null or unknown statuses', () {
+      expect(BookingStatuses.normalize(null), BookingStatuses.pending);
+      expect(
+        BookingStatuses.normalize('something-else'),
+        BookingStatuses.pending,
+      );
+    });
+
     test('returns stable display labels', () {
       expect(BookingStatuses.label('confirmed'), 'Accepted');
       expect(BookingStatuses.label('cancelled'), 'Rejected');
@@ -25,6 +33,72 @@ void main() {
       expect(bookingAmountFrom(89.5), 89.5);
       expect(bookingAmountFrom(r'$1,250.75'), 1250.75);
       expect(bookingAmountFrom(null), 0);
+    });
+
+    test('reads provider name from top-level and nested booking data', () {
+      expect(
+        bookingProviderNameFrom({'providerName': 'Dream Events'}),
+        'Dream Events',
+      );
+      expect(
+        bookingProviderNameFrom({
+          'providerData': {'businessName': 'Golden Moments'},
+        }),
+        'Golden Moments',
+      );
+      expect(bookingProviderNameFrom({}), 'Service Provider');
+    });
+
+    test('detects cancelled bookings and maps display labels', () {
+      expect(
+        bookingWasCancelled({
+          'status': BookingStatuses.rejected,
+          'cancelledBy': 'user',
+        }),
+        isTrue,
+      );
+      expect(bookingWasCancelled({'status': 'cancelled'}), isTrue);
+      expect(
+        bookingWasCancelled({
+          'status': BookingStatuses.accepted,
+          'cancelledBy': 'user',
+        }),
+        isFalse,
+      );
+      expect(
+        bookingStatusLabelFrom({
+          'status': BookingStatuses.rejected,
+          'cancelledBy': 'user',
+        }),
+        'Cancelled',
+      );
+      expect(
+        bookingStatusLabelFrom({
+          'status': BookingStatuses.accepted,
+          'cancelledBy': 'user',
+        }),
+        'Accepted',
+      );
+      expect(
+        bookingStatusLabelFrom({'status': BookingStatuses.rejected}),
+        'Rejected',
+      );
+    });
+
+    test('allows users to cancel only active bookings', () {
+      expect(
+        bookingCanBeCancelledByUser({'status': BookingStatuses.pending}),
+        isTrue,
+      );
+      expect(bookingCanBeCancelledByUser({'status': 'confirmed'}), isTrue);
+      expect(
+        bookingCanBeCancelledByUser({'status': BookingStatuses.rejected}),
+        isFalse,
+      );
+      expect(
+        bookingCanBeCancelledByUser({'status': BookingStatuses.completed}),
+        isFalse,
+      );
     });
 
     test('builds a normalized booking payload with required fields', () {
@@ -62,4 +136,3 @@ void main() {
     });
   });
 }
-

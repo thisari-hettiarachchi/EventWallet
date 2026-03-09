@@ -9,10 +9,13 @@ class ServiceProviderBookingsPage extends StatefulWidget {
   const ServiceProviderBookingsPage({super.key});
 
   @override
-  State<ServiceProviderBookingsPage> createState() => _ServiceProviderBookingsPageState();
+  State<ServiceProviderBookingsPage> createState() =>
+      _ServiceProviderBookingsPageState();
 }
 
-class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPage> with SingleTickerProviderStateMixin {
+class _ServiceProviderBookingsPageState
+    extends State<ServiceProviderBookingsPage>
+    with SingleTickerProviderStateMixin {
   final User? user = FirebaseAuth.instance.currentUser;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -24,7 +27,10 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
-    _fadeAnimation = CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
     _animationController.forward();
   }
 
@@ -34,25 +40,53 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
     super.dispose();
   }
 
-  Future<void> _updateBookingStatus(String bookingId, String status) async {
+  Future<void> _updateBookingStatus(
+    String bookingId,
+    String status, {
+    String? statusReason,
+    String? cancelledBy,
+  }) async {
     final normalizedStatus = BookingStatuses.normalize(status);
+
+    final updateData = <String, dynamic>{
+      'status': normalizedStatus,
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+
+    if (normalizedStatus == BookingStatuses.rejected) {
+      updateData['statusReason'] = statusReason ?? 'rejected';
+
+      if ((cancelledBy ?? '').isNotEmpty) {
+        updateData['cancelledBy'] = cancelledBy;
+        updateData['cancelledAt'] = FieldValue.serverTimestamp();
+      } else {
+        updateData['cancelledBy'] = FieldValue.delete();
+        updateData['cancelledAt'] = FieldValue.delete();
+      }
+    } else {
+      updateData['statusReason'] = FieldValue.delete();
+      updateData['cancelledBy'] = FieldValue.delete();
+      updateData['cancelledAt'] = FieldValue.delete();
+    }
 
     try {
       await FirebaseFirestore.instance
           .collection('bookings')
           .doc(bookingId)
-          .update({
-        'status': normalizedStatus,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+          .update(updateData);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Booking ${BookingStatuses.label(normalizedStatus).toLowerCase()} successfully', style: TextStyle(fontSize: 14.sp)),
+            content: Text(
+              'Booking ${BookingStatuses.label(normalizedStatus).toLowerCase()} successfully',
+              style: TextStyle(fontSize: 14.sp),
+            ),
             backgroundColor: _getStatusColor(normalizedStatus),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
           ),
         );
       }
@@ -71,7 +105,13 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
 
   @override
   Widget build(BuildContext context) {
-    if (user == null) return Scaffold(body: Center(child: Text('Please login', style: TextStyle(fontSize: 16.sp))));
+    if (user == null) {
+      return Scaffold(
+        body: Center(
+          child: Text('Please login', style: TextStyle(fontSize: 16.sp)),
+        ),
+      );
+    }
 
     return DefaultTabController(
       length: 3,
@@ -82,10 +122,7 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFF00897B),
-                Color(0xFF1565C0),
-              ],
+              colors: [Color(0xFF00897B), Color(0xFF1565C0)],
               stops: [0.0, 0.3],
             ),
           ),
@@ -98,7 +135,9 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                   child: Container(
                     decoration: BoxDecoration(
                       color: const Color(0xFFF5F7FA),
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(35.r),
+                      ),
                     ),
                     child: Column(
                       children: [
@@ -109,7 +148,10 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                           indicatorColor: const Color(0xFF00897B),
                           indicatorWeight: 3.h,
                           indicatorSize: TabBarIndicatorSize.label,
-                          labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                          labelStyle: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.sp,
+                          ),
                           tabs: const [
                             Tab(text: 'Pending'),
                             Tab(text: 'Accepted'),
@@ -121,7 +163,10 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                             children: [
                               _buildBookingList(BookingStatuses.pending),
                               _buildBookingList(BookingStatuses.accepted),
-                              _buildBookingList(BookingStatuses.completed, otherStatus: BookingStatuses.rejected),
+                              _buildBookingList(
+                                BookingStatuses.completed,
+                                otherStatus: BookingStatuses.rejected,
+                              ),
                             ],
                           ),
                         ),
@@ -173,22 +218,30 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: Color(0xFF00897B)));
+          return const Center(
+            child: CircularProgressIndicator(color: Color(0xFF00897B)),
+          );
         }
 
-        final docs = (snapshot.data?.docs ?? const <QueryDocumentSnapshot>[])
-            .where((doc) {
+        final docs =
+            (snapshot.data?.docs ?? const <QueryDocumentSnapshot>[]).where((
+              doc,
+            ) {
               final data = doc.data() as Map<String, dynamic>;
-              return statusFilters.contains(BookingStatuses.normalize(data['status']));
-            })
-            .toList()
-          ..sort((a, b) {
-            final aData = a.data() as Map<String, dynamic>;
-            final bData = b.data() as Map<String, dynamic>;
-            final aDate = bookingEventDateFromMap(aData) ?? DateTime.fromMillisecondsSinceEpoch(0);
-            final bDate = bookingEventDateFromMap(bData) ?? DateTime.fromMillisecondsSinceEpoch(0);
-            return aDate.compareTo(bDate);
-          });
+              return statusFilters.contains(
+                BookingStatuses.normalize(data['status']),
+              );
+            }).toList()..sort((a, b) {
+              final aData = a.data() as Map<String, dynamic>;
+              final bData = b.data() as Map<String, dynamic>;
+              final aDate =
+                  bookingEventDateFromMap(aData) ??
+                  DateTime.fromMillisecondsSinceEpoch(0);
+              final bDate =
+                  bookingEventDateFromMap(bData) ??
+                  DateTime.fromMillisecondsSinceEpoch(0);
+              return aDate.compareTo(bDate);
+            });
 
         if (docs.isEmpty) {
           return Center(
@@ -199,7 +252,11 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                 SizedBox(height: 16.h),
                 Text(
                   'No ${BookingStatuses.label(status).toLowerCase()} bookings',
-                  style: TextStyle(color: Colors.grey, fontSize: 16.sp, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
@@ -267,20 +324,40 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                           ),
                         ),
                       ),
-                      _buildStatusBadge(status),
+                      _buildStatusBadge(data),
                     ],
                   ),
                   SizedBox(height: 16.h),
-                  _buildInfoTile(Icons.person, 'Client', bookingClientNameFrom(data), const Color(0xFF1565C0)),
+                  _buildInfoTile(
+                    Icons.person,
+                    'Client',
+                    bookingClientNameFrom(data),
+                    const Color(0xFF1565C0),
+                  ),
                   _buildInfoTile(
                     Icons.calendar_today,
                     'Date',
                     eventDate != null ? _formatDate(eventDate) : 'Date not set',
                     const Color(0xFF00897B),
                   ),
-                  _buildInfoTile(Icons.location_on, 'Location', bookingLocationFrom(data), Colors.orange),
-                  _buildInfoTile(Icons.category, 'Event Type', firstNonEmpty([data['eventType']], fallback: 'N/A'), Colors.purple),
-                  _buildInfoTile(Icons.inventory_2_outlined, 'Package', packageName, const Color(0xFF00897B)),
+                  _buildInfoTile(
+                    Icons.location_on,
+                    'Location',
+                    bookingLocationFrom(data),
+                    Colors.orange,
+                  ),
+                  _buildInfoTile(
+                    Icons.category,
+                    'Event Type',
+                    firstNonEmpty([data['eventType']], fallback: 'N/A'),
+                    Colors.purple,
+                  ),
+                  _buildInfoTile(
+                    Icons.inventory_2_outlined,
+                    'Package',
+                    packageName,
+                    const Color(0xFF00897B),
+                  ),
 
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 16.h),
@@ -333,7 +410,11 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () => _updateBookingStatus(id, BookingStatuses.rejected),
+                onTap: () => _updateBookingStatus(
+                  id,
+                  BookingStatuses.rejected,
+                  statusReason: 'rejected',
+                ),
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                   child: Row(
@@ -343,7 +424,11 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                       SizedBox(width: 8.w),
                       Text(
                         'Reject',
-                        style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.w700, fontSize: 14.sp),
+                        style: TextStyle(
+                          color: Colors.red[700],
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14.sp,
+                        ),
                       ),
                     ],
                   ),
@@ -362,11 +447,19 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.check, size: 20.sp, color: const Color(0xFF00897B)),
+                      Icon(
+                        Icons.check,
+                        size: 20.sp,
+                        color: const Color(0xFF00897B),
+                      ),
                       SizedBox(width: 8.w),
                       Text(
                         'Accept',
-                        style: TextStyle(color: const Color(0xFF00897B), fontWeight: FontWeight.w700, fontSize: 14.sp),
+                        style: TextStyle(
+                          color: const Color(0xFF00897B),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14.sp,
+                        ),
                       ),
                     ],
                   ),
@@ -391,17 +484,30 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () => _updateBookingStatus(id, BookingStatuses.rejected),
+                onTap: () => _updateBookingStatus(
+                  id,
+                  BookingStatuses.rejected,
+                  statusReason: 'cancelled',
+                  cancelledBy: 'provider',
+                ),
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.cancel_outlined, size: 20.sp, color: Colors.red[700]),
+                      Icon(
+                        Icons.cancel_outlined,
+                        size: 20.sp,
+                        color: Colors.red[700],
+                      ),
                       SizedBox(width: 8.w),
                       Text(
                         'Cancel',
-                        style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.w700, fontSize: 14.sp),
+                        style: TextStyle(
+                          color: Colors.red[700],
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14.sp,
+                        ),
                       ),
                     ],
                   ),
@@ -414,17 +520,26 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () => _updateBookingStatus(id, BookingStatuses.completed),
+                onTap: () =>
+                    _updateBookingStatus(id, BookingStatuses.completed),
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.task_alt, size: 20.sp, color: const Color(0xFF1565C0)),
+                      Icon(
+                        Icons.task_alt,
+                        size: 20.sp,
+                        color: const Color(0xFF1565C0),
+                      ),
                       SizedBox(width: 8.w),
                       Text(
                         'Complete',
-                        style: TextStyle(color: const Color(0xFF1565C0), fontWeight: FontWeight.w700, fontSize: 14.sp),
+                        style: TextStyle(
+                          color: const Color(0xFF1565C0),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14.sp,
+                        ),
                       ),
                     ],
                   ),
@@ -437,7 +552,12 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
     );
   }
 
-  Widget _buildInfoTile(IconData icon, String label, String value, Color color) {
+  Widget _buildInfoTile(
+    IconData icon,
+    String label,
+    String value,
+    Color color,
+  ) {
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
       child: Row(
@@ -457,7 +577,11 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
               children: [
                 Text(
                   label,
-                  style: TextStyle(color: Colors.grey[500], fontSize: 11.sp, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 Text(
                   value,
@@ -491,7 +615,8 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
     }
   }
 
-  Widget _buildStatusBadge(String status) {
+  Widget _buildStatusBadge(Map<String, dynamic> data) {
+    final status = data['status']?.toString() ?? BookingStatuses.pending;
     final color = _getStatusColor(status);
 
     return Container(
@@ -502,14 +627,32 @@ class _ServiceProviderBookingsPageState extends State<ServiceProviderBookingsPag
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(
-        BookingStatuses.label(status).toUpperCase(),
-        style: TextStyle(color: color, fontSize: 11.sp, fontWeight: FontWeight.w800, letterSpacing: 0.5.w),
+        bookingStatusLabelFrom(data).toUpperCase(),
+        style: TextStyle(
+          color: color,
+          fontSize: 11.sp,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.5.w,
+        ),
       ),
     );
   }
 
   String _formatDate(DateTime date) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 }

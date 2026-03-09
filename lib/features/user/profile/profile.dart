@@ -9,6 +9,7 @@ import '../../../core/constants/colors.dart';
 import '../../../core/constants/styles.dart';
 import '../auth/login.dart';
 import '../../../services/auth_service.dart';
+import '../bookings/my_booking_requests.dart';
 import 'edit_profile.dart';
 import '../info/privacy.dart';
 import '../info/about.dart';
@@ -24,14 +25,14 @@ class ProfilePage extends StatelessWidget {
     if (user == null) {
       // If user is not signed in, redirect to login
       Future.microtask(() {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const LoginPage()),
-        );
+        if (context.mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const LoginPage()),
+          );
+        }
       });
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     // Fetch user data from Firestore - Check both 'users' and 'service_providers'
@@ -52,7 +53,7 @@ class ProfilePage extends StatelessWidget {
 
         final userData = snapshot.data!.data() as Map<String, dynamic>;
         final bool isServiceProvider = userData.containsKey('businessName');
-        final displayName = isServiceProvider 
+        final displayName = isServiceProvider
             ? userData['businessName'] ?? 'Service Provider'
             : userData['name'] ?? 'User';
         final email = userData['email'] ?? 'No email';
@@ -97,64 +98,70 @@ class ProfilePage extends StatelessWidget {
                   SizedBox(height: 16.h),
                   Text(
                     displayName,
-                    style: AppTextStyles.whiteText(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: AppTextStyles.whiteText(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: 4.h),
                   Text(
                     email,
-                    style: AppTextStyles.whiteText(fontSize: 15).copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
-                    ),
+                    style: AppTextStyles.whiteText(
+                      fontSize: 15,
+                    ).copyWith(color: Colors.white.withValues(alpha: 0.9)),
                   ),
                   SizedBox(height: 24.h),
-                  if (!isServiceProvider) Container(
-                    margin: AppSpacing.horizontalPadding,
-                    padding: EdgeInsets.all(20.r),
-                    decoration: AppDecorations.overlayButton.copyWith(
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.3),
-                        width: 1.5.w,
+                  if (!isServiceProvider)
+                    Container(
+                      margin: AppSpacing.horizontalPadding,
+                      padding: EdgeInsets.all(20.r),
+                      decoration: AppDecorations.overlayButton.copyWith(
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.3),
+                          width: 1.5.w,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          // Total Events
+                          _buildStatItem(
+                            'Total Events',
+                            userData['eventsCount'] != null
+                                ? userData['eventsCount'].toString()
+                                : '0',
+                          ),
+
+                          Container(
+                            width: 1.w,
+                            height: 40.h,
+                            color: Colors.white.withValues(alpha: 0.3),
+                          ),
+
+                          // Total Budget
+                          _buildStatItem(
+                            'Total Budget',
+                            userData['totalBudget'] != null
+                                ? '\$${userData['totalBudget'].toString()}'
+                                : '\$0',
+                          ),
+
+                          Container(
+                            width: 1.w,
+                            height: 40.h,
+                            color: Colors.white.withValues(alpha: 0.3),
+                          ),
+
+                          // Amount Spent
+                          _buildStatItem(
+                            'Amount Spent',
+                            userData['spent'] != null
+                                ? '\$${userData['spent'].toString()}'
+                                : '\$0',
+                          ),
+                        ],
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        // Total Events
-                        _buildStatItem(
-                          'Total Events',
-                          userData['eventsCount'] != null ? userData['eventsCount'].toString() : '0',
-                        ),
-
-                        Container(
-                          width: 1.w,
-                          height: 40.h,
-                          color: Colors.white.withValues(alpha: 0.3),
-                        ),
-
-                        // Total Budget
-                        _buildStatItem(
-                          'Total Budget',
-                          userData['totalBudget'] != null
-                              ? '\$${userData['totalBudget'].toString()}'
-                              : '\$0',
-                        ),
-
-                        Container(
-                          width: 1.w,
-                          height: 40.h,
-                          color: Colors.white.withValues(alpha: 0.3),
-                        ),
-
-                        // Amount Spent
-                        _buildStatItem(
-                          'Amount Spent',
-                          userData['spent'] != null
-                              ? '\$${userData['spent'].toString()}'
-                              : '\$0',
-                        ),
-                      ],
-                    ),
-                  ),
                   SizedBox(height: 20.h),
                   Expanded(
                     child: Container(
@@ -193,7 +200,25 @@ class ProfilePage extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const ManageEventsPage(),
+                                    builder: (context) =>
+                                        const ManageEventsPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                            SizedBox(height: 12.h),
+                            _buildSettingsCard(
+                              icon: Icons.receipt_long_outlined,
+                              title: 'My Booking Requests',
+                              subtitle:
+                                  'Track pending, accepted, rejected, and completed bookings',
+                              color: AppColors.primaryGreen,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const UserBookingStatusPage(),
                                   ),
                                 );
                               },
@@ -209,7 +234,8 @@ class ProfilePage extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const PrivacySecurityPage(),
+                                  builder: (context) =>
+                                      const PrivacySecurityPage(),
                                 ),
                               );
                             },
@@ -243,13 +269,15 @@ class ProfilePage extends StatelessWidget {
                             _buildSettingsCard(
                               icon: Icons.person_add_alt_1,
                               title: 'Become a Service Provider',
-                              subtitle: 'Offer your services for events and get bookings',
+                              subtitle:
+                                  'Offer your services for events and get bookings',
                               color: Colors.cyan.shade800,
                               onTap: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const ServiceProviderPage(),
+                                    builder: (context) =>
+                                        const ServiceProviderPage(),
                                   ),
                                 );
                               },
@@ -292,10 +320,15 @@ class ProfilePage extends StatelessWidget {
                                         padding: EdgeInsets.all(10.r),
                                         decoration: BoxDecoration(
                                           color: Colors.red.shade100,
-                                          borderRadius: BorderRadius.circular(10.r),
+                                          borderRadius: BorderRadius.circular(
+                                            10.r,
+                                          ),
                                         ),
-                                        child: Icon(Icons.logout,
-                                            color: Colors.red.shade700, size: 22.sp),
+                                        child: Icon(
+                                          Icons.logout,
+                                          color: Colors.red.shade700,
+                                          size: 22.sp,
+                                        ),
                                       ),
                                       SizedBox(width: 12.w),
                                       Expanded(
@@ -308,8 +341,11 @@ class ProfilePage extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      Icon(Icons.arrow_forward_ios,
-                                          color: Colors.red.shade400, size: 16.sp),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: Colors.red.shade400,
+                                        size: 16.sp,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -333,11 +369,17 @@ class ProfilePage extends StatelessWidget {
 
   Future<DocumentSnapshot> _getUserData(String uid) async {
     // Try to get from 'users' collection first
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
     if (userDoc.exists) return userDoc;
 
     // If not found, try 'service_providers' collection
-    return await FirebaseFirestore.instance.collection('service_providers').doc(uid).get();
+    return await FirebaseFirestore.instance
+        .collection('service_providers')
+        .doc(uid)
+        .get();
   }
 
   Widget _buildStatItem(String label, String value) {
@@ -345,14 +387,18 @@ class ProfilePage extends StatelessWidget {
       children: [
         Text(
           value,
-          style: AppTextStyles.whiteText(fontSize: 22, fontWeight: FontWeight.bold),
+          style: AppTextStyles.whiteText(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         SizedBox(height: 4.h),
         Text(
           label,
-          style: AppTextStyles.whiteText(fontSize: 13, fontWeight: FontWeight.w500).copyWith(
-            color: Colors.white.withValues(alpha: 0.9),
-          ),
+          style: AppTextStyles.whiteText(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ).copyWith(color: Colors.white.withValues(alpha: 0.9)),
         ),
       ],
     );
@@ -389,20 +435,17 @@ class ProfilePage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: AppTextStyles.bodyLarge,
-                      ),
+                      Text(title, style: AppTextStyles.bodyLarge),
                       SizedBox(height: 4.h),
-                      Text(
-                        subtitle,
-                        style: AppTextStyles.bodyMedium,
-                      ),
+                      Text(subtitle, style: AppTextStyles.bodyMedium),
                     ],
                   ),
                 ),
-                Icon(Icons.arrow_forward_ios,
-                    color: AppColors.textGrey, size: 16.sp),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: AppColors.textGrey,
+                  size: 16.sp,
+                ),
               ],
             ),
           ),
@@ -419,7 +462,10 @@ class ProfilePage extends StatelessWidget {
           'Logout',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
         ),
-        content: Text('Are you sure you want to logout?', style: TextStyle(fontSize: 14.sp)),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(fontSize: 14.sp),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -434,7 +480,7 @@ class ProfilePage extends StatelessWidget {
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (_) => const LoginPage()),
-                        (route) => false,
+                    (route) => false,
                   );
                 }
               } catch (e) {
@@ -451,7 +497,10 @@ class ProfilePage extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red.shade700,
             ),
-            child: Text('Logout', style: TextStyle(fontSize: 14.sp, color: Colors.white)),
+            child: Text(
+              'Logout',
+              style: TextStyle(fontSize: 14.sp, color: Colors.white),
+            ),
           ),
         ],
       ),

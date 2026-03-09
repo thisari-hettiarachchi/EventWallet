@@ -18,7 +18,8 @@ class ServiceProviderDashboard extends StatefulWidget {
   });
 
   @override
-  State<ServiceProviderDashboard> createState() => _ServiceProviderDashboardState();
+  State<ServiceProviderDashboard> createState() =>
+      _ServiceProviderDashboardState();
 }
 
 class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
@@ -46,7 +47,10 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
-    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
     _controller.forward();
 
     _fetchProviderData();
@@ -98,9 +102,12 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
         final data = doc.data();
         final amount = bookingAmountFrom(data['amount']);
         final status = BookingStatuses.normalize(data['status']);
-        final timestamp = bookingDateFrom(data['createdAt']) ?? bookingDateFrom(data['timestamp']);
+        final timestamp =
+            bookingDateFrom(data['createdAt']) ??
+            bookingDateFrom(data['timestamp']);
 
-        if (status == BookingStatuses.accepted || status == BookingStatuses.completed) {
+        if (status == BookingStatuses.accepted ||
+            status == BookingStatuses.completed) {
           totalRev += amount;
           if (timestamp != null && !timestamp.isBefore(monthStart)) {
             monthlyRev += amount;
@@ -134,8 +141,14 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
         ..sort((a, b) {
           final aData = a.data();
           final bData = b.data();
-          final aDate = bookingDateFrom(aData['createdAt']) ?? bookingEventDateFromMap(aData) ?? DateTime.fromMillisecondsSinceEpoch(0);
-          final bDate = bookingDateFrom(bData['createdAt']) ?? bookingEventDateFromMap(bData) ?? DateTime.fromMillisecondsSinceEpoch(0);
+          final aDate =
+              bookingDateFrom(aData['createdAt']) ??
+              bookingEventDateFromMap(aData) ??
+              DateTime.fromMillisecondsSinceEpoch(0);
+          final bDate =
+              bookingDateFrom(bData['createdAt']) ??
+              bookingEventDateFromMap(bData) ??
+              DateTime.fromMillisecondsSinceEpoch(0);
           return bDate.compareTo(aDate);
         });
 
@@ -157,19 +170,23 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       final today = DateTime.now();
       final startOfToday = DateTime(today.year, today.month, today.day);
 
-      final docs = snapshot.docs.where((doc) {
-        final data = doc.data();
-        final status = BookingStatuses.normalize(data['status']);
-        final eventDate = bookingEventDateFromMap(data);
-        return status == BookingStatuses.accepted &&
-            eventDate != null &&
-            !eventDate.isBefore(startOfToday);
-      }).toList()
-        ..sort((a, b) {
-          final aDate = bookingEventDateFromMap(a.data()) ?? DateTime.fromMillisecondsSinceEpoch(0);
-          final bDate = bookingEventDateFromMap(b.data()) ?? DateTime.fromMillisecondsSinceEpoch(0);
-          return aDate.compareTo(bDate);
-        });
+      final docs =
+          snapshot.docs.where((doc) {
+            final data = doc.data();
+            final status = BookingStatuses.normalize(data['status']);
+            final eventDate = bookingEventDateFromMap(data);
+            return status == BookingStatuses.accepted &&
+                eventDate != null &&
+                !eventDate.isBefore(startOfToday);
+          }).toList()..sort((a, b) {
+            final aDate =
+                bookingEventDateFromMap(a.data()) ??
+                DateTime.fromMillisecondsSinceEpoch(0);
+            final bDate =
+                bookingEventDateFromMap(b.data()) ??
+                DateTime.fromMillisecondsSinceEpoch(0);
+            return aDate.compareTo(bDate);
+          });
 
       setState(() {
         _upcomingEvents = docs.take(5).toList();
@@ -234,9 +251,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.primaryGradient,
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -246,7 +261,9 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                 child: Container(
                   decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(35.r),
+                    ),
                   ),
                   child: RefreshIndicator(
                     onRefresh: () async {
@@ -256,7 +273,10 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                       await _fetchUpcomingEvents();
                     },
                     child: ListView(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                        vertical: 24.h,
+                      ),
                       children: [
                         _buildRevenueOverview(),
                         SizedBox(height: 24.h),
@@ -334,11 +354,18 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                       width: 2.w,
                     ),
                     image: imageUrl.isNotEmpty
-                        ? DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover)
+                        ? DecorationImage(
+                            image: NetworkImage(imageUrl),
+                            fit: BoxFit.cover,
+                          )
                         : null,
                   ),
                   child: imageUrl.isEmpty
-                      ? Icon(_getProviderIcon(), color: Colors.white, size: 32.sp)
+                      ? Icon(
+                          _getProviderIcon(),
+                          color: Colors.white,
+                          size: 32.sp,
+                        )
                       : null,
                 ),
                 SizedBox(width: 16.w),
@@ -372,7 +399,11 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.settings_outlined, color: Colors.white, size: 28.sp),
+                  icon: Icon(
+                    Icons.settings_outlined,
+                    color: Colors.white,
+                    size: 28.sp,
+                  ),
                   onPressed: () {},
                 ),
               ],
@@ -548,7 +579,12 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
@@ -653,7 +689,12 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     );
   }
 
-  Widget _buildActionButton(String label, IconData icon, Color color, VoidCallback onTap) {
+  Widget _buildActionButton(
+    String label,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -805,7 +846,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Text(
-                  BookingStatuses.label(status).toUpperCase(),
+                  bookingStatusLabelFrom(data).toUpperCase(),
                   style: TextStyle(
                     color: statusColor,
                     fontSize: 11.sp,
@@ -823,12 +864,19 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               Expanded(
                 child: Row(
                   children: [
-                    Icon(Icons.calendar_today, size: 16.sp, color: Colors.grey[600]),
+                    Icon(
+                      Icons.calendar_today,
+                      size: 16.sp,
+                      color: Colors.grey[600],
+                    ),
                     SizedBox(width: 6.w),
                     Expanded(
                       child: Text(
                         _formatDate(bookingEventDateFromMap(data)),
-                        style: TextStyle(fontSize: 13.sp, color: Colors.grey[600]),
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color: Colors.grey[600],
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -931,7 +979,11 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                       ],
                     ),
                   ),
-                  Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16.sp),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                    size: 16.sp,
+                  ),
                 ],
               ),
             );
@@ -967,11 +1019,26 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           ),
           child: Column(
             children: [
-              _buildMetricRow('Completion Rate', '$completionRate%', Icons.check_circle, Colors.green),
+              _buildMetricRow(
+                'Completion Rate',
+                '$completionRate%',
+                Icons.check_circle,
+                Colors.green,
+              ),
               Divider(height: 24.h),
-              _buildMetricRow('Average Rating', _averageRating.toStringAsFixed(1), Icons.star, Colors.amber),
+              _buildMetricRow(
+                'Average Rating',
+                _averageRating.toStringAsFixed(1),
+                Icons.star,
+                Colors.amber,
+              ),
               Divider(height: 24.h),
-              _buildMetricRow('Total Reviews', _totalReviews.toString(), Icons.rate_review, AppColors.primaryBlue),
+              _buildMetricRow(
+                'Total Reviews',
+                _totalReviews.toString(),
+                Icons.rate_review,
+                AppColors.primaryBlue,
+              ),
             ],
           ),
         ),
@@ -979,7 +1046,12 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     );
   }
 
-  Widget _buildMetricRow(String label, String value, IconData icon, Color color) {
+  Widget _buildMetricRow(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Row(
       children: [
         Container(
@@ -1034,7 +1106,20 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     final date = bookingDateFrom(value);
     if (date == null) return 'Date not set';
 
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
