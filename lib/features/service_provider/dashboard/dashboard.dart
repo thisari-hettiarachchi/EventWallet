@@ -3,8 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/provider_bottom_nav.dart';
 import '../../../core/constants/colors.dart';
-import '../../../core/constants/styles.dart';
 import '../services/my_services.dart';
+import '../bookings/bookings.dart';
+import '../../../services/booking_service.dart';
+import 'all_reviews_page.dart';
+import 'notifications_page.dart';
 
 class ServiceProviderDashboard extends StatefulWidget {
   final String providerId;
@@ -17,7 +20,8 @@ class ServiceProviderDashboard extends StatefulWidget {
   });
 
   @override
-  State<ServiceProviderDashboard> createState() => _ServiceProviderDashboardState();
+  State<ServiceProviderDashboard> createState() =>
+      _ServiceProviderDashboardState();
 }
 
 class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
@@ -35,6 +39,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
 
   List<DocumentSnapshot> _recentBookings = [];
   List<DocumentSnapshot> _upcomingEvents = [];
+  List<DocumentSnapshot> _recentReviewsList = [];
   Map<String, dynamic>? _providerData;
 
   @override
@@ -45,19 +50,29 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
-    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
     _controller.forward();
 
-    _fetchProviderData();
-    _fetchBookingStats();
-    _fetchRecentBookings();
-    _fetchUpcomingEvents();
+    _fetchAllData();
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchAllData() async {
+    await Future.wait([
+      _fetchProviderData(),
+      _fetchBookingStats(),
+      _fetchRecentBookings(),
+      _fetchUpcomingEvents(),
+      _fetchRecentReviews(),
+    ]);
   }
 
   Future<void> _fetchProviderData() async {
@@ -70,8 +85,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       if (doc.exists) {
         setState(() {
           _providerData = doc.data();
-          _averageRating = (_providerData?['rating'] ?? 0).toDouble();
-          _totalReviews = (_providerData?['reviewCount'] ?? 0);
+          _averageRating = _doubleFrom(_providerData?['rating']);
+          _totalReviews = _intFrom(_providerData?['reviewCount']);
         });
       }
     } catch (e) {
@@ -95,17 +110,22 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
 
       for (var doc in snapshot.docs) {
         final data = doc.data();
-        final amount = (data['amount'] ?? 0).toDouble();
-        totalRev += amount;
+        final amount = bookingAmountFrom(data['amount']);
+        final status = BookingStatuses.normalize(data['status']);
+        final timestamp =
+            bookingDateFrom(data['createdAt']) ??
+            bookingDateFrom(data['timestamp']);
 
-        final timestamp = (data['createdAt'] as Timestamp?)?.toDate();
-        if (timestamp != null && timestamp.isAfter(monthStart)) {
-          monthlyRev += amount;
+        if (status == BookingStatuses.accepted ||
+            status == BookingStatuses.completed) {
+          totalRev += amount;
+          if (timestamp != null && !timestamp.isBefore(monthStart)) {
+            monthlyRev += amount;
+          }
         }
 
-        final status = data['status'] ?? '';
-        if (status == 'pending') pending++;
-        if (status == 'completed') completed++;
+        if (status == BookingStatuses.pending) pending++;
+        if (status == BookingStatuses.completed) completed++;
       }
 
       setState(() {
@@ -125,12 +145,25 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       final snapshot = await FirebaseFirestore.instance
           .collection('bookings')
           .where('providerId', isEqualTo: widget.providerId)
-          .orderBy('createdAt', descending: true)
-          .limit(5)
           .get();
 
+      final docs = snapshot.docs.toList()
+        ..sort((a, b) {
+          final aData = a.data();
+          final bData = b.data();
+          final aDate =
+              bookingDateFrom(aData['createdAt']) ??
+              bookingEventDateFromMap(aData) ??
+              DateTime.fromMillisecondsSinceEpoch(0);
+          final bDate =
+              bookingDateFrom(bData['createdAt']) ??
+              bookingEventDateFromMap(bData) ??
+              DateTime.fromMillisecondsSinceEpoch(0);
+          return bDate.compareTo(aDate);
+        });
+
       setState(() {
-        _recentBookings = snapshot.docs;
+        _recentBookings = docs.take(5).toList();
       });
     } catch (e) {
       debugPrint('Error fetching recent bookings: $e');
@@ -142,16 +175,52 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
       final snapshot = await FirebaseFirestore.instance
           .collection('bookings')
           .where('providerId', isEqualTo: widget.providerId)
-          .where('status', isEqualTo: 'confirmed')
-          .orderBy('eventDate')
-          .limit(5)
           .get();
 
+      final today = DateTime.now();
+      final startOfToday = DateTime(today.year, today.month, today.day);
+
+      final docs =
+          snapshot.docs.where((doc) {
+            final data = doc.data();
+            final status = BookingStatuses.normalize(data['status']);
+            final eventDate = bookingEventDateFromMap(data);
+            return status == BookingStatuses.accepted &&
+                eventDate != null &&
+                !eventDate.isBefore(startOfToday);
+          }).toList()..sort((a, b) {
+            final aDate =
+                bookingEventDateFromMap(a.data()) ??
+                DateTime.fromMillisecondsSinceEpoch(0);
+            final bDate =
+                bookingEventDateFromMap(b.data()) ??
+                DateTime.fromMillisecondsSinceEpoch(0);
+            return aDate.compareTo(bDate);
+          });
+
       setState(() {
-        _upcomingEvents = snapshot.docs;
+        _upcomingEvents = docs.take(5).toList();
       });
     } catch (e) {
       debugPrint('Error fetching upcoming events: $e');
+    }
+  }
+
+  Future<void> _fetchRecentReviews() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('service_providers')
+          .doc(widget.providerId)
+          .collection('reviews')
+          .orderBy('createdAt', descending: true)
+          .limit(3)
+          .get();
+
+      setState(() {
+        _recentReviewsList = snapshot.docs;
+      });
+    } catch (e) {
+      debugPrint('Error fetching reviews: $e');
     }
   }
 
@@ -198,14 +267,28 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     );
   }
 
+  void _navigateToBookings() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const ServiceProviderBookingsPage()),
+    );
+  }
+
+  void _viewAllReviews() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AllReviewsPage(providerId: widget.providerId),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.primaryGradient,
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -215,17 +298,17 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                 child: Container(
                   decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(35.r),
+                    ),
                   ),
                   child: RefreshIndicator(
-                    onRefresh: () async {
-                      await _fetchProviderData();
-                      await _fetchBookingStats();
-                      await _fetchRecentBookings();
-                      await _fetchUpcomingEvents();
-                    },
+                    onRefresh: _fetchAllData,
                     child: ListView(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                        vertical: 24.h,
+                      ),
                       children: [
                         _buildRevenueOverview(),
                         SizedBox(height: 24.h),
@@ -236,6 +319,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                         _buildRecentBookings(),
                         SizedBox(height: 28.h),
                         _buildUpcomingEvents(),
+                        SizedBox(height: 28.h),
+                        _buildRecentReviews(),
                         SizedBox(height: 28.h),
                         _buildPerformanceMetrics(),
                         SizedBox(height: 100.h),
@@ -254,7 +339,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           borderRadius: BorderRadius.circular(30.r),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primaryGreen.withOpacity(0.4),
+              color: AppColors.primaryGreen.withValues(alpha: 0.4),
               blurRadius: 16.r,
               offset: Offset(0, 8.h),
             ),
@@ -283,7 +368,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
   // ================= HEADER =================
   Widget _buildHeader() {
     final imageUrl = _providerData?['imageUrl'] ?? '';
-    
+
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
       child: FadeTransition(
@@ -296,19 +381,26 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                   width: 64.w,
                   height: 64.w,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(16.r),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                       width: 2.w,
                     ),
-                    image: imageUrl.isNotEmpty 
-                      ? DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover)
-                      : null,
+                    image: imageUrl.isNotEmpty
+                        ? DecorationImage(
+                            image: NetworkImage(imageUrl),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
                   ),
-                  child: imageUrl.isEmpty 
-                    ? Icon(_getProviderIcon(), color: Colors.white, size: 32.sp)
-                    : null,
+                  child: imageUrl.isEmpty
+                      ? Icon(
+                          _getProviderIcon(),
+                          color: Colors.white,
+                          size: 32.sp,
+                        )
+                      : null,
                 ),
                 SizedBox(width: 16.w),
                 Expanded(
@@ -330,7 +422,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                       Text(
                         _getProviderTitle(),
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                         ),
@@ -340,38 +432,105 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                     ],
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.settings_outlined, color: Colors.white, size: 28.sp),
-                  onPressed: () {},
-                ),
+                _buildNotificationIcon(),
               ],
             ),
             SizedBox(height: 16.h),
-            Row(
-              children: [
-                Icon(Icons.star, color: Colors.amber, size: 20.sp),
-                SizedBox(width: 6.w),
-                Text(
-                  _averageRating.toStringAsFixed(1),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w700,
+            GestureDetector(
+              onTap: _viewAllReviews,
+              child: Row(
+                children: [
+                  Icon(Icons.star, color: Colors.amber, size: 20.sp),
+                  SizedBox(width: 6.w),
+                  Text(
+                    _averageRating.toStringAsFixed(1),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                SizedBox(width: 4.w),
-                Text(
-                  '($_totalReviews reviews)',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 14.sp,
+                  SizedBox(width: 4.w),
+                  Text(
+                    '($_totalReviews reviews)',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 14.sp,
+                    ),
                   ),
-                ),
-              ],
+                  SizedBox(width: 4.w),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white70,
+                    size: 12.sp,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildNotificationIcon() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('service_providers')
+          .doc(widget.providerId)
+          .collection('notifications')
+          .where('isRead', isEqualTo: false)
+          .snapshots(),
+      builder: (context, snapshot) {
+        final unreadCount = snapshot.data?.docs.length ?? 0;
+
+        return Stack(
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.notifications_none_rounded,
+                color: Colors.white,
+                size: 28.sp,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ServiceProviderNotificationsPage(
+                      providerId: widget.providerId,
+                    ),
+                  ),
+                );
+              },
+            ),
+            if (unreadCount > 0)
+              Positioned(
+                right: 8.w,
+                top: 8.h,
+                child: Container(
+                  padding: EdgeInsets.all(2.r),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  constraints: BoxConstraints(
+                    minWidth: 16.w,
+                    minHeight: 16.w,
+                  ),
+                  child: Text(
+                    unreadCount > 9 ? '9+' : '$unreadCount',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -384,7 +543,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
         borderRadius: BorderRadius.circular(24.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryBlue.withOpacity(0.3),
+            color: AppColors.primaryBlue.withValues(alpha: 0.3),
             blurRadius: 20.r,
             offset: Offset(0, 10.h),
           ),
@@ -407,7 +566,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Text(
@@ -437,9 +596,9 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           Container(
             padding: EdgeInsets.all(16.r),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
@@ -517,7 +676,12 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
@@ -532,7 +696,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           Container(
             padding: EdgeInsets.all(10.r),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Icon(icon, color: color, size: 24.sp),
@@ -602,20 +766,16 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                 'View\nBookings',
                 Icons.calendar_today,
                 AppColors.primaryBlue,
-                () {
-                  // Navigate to bookings
-                },
+                _navigateToBookings,
               ),
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: _buildActionButton(
-                'Analytics',
-                Icons.analytics,
+                'Reviews',
+                Icons.rate_review,
                 const Color(0xFF26A69A),
-                () {
-                  // Navigate to analytics
-                },
+                _viewAllReviews,
               ),
             ),
           ],
@@ -624,7 +784,12 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     );
   }
 
-  Widget _buildActionButton(String label, IconData icon, Color color, VoidCallback onTap) {
+  Widget _buildActionButton(
+    String label,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -639,7 +804,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
             Container(
               padding: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Icon(icon, color: color, size: 28.sp),
@@ -680,7 +845,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: _navigateToBookings,
               child: Text(
                 'View All',
                 style: TextStyle(
@@ -712,27 +877,14 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           ..._recentBookings.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             return _buildBookingCard(data);
-          }).toList(),
+          }),
       ],
     );
   }
 
   Widget _buildBookingCard(Map<String, dynamic> data) {
-    final status = data['status'] ?? 'pending';
-    Color statusColor;
-    switch (status) {
-      case 'confirmed':
-        statusColor = AppColors.primaryGreen;
-        break;
-      case 'completed':
-        statusColor = AppColors.primaryBlue;
-        break;
-      case 'cancelled':
-        statusColor = Colors.redAccent;
-        break;
-      default:
-        statusColor = const Color(0xFFFF6F00);
-    }
+    final status = BookingStatuses.normalize(data['status']);
+    final statusColor = _statusColor(status);
 
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
@@ -749,7 +901,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               Container(
                 padding: EdgeInsets.all(10.r),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(Icons.event, color: statusColor, size: 24.sp),
@@ -760,7 +912,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data['eventName'] ?? 'Event Booking',
+                      bookingEventNameFrom(data),
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
@@ -771,7 +923,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                     ),
                     SizedBox(height: 4.h),
                     Text(
-                      data['clientName'] ?? 'Client',
+                      bookingClientNameFrom(data),
                       style: TextStyle(
                         fontSize: 14.sp,
                         color: Colors.grey[600],
@@ -785,11 +937,11 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Text(
-                  status.toUpperCase(),
+                  bookingStatusLabelFrom(data).toUpperCase(),
                   style: TextStyle(
                     color: statusColor,
                     fontSize: 11.sp,
@@ -804,18 +956,33 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(Icons.calendar_today, size: 16.sp, color: Colors.grey[600]),
-                  SizedBox(width: 6.w),
-                  Text(
-                    _formatDate(data['eventDate']),
-                    style: TextStyle(fontSize: 13.sp, color: Colors.grey[600]),
-                  ),
-                ],
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      size: 16.sp,
+                      color: Colors.grey[600],
+                    ),
+                    SizedBox(width: 6.w),
+                    Expanded(
+                      child: Text(
+                        _formatDate(bookingEventDateFromMap(data)),
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color: Colors.grey[600],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Text(
-                '\$${(data['amount'] ?? 0).toDouble().toStringAsFixed(2)}',
+                bookingAmountFrom(data['amount']) > 0
+                    ? '\$${bookingAmountFrom(data['amount']).toStringAsFixed(2)}'
+                    : 'TBD',
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w900,
@@ -876,7 +1043,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                   Container(
                     padding: EdgeInsets.all(10.r),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Icon(Icons.event, color: Colors.white, size: 24.sp),
@@ -887,7 +1054,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          data['eventName'] ?? 'Event',
+                          bookingEventNameFrom(data),
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.w700,
@@ -898,21 +1065,143 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                         ),
                         SizedBox(height: 4.h),
                         Text(
-                          _formatDate(data['eventDate']),
+                          _formatDate(bookingEventDateFromMap(data)),
                           style: TextStyle(
                             fontSize: 14.sp,
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16.sp),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                    size: 16.sp,
+                  ),
                 ],
               ),
             );
-          }).toList(),
+          }),
       ],
+    );
+  }
+
+  // ================= RECENT REVIEWS =================
+  Widget _buildRecentReviews() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Recent Reviews',
+              style: TextStyle(
+                fontSize: 24.sp,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textDark,
+              ),
+            ),
+            if (_recentReviewsList.isNotEmpty)
+              TextButton(
+                onPressed: _viewAllReviews,
+                child: Text(
+                  'View All',
+                  style: TextStyle(
+                    color: AppColors.primaryGreen,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+          ],
+        ),
+        SizedBox(height: 16.h),
+        if (_recentReviewsList.isEmpty)
+          Container(
+            padding: EdgeInsets.all(24.r),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16.r),
+              boxShadow: [AppColors.cardShadow()],
+            ),
+            child: const Center(
+              child: Text(
+                'No reviews yet',
+                style: TextStyle(color: Colors.grey, fontSize: 15),
+              ),
+            ),
+          )
+        else
+          ..._recentReviewsList.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return _buildReviewCard(data);
+          }),
+      ],
+    );
+  }
+
+  Widget _buildReviewCard(Map<String, dynamic> data) {
+    final rating = _doubleFrom(data['rating']);
+    final userName = data['userName'] ?? 'Anonymous';
+    final comment = data['comment'] ?? '';
+    final createdAt = bookingDateFrom(data['createdAt']);
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(16.r),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [AppColors.cardShadow()],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                userName,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
+              ),
+              if (createdAt != null)
+                Text(
+                  '${createdAt.day}/${createdAt.month}/${createdAt.year}',
+                  style: TextStyle(color: Colors.grey, fontSize: 12.sp),
+                ),
+            ],
+          ),
+          SizedBox(height: 6.h),
+          Row(
+            children: List.generate(5, (index) {
+              return Icon(
+                index < rating ? Icons.star_rounded : Icons.star_border_rounded,
+                color: Colors.amber,
+                size: 18.sp,
+              );
+            }),
+          ),
+          if (comment.isNotEmpty) ...[
+            SizedBox(height: 10.h),
+            Text(
+              comment,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.grey.shade800,
+                height: 1.4,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ],
+      ),
     );
   }
 
@@ -943,11 +1232,26 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           ),
           child: Column(
             children: [
-              _buildMetricRow('Completion Rate', '$completionRate%', Icons.check_circle, Colors.green),
+              _buildMetricRow(
+                'Completion Rate',
+                '$completionRate%',
+                Icons.check_circle,
+                Colors.green,
+              ),
               Divider(height: 24.h),
-              _buildMetricRow('Average Rating', _averageRating.toStringAsFixed(1), Icons.star, Colors.amber),
+              _buildMetricRow(
+                'Average Rating',
+                _averageRating.toStringAsFixed(1),
+                Icons.star,
+                Colors.amber,
+              ),
               Divider(height: 24.h),
-              _buildMetricRow('Total Reviews', _totalReviews.toString(), Icons.rate_review, AppColors.primaryBlue),
+              _buildMetricRow(
+                'Total Reviews',
+                _totalReviews.toString(),
+                Icons.rate_review,
+                AppColors.primaryBlue,
+              ),
             ],
           ),
         ),
@@ -955,13 +1259,18 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     );
   }
 
-  Widget _buildMetricRow(String label, String value, IconData icon, Color color) {
+  Widget _buildMetricRow(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Row(
       children: [
         Container(
           padding: EdgeInsets.all(10.r),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Icon(icon, color: color, size: 24.sp),
@@ -992,17 +1301,49 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
   }
 
   // ================= HELPERS =================
-  String _formatDate(dynamic date) {
-    if (date == null) return 'No Date';
-    DateTime dt;
-    if (date is Timestamp) {
-      dt = date.toDate();
-    } else if (date is String) {
-      return date;
-    } else {
-      return 'Invalid Date';
+  Color _statusColor(String status) {
+    switch (BookingStatuses.normalize(status)) {
+      case BookingStatuses.accepted:
+        return AppColors.primaryGreen;
+      case BookingStatuses.completed:
+        return AppColors.primaryBlue;
+      case BookingStatuses.rejected:
+        return Colors.redAccent;
+      case BookingStatuses.pending:
+      default:
+        return const Color(0xFFFF6F00);
     }
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
+  }
+
+  String _formatDate(dynamic value) {
+    final date = bookingDateFrom(value);
+    if (date == null) return 'Date not set';
+
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+
+  double _doubleFrom(dynamic value) {
+    if (value is num) return value.toDouble();
+    return double.tryParse(value?.toString() ?? '') ?? 0;
+  }
+
+  int _intFrom(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 }

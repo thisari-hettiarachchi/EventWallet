@@ -10,11 +10,18 @@ class MusicPage extends StatefulWidget {
   State<MusicPage> createState() => _MusicPageState();
 }
 
-class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMixin {
+class _MusicPageState extends State<MusicPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   String _selectedFilter = 'All';
-  final List<String> _filters = ['All', 'DJ', 'Live Band', 'Solo Artist', 'Classical'];
+  final List<String> _filters = [
+    'All',
+    'DJ',
+    'Live Band',
+    'Solo Artist',
+    'Classical',
+  ];
 
   List<DocumentSnapshot> _musicians = [];
   bool _isLoading = true;
@@ -73,11 +80,15 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: IconButton(
-                            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 24.sp,
+                            ),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ),
@@ -97,7 +108,7 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
                               Text(
                                 '${_musicians.length} musicians available',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   fontSize: 15.sp,
                                 ),
                               ),
@@ -105,8 +116,12 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.favorite_border, color: Colors.white, size: 28.sp),
-                          onPressed: () => _showFavorites(),
+                          icon: Icon(
+                            Icons.favorite_border,
+                            color: Colors.white,
+                            size: 28.sp,
+                          ),
+                          onPressed: _showFavorites,
                         ),
                       ],
                     ),
@@ -115,8 +130,11 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
                     controller: _tabController,
                     indicatorColor: Colors.white,
                     labelColor: Colors.white,
-                    unselectedLabelColor: Colors.white.withOpacity(0.6),
-                    labelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+                    unselectedLabelColor: Colors.white.withValues(alpha: 0.6),
+                    labelStyle: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                     tabs: const [
                       Tab(text: 'Browse'),
                       Tab(text: 'Popular'),
@@ -164,14 +182,14 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
               ),
             ),
             selected: isSelected,
-            onSelected: (selected) {
+            onSelected: (_) {
               setState(() => _selectedFilter = filter);
             },
-            backgroundColor: Colors.white.withOpacity(0.2),
-            selectedColor: Colors.white.withOpacity(0.3),
+            backgroundColor: Colors.white.withValues(alpha: 0.2),
+            selectedColor: Colors.white.withValues(alpha: 0.3),
             checkmarkColor: Colors.white,
             side: BorderSide(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               width: 1.w,
             ),
           );
@@ -208,7 +226,12 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
     }).toList();
 
     if (popular.isEmpty) {
-      return Center(child: Text('No popular musicians yet', style: TextStyle(fontSize: 16.sp)));
+      return Center(
+        child: Text(
+          'No popular musicians yet',
+          style: TextStyle(fontSize: 16.sp),
+        ),
+      );
     }
 
     return GridView.builder(
@@ -246,21 +269,21 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
       ),
       child: Row(
         children: [
-          // Image Section
           ClipRRect(
-            borderRadius: BorderRadius.horizontal(left: Radius.circular(20.r)),
+            borderRadius: BorderRadius.horizontal(
+              left: Radius.circular(20.r),
+            ),
             child: imageUrl.isNotEmpty
                 ? Image.network(
-              imageUrl,
-              width: 120.w,
-              height: 160.h,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => _buildPlaceholderImage(120.w, 160.h),
-            )
+                    imageUrl,
+                    width: 120.w,
+                    height: 160.h,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        _buildPlaceholderImage(120.w, 160.h),
+                  )
                 : _buildPlaceholderImage(120.w, 160.h),
           ),
-
-          // Details Section
           Expanded(
             child: Padding(
               padding: EdgeInsets.all(16.r),
@@ -282,9 +305,12 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 4.h,
+                        ),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryGreen.withOpacity(0.1),
+                          color: AppColors.primaryGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Row(
@@ -306,9 +332,12 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
                   ),
                   SizedBox(height: 6.h),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.w,
+                      vertical: 4.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryBlue.withOpacity(0.1),
+                      color: AppColors.primaryBlue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Text(
@@ -325,7 +354,7 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
                     '$yearsExperience years experience',
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: AppColors.textGrey.withOpacity(0.8),
+                      color: AppColors.textGrey.withValues(alpha: 0.8),
                     ),
                   ),
                   SizedBox(height: 8.h),
@@ -335,9 +364,12 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
                       runSpacing: 4.h,
                       children: genres.take(2).map((genre) {
                         return Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.w,
+                            vertical: 3.h,
+                          ),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryGreen.withOpacity(0.1),
+                            color: AppColors.primaryGreen.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Text(
@@ -364,7 +396,8 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: Icon(Icons.play_circle_filled,
+                        icon: Icon(
+                          Icons.play_circle_filled,
                           color: AppColors.primaryGreen,
                           size: 32.sp,
                         ),
@@ -405,20 +438,24 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
               children: [
                 imageUrl.isNotEmpty
                     ? Image.network(
-                  imageUrl,
-                  height: 140.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _buildPlaceholderImage(double.infinity, 140.h),
-                )
+                        imageUrl,
+                        height: 140.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            _buildPlaceholderImage(double.infinity, 140.h),
+                      )
                     : _buildPlaceholderImage(double.infinity, 140.h),
                 Positioned(
                   top: 8.h,
                   right: 8.w,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 4.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
+                      color: Colors.black.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Row(
@@ -460,7 +497,7 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
                     type,
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: AppColors.textGrey.withOpacity(0.8),
+                      color: AppColors.textGrey.withValues(alpha: 0.8),
                     ),
                   ),
                   const Spacer(),
@@ -499,8 +536,8 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primaryGreen.withOpacity(0.3),
-            AppColors.primaryBlue.withOpacity(0.3),
+            AppColors.primaryGreen.withValues(alpha: 0.3),
+            AppColors.primaryBlue.withValues(alpha: 0.3),
           ],
         ),
       ),
@@ -520,14 +557,14 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
           Icon(
             Icons.music_off_outlined,
             size: 80.sp,
-            color: AppColors.textGrey.withOpacity(0.3),
+            color: AppColors.textGrey.withValues(alpha: 0.3),
           ),
           SizedBox(height: 16.h),
           Text(
             'No musicians found',
             style: TextStyle(
               fontSize: 18.sp,
-              color: AppColors.textGrey.withOpacity(0.6),
+              color: AppColors.textGrey.withValues(alpha: 0.6),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -540,8 +577,14 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Favorites', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
-        content: Text('Your favorite musicians will appear here.', style: TextStyle(fontSize: 14.sp)),
+        title: Text(
+          'Favorites',
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Your favorite musicians will appear here.',
+          style: TextStyle(fontSize: 14.sp),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -618,7 +661,10 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryGreen,
                     ),
-                    child: Text('Book Now', style: TextStyle(fontSize: 14.sp, color: Colors.white)),
+                    child: Text(
+                      'Send Request',
+                      style: TextStyle(fontSize: 14.sp, color: Colors.white),
+                    ),
                   ),
                 ),
               ],
@@ -633,15 +679,24 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Book ${data['name']}', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Send request to ${data['name']}',
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Type: ${data['type']}', style: TextStyle(fontSize: 14.sp)),
-            Text('Rate: \$${data['hourlyRate']}/hour', style: TextStyle(fontSize: 14.sp)),
+            Text(
+              'Rate: \$${data['hourlyRate']}/hour',
+              style: TextStyle(fontSize: 14.sp),
+            ),
             SizedBox(height: 16.h),
-            Text('Select event date and duration:', style: TextStyle(fontSize: 14.sp)),
+            Text(
+              'Select event date and duration:',
+              style: TextStyle(fontSize: 14.sp),
+            ),
           ],
         ),
         actions: [
@@ -662,7 +717,10 @@ class _MusicPageState extends State<MusicPage> with SingleTickerProviderStateMix
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryGreen,
             ),
-            child: Text('Confirm', style: TextStyle(fontSize: 14.sp, color: Colors.white)),
+            child: Text(
+              'Send Request',
+              style: TextStyle(fontSize: 14.sp, color: Colors.white),
+            ),
           ),
         ],
       ),

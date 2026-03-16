@@ -37,6 +37,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
   final List<String> _statusOptions = ['Upcoming', 'In Progress', 'Completed'];
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  bool _isCreating = false;
 
   @override
   void dispose() {
@@ -124,7 +125,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   Future<void> _createEvent() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_isCreating || !_formKey.currentState!.validate()) return;
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -158,6 +159,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
       }
       return;
     }
+
+    setState(() {
+      _isCreating = true;
+    });
 
     final data = {
       'eventName': _eventNameController.text.trim(),
@@ -209,6 +214,12 @@ class _CreateEventPageState extends State<CreateEventPage> {
           ),
         );
       }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCreating = false;
+        });
+      }
     }
   }
 
@@ -221,7 +232,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
         backgroundColor: const Color(0xFF00897B),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
-          onPressed: () => Navigator.pop(context),
+          onPressed: _isCreating ? null : () => Navigator.pop(context),
         ),
         title: Text(
           'Create New Event',
@@ -451,13 +462,15 @@ class _CreateEventPageState extends State<CreateEventPage> {
             SizedBox(height: 32.h),
             Container(
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF00897B), Color(0xFF1565C0)],
+                gradient: LinearGradient(
+                  colors: _isCreating
+                      ? [const Color(0xFF00897B).withOpacity(0.7), const Color(0xFF1565C0).withOpacity(0.7)]
+                      : [const Color(0xFF00897B), const Color(0xFF1565C0)],
                 ),
                 borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF00897B).withOpacity(0.3),
+                    color: const Color(0xFF00897B).withOpacity(_isCreating ? 0.18 : 0.3),
                     blurRadius: 12.r,
                     offset: Offset(0, 6.h),
                   ),
@@ -466,18 +479,34 @@ class _CreateEventPageState extends State<CreateEventPage> {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: _createEvent,
+                  onTap: _isCreating ? null : _createEvent,
                   borderRadius: BorderRadius.circular(12.r),
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 16.h),
                     child: Center(
-                      child: Text(
-                        'Create Event',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (_isCreating) ...[
+                            SizedBox(
+                              height: 18.sp,
+                              width: 18.sp,
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 2.2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            ),
+                            SizedBox(width: 12.w),
+                          ],
+                          Text(
+                            _isCreating ? 'Creating...' : 'Create Event',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

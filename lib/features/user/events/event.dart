@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/colors.dart';
@@ -17,6 +18,7 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _searchQuery = '';
+  final user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -47,7 +49,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
     final today = DateTime(now.year, now.month, now.day);
     final eventDay = DateTime(eventDate.year, eventDate.month, eventDate.day);
 
-    if (eventDay.isAfter(today)) {
+    if (eventDay.isAfter(today) || eventDay.isAtSameMomentAs(today)) {
       return 'Upcoming';
     } else {
       return 'Completed';
@@ -201,13 +203,28 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
   }
 
   Widget _buildEventList(String statusFilter) {
+    if (user == null) {
+       return const Center(child: Text('Please login to view events'));
+    }
+
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('events')
+          .where('userId', isEqualTo: user!.uid)
           .orderBy('date', descending: false)
           .snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen));
+        if (snapshot.connectionState == ConnectionState.waiting) {
+           return const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen));
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(child: Text('No events found.', style: TextStyle(color: Colors.grey, fontSize: 14.sp)));
+        }
 
         final events = snapshot.data!.docs.where((doc) {
           final data = doc.data() as Map<String, dynamic>;
@@ -237,6 +254,10 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                 color = AppColors.primaryBlue;
             }
 
+            final double budgetValue = (data['budget'] ?? 0).toDouble();
+            final double spentValue = (data['spent'] ?? 0).toDouble();
+            final double progress = budgetValue > 0 ? (spentValue / budgetValue).clamp(0.0, 1.0) : 0.0;
+
             return GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -253,9 +274,9 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                 data['eventName'] ?? data['name'] ?? '',
                 _formatTimestamp(data['date']),
                 data['venue'] ?? '',
-                '\$${data['budget'] ?? 0}',
-                '\$${data['spent'] ?? 0}',
-                (data['spent'] ?? 0).toDouble() / (data['budget'] ?? 1).toDouble(),
+                '\$${budgetValue.toStringAsFixed(2)}',
+                '\$${spentValue.toStringAsFixed(2)}',
+                progress,
                 color,
                 _getCategoryIcon(data['category'] ?? 'Other'),
                 statusFilter,

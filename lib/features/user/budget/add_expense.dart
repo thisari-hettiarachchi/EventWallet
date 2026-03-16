@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 
@@ -18,6 +19,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   final _categoryController = TextEditingController();
+  final user = FirebaseAuth.instance.currentUser;
 
   String? _selectedEventId;
   String? _selectedEventName;
@@ -40,24 +42,35 @@ class _AddExpensePageState extends State<AddExpensePage> {
   }
 
   void _fetchEvents() async {
-    final snapshot = await FirebaseFirestore.instance.collection('events').get();
-    setState(() {
-      _events = snapshot.docs;
-      if (_selectedEventId == null && _events.isNotEmpty) {
-        final data = _events.first.data() as Map<String, dynamic>;
-        _selectedEventId = _events.first.id;
-        _selectedEventName = data['eventName'] ?? data['name'];
-      }
-    });
+    if (user == null) return;
+    final snapshot = await FirebaseFirestore.instance
+        .collection('events')
+        .where('userId', isEqualTo: user!.uid)
+        .get();
+    
+    if (mounted) {
+      setState(() {
+        _events = snapshot.docs;
+        if (_selectedEventId == null && _events.isNotEmpty) {
+          final data = _events.first.data() as Map<String, dynamic>;
+          _selectedEventId = _events.first.id;
+          _selectedEventName = data['eventName'] ?? data['name'];
+        }
+      });
+    }
   }
 
   Future<void> _saveExpense() async {
+    if (user == null) return;
     if (!_formKey.currentState!.validate()) return;
 
     try {
+      final amount = double.parse(_amountController.text.trim());
+      
       await FirebaseFirestore.instance.collection('expenses').add({
+        'userId': user!.uid,
         'title': _titleController.text.trim(),
-        'amount': double.parse(_amountController.text.trim()),
+        'amount': amount,
         'category': _categoryController.text.trim(),
         'eventId': _selectedEventId,
         'event': _selectedEventName,
@@ -71,8 +84,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
           final snapshot = await transaction.get(eventRef);
           if (snapshot.exists) {
             final currentSpent = (snapshot.data()?['spent'] ?? 0).toDouble();
-            final newAmount = double.parse(_amountController.text.trim());
-            transaction.update(eventRef, {'spent': currentSpent + newAmount});
+            transaction.update(eventRef, {'spent': currentSpent + amount});
           }
         });
       }
@@ -147,25 +159,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
-                            width: 1.w,
-                          ),
                         ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () => Navigator.pop(context),
-                            borderRadius: BorderRadius.circular(12.r),
-                            child: Padding(
-                              padding: EdgeInsets.all(12.r),
-                              child: Icon(
-                                Icons.arrow_back_ios_new,
-                                color: Colors.white,
-                                size: 20.sp,
-                              ),
-                            ),
-                          ),
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back, color: Colors.white),
+                          onPressed: () => Navigator.pop(context),
                         ),
                       ),
                       const Spacer(),
@@ -175,7 +172,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                           color: Colors.white,
                           fontSize: 20.sp,
                           fontWeight: FontWeight.bold,
-                          letterSpacing: -0.5.w,
                         ),
                       ),
                       const Spacer(),
@@ -195,10 +191,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20.r),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
-                            width: 2.w,
-                          ),
                         ),
                         child: Icon(
                           Icons.account_balance_wallet_outlined,
@@ -215,7 +207,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                           fontSize: 22.sp,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
-                          letterSpacing: -0.5.w,
                         ),
                         textAlign: TextAlign.center,
                         maxLines: 1,
@@ -320,7 +311,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                         color: Colors.white,
                                         fontSize: 18.sp,
                                         fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5.w,
                                       ),
                                     ),
                                   ],

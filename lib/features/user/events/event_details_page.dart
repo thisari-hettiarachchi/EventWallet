@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'tasks_page.dart';
 import 'guest_list.dart';
@@ -7,6 +8,7 @@ import '../budget/expenses_page.dart';
 import '../../../core/constants/colors.dart';
 import '../discovery/discovery.dart';
 import 'edit_event.dart';
+import '../../../services/events_service.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final String eventId;
@@ -26,6 +28,8 @@ class _EventDetailsPageState extends State<EventDetailsPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  final FirestoreService _firestoreService = FirestoreService();
+  bool _isDeleting = false;
 
   @override
   void initState() {
@@ -45,6 +49,99 @@ class _EventDetailsPageState extends State<EventDetailsPage>
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  bool _canManageEvent(Map<String, dynamic> event) {
+    final user = FirebaseAuth.instance.currentUser;
+    return user != null && event['userId'] == user.uid;
+  }
+
+  Future<bool> _confirmDeleteEvent(String eventName) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: Text(
+              'Delete Event',
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+            ),
+            content: Text(
+              'Are you sure you want to delete "$eventName"? This action cannot be undone.',
+              style: TextStyle(fontSize: 14.sp),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade700,
+                ),
+                child: Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
+  Future<void> _deleteEvent(Map<String, dynamic> event) async {
+    if (_isDeleting) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    final eventName = (event['eventName'] ?? event['name'] ?? 'this event').toString();
+
+    if (user == null || event['userId'] != user.uid) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You can only delete your own events.')),
+      );
+      return;
+    }
+
+    final shouldDelete = await _confirmDeleteEvent(eventName);
+    if (!shouldDelete || !mounted) return;
+
+    setState(() {
+      _isDeleting = true;
+    });
+
+    try {
+      await _firestoreService.deleteEvent(widget.eventId);
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('notifications')
+          .add({
+        'title': 'Event Deleted',
+        'message': 'Your event "$eventName" has been deleted.',
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'type': 'event',
+      });
+
+      if (!mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
+      Navigator.pop(context);
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Event deleted successfully')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to delete event. Please try again.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleting = false;
+        });
+      }
+    }
   }
 
   @override
@@ -73,7 +170,8 @@ class _EventDetailsPageState extends State<EventDetailsPage>
           return const Scaffold(body: Center(child: Text('Event not found')));
         }
         final event = eventData as Map<String, dynamic>;
-        
+        final canManageEvent = _canManageEvent(event);
+
         final budget = (event['budget'] ?? 0).toDouble();
         final spent = (event['spent'] ?? 0).toDouble();
         final progress = budget > 0 ? spent / budget : 0.0;
@@ -177,42 +275,81 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                               ),
                             ),
                           ),
-                          SizedBox(width: 8.w),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12.r),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
-                                width: 1.w,
-                              ),
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => EditEventPage(
-                                        eventId: widget.eventId,
-                                        eventData: event,
-                                      ),
-                                    ),
-                                  );
-                                },
+                          if (canManageEvent) ...[
+                            SizedBox(width: 8.w),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(12.r),
-                                child: Padding(
-                                  padding: EdgeInsets.all(12.r),
-                                  child: Icon(
-                                    Icons.edit_outlined,
-                                    color: Colors.white,
-                                    size: 20.sp,
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.3),
+                                  width: 1.w,
+                                ),
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: _isDeleting
+                                      ? null
+                                      : () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => EditEventPage(
+                                                eventId: widget.eventId,
+                                                eventData: event,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(12.r),
+                                    child: Icon(
+                                      Icons.edit_outlined,
+                                      color: Colors.white,
+                                      size: 20.sp,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
+                            SizedBox(width: 8.w),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.18),
+                                borderRadius: BorderRadius.circular(12.r),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.3),
+                                  width: 1.w,
+                                ),
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: _isDeleting ? null : () => _deleteEvent(event),
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(12.r),
+                                    child: _isDeleting
+                                        ? SizedBox(
+                                            height: 20.sp,
+                                            width: 20.sp,
+                                            child: const CircularProgressIndicator(
+                                              strokeWidth: 2.2,
+                                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                            ),
+                                          )
+                                        : Icon(
+                                            Icons.delete_outline,
+                                            color: Colors.white,
+                                            size: 20.sp,
+                                          ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),

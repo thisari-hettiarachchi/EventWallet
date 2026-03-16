@@ -7,9 +7,11 @@ import '../../../services/auth_service.dart';
 import '../../user/auth/login.dart';
 import '../services/my_services.dart';
 import 'edit_business_profile.dart';
+import 'earnings_analytics.dart';
 import '../../user/info/privacy.dart';
 import '../../user/info/help.dart';
 import '../../../core/constants/colors.dart';
+import '../../../services/booking_service.dart';
 
 class ServiceProviderProfilePage extends StatelessWidget {
   const ServiceProviderProfilePage({super.key});
@@ -75,7 +77,7 @@ class ServiceProviderProfilePage extends StatelessWidget {
                       border: Border.all(color: Colors.white, width: 4.w),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           blurRadius: 10.r,
                           offset: Offset(0, 5.h),
                         ),
@@ -107,7 +109,7 @@ class ServiceProviderProfilePage extends StatelessWidget {
                     email,
                     style: TextStyle(
                       fontSize: 15.sp,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                   SizedBox(height: 24.h),
@@ -166,7 +168,10 @@ class ServiceProviderProfilePage extends StatelessWidget {
                             subtitle: 'View your detailed revenue reports',
                             color: AppColors.primaryGreen,
                             onTap: () {
-                              // Coming soon
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const EarningsAnalyticsPage()),
+                              );
                             },
                           ),
                           SizedBox(height: 24.h),
@@ -280,10 +285,10 @@ class ServiceProviderProfilePage extends StatelessWidget {
           totalBookings = snapshot.data!.docs.length;
           for (var doc in snapshot.data!.docs) {
             final data = doc.data() as Map<String, dynamic>;
-            final status = data['status'] ?? '';
-            final amount = (data['amount'] ?? 0).toDouble();
-            
-            if (status == 'completed') {
+            final status = BookingStatuses.normalize(data['status']);
+            final amount = bookingAmountFrom(data['amount']);
+
+            if (status == BookingStatuses.completed) {
               completedCount++;
               totalRevenue += amount;
             }
@@ -294,10 +299,10 @@ class ServiceProviderProfilePage extends StatelessWidget {
           margin: EdgeInsets.symmetric(horizontal: 20.w),
           padding: EdgeInsets.all(20.r),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
+            color: Colors.white.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(16.r),
             border: Border.all(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               width: 1.5.w,
             ),
           ),
@@ -331,7 +336,7 @@ class ServiceProviderProfilePage extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withValues(alpha: 0.9),
             fontSize: 12.sp,
             fontWeight: FontWeight.w500,
           ),
@@ -344,7 +349,7 @@ class ServiceProviderProfilePage extends StatelessWidget {
     return Container(
       width: 1.w,
       height: 35.h,
-      color: Colors.white.withOpacity(0.3),
+      color: Colors.white.withValues(alpha: 0.3),
     );
   }
 
@@ -361,7 +366,7 @@ class ServiceProviderProfilePage extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10.r,
             offset: Offset(0, 4.h),
           ),
@@ -379,7 +384,7 @@ class ServiceProviderProfilePage extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(10.r),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   child: Icon(icon, color: color, size: 22.sp),
