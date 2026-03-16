@@ -12,7 +12,14 @@ class CateringPage extends StatefulWidget {
 
 class _CateringPageState extends State<CateringPage> {
   String _selectedFilter = 'All';
-  final List<String> _filters = ['All', 'Buffet', 'Plated', 'BBQ', 'Desserts', 'Cocktails'];
+  final List<String> _filters = [
+    'All',
+    'Buffet',
+    'Plated',
+    'BBQ',
+    'Desserts',
+    'Cocktails',
+  ];
 
   List<DocumentSnapshot> _caterers = [];
   bool _isLoading = true;
@@ -53,9 +60,7 @@ class _CateringPageState extends State<CateringPage> {
       body: Column(
         children: [
           Container(
-            decoration: const BoxDecoration(
-              gradient: AppColors.headerGradient,
-            ),
+            decoration: const BoxDecoration(gradient: AppColors.headerGradient),
             child: SafeArea(
               child: Column(
                 children: [
@@ -65,11 +70,15 @@ class _CateringPageState extends State<CateringPage> {
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: IconButton(
-                            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 24.sp,
+                            ),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ),
@@ -89,7 +98,7 @@ class _CateringPageState extends State<CateringPage> {
                               Text(
                                 '${_caterers.length} caterers available',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   fontSize: 15.sp,
                                 ),
                               ),
@@ -97,7 +106,11 @@ class _CateringPageState extends State<CateringPage> {
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.filter_list, color: Colors.white, size: 28.sp),
+                          icon: Icon(
+                            Icons.filter_list,
+                            color: Colors.white,
+                            size: 28.sp,
+                          ),
                           onPressed: () => _showFilterOptions(),
                         ),
                       ],
@@ -114,14 +127,14 @@ class _CateringPageState extends State<CateringPage> {
                 : _filteredCaterers.isEmpty
                 ? _buildEmptyState()
                 : ListView.builder(
-              padding: EdgeInsets.all(20.r),
-              itemCount: _filteredCaterers.length,
-              itemBuilder: (context, index) {
-                final doc = _filteredCaterers[index];
-                final data = doc.data() as Map<String, dynamic>;
-                return _buildCatererCard(data, doc.id);
-              },
-            ),
+                    padding: EdgeInsets.all(20.r),
+                    itemCount: _filteredCaterers.length,
+                    itemBuilder: (context, index) {
+                      final doc = _filteredCaterers[index];
+                      final data = doc.data() as Map<String, dynamic>;
+                      return _buildCatererCard(data, doc.id);
+                    },
+                  ),
           ),
         ],
       ),
@@ -154,11 +167,11 @@ class _CateringPageState extends State<CateringPage> {
             onSelected: (selected) {
               setState(() => _selectedFilter = filter);
             },
-            backgroundColor: Colors.white.withOpacity(0.2),
-            selectedColor: Colors.white.withOpacity(0.3),
+            backgroundColor: Colors.white.withValues(alpha: 0.2),
+            selectedColor: Colors.white.withValues(alpha: 0.3),
             checkmarkColor: Colors.white,
             side: BorderSide(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               width: 1.w,
             ),
           );
@@ -193,20 +206,23 @@ class _CateringPageState extends State<CateringPage> {
               children: [
                 imageUrl.isNotEmpty
                     ? Image.network(
-                  imageUrl,
-                  height: 180.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
-                )
+                        imageUrl,
+                        height: 180.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
+                      )
                     : _buildPlaceholderImage(),
                 Positioned(
                   top: 12.h,
                   right: 12.w,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 6.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
+                      color: Colors.black.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Row(
@@ -271,16 +287,17 @@ class _CateringPageState extends State<CateringPage> {
                 SizedBox(height: 8.h),
                 Row(
                   children: [
-                    Icon(Icons.people,
+                    Icon(
+                      Icons.people,
                       size: 16.sp,
-                      color: AppColors.textGrey.withOpacity(0.7),
+                      color: AppColors.textGrey.withValues(alpha: 0.7),
                     ),
                     SizedBox(width: 4.w),
                     Text(
                       'Min. $minGuests guests',
                       style: TextStyle(
                         fontSize: 13.sp,
-                        color: AppColors.textGrey.withOpacity(0.8),
+                        color: AppColors.textGrey.withValues(alpha: 0.8),
                       ),
                     ),
                     const Spacer(),
@@ -288,7 +305,7 @@ class _CateringPageState extends State<CateringPage> {
                       '$reviews reviews',
                       style: TextStyle(
                         fontSize: 13.sp,
-                        color: AppColors.textGrey.withOpacity(0.8),
+                        color: AppColors.textGrey.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -299,15 +316,19 @@ class _CateringPageState extends State<CateringPage> {
                   runSpacing: 8.h,
                   children: cuisines.map((cuisine) {
                     return Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 6.h,
+                      ),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.restaurant,
+                          Icon(
+                            Icons.restaurant,
                             size: 14.sp,
                             color: AppColors.primaryGreen,
                           ),
@@ -376,16 +397,12 @@ class _CateringPageState extends State<CateringPage> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primaryGreen.withOpacity(0.3),
-            AppColors.primaryBlue.withOpacity(0.3),
+            AppColors.primaryGreen.withValues(alpha: 0.3),
+            AppColors.primaryBlue.withValues(alpha: 0.3),
           ],
         ),
       ),
-      child: Icon(
-        Icons.restaurant_menu,
-        size: 64.sp,
-        color: Colors.white,
-      ),
+      child: Icon(Icons.restaurant_menu, size: 64.sp, color: Colors.white),
     );
   }
 
@@ -397,14 +414,14 @@ class _CateringPageState extends State<CateringPage> {
           Icon(
             Icons.restaurant_outlined,
             size: 80.sp,
-            color: AppColors.textGrey.withOpacity(0.3),
+            color: AppColors.textGrey.withValues(alpha: 0.3),
           ),
           SizedBox(height: 16.h),
           Text(
             'No caterers found',
             style: TextStyle(
               fontSize: 18.sp,
-              color: AppColors.textGrey.withOpacity(0.6),
+              color: AppColors.textGrey.withValues(alpha: 0.6),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -441,7 +458,10 @@ class _CateringPageState extends State<CateringPage> {
                   backgroundColor: AppColors.primaryGreen,
                   padding: EdgeInsets.symmetric(vertical: 15.h),
                 ),
-                child: Text('Apply Filters', style: TextStyle(fontSize: 16.sp, color: Colors.white)),
+                child: Text(
+                  'Apply Filters',
+                  style: TextStyle(fontSize: 16.sp, color: Colors.white),
+                ),
               ),
             ),
           ],
@@ -519,19 +539,22 @@ class _CateringPageState extends State<CateringPage> {
         if (menuItems.isEmpty)
           Text('No items available', style: TextStyle(fontSize: 14.sp))
         else
-          ...menuItems.map((item) => Padding(
-            padding: EdgeInsets.symmetric(vertical: 4.h),
-            child: Row(
-              children: [
-                Icon(Icons.check_circle,
-                  size: 16.sp,
-                  color: AppColors.primaryGreen,
-                ),
-                SizedBox(width: 8.w),
-                Text(item.toString(), style: TextStyle(fontSize: 14.sp)),
-              ],
+          ...menuItems.map(
+            (item) => Padding(
+              padding: EdgeInsets.symmetric(vertical: 4.h),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    size: 16.sp,
+                    color: AppColors.primaryGreen,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(item.toString(), style: TextStyle(fontSize: 14.sp)),
+                ],
+              ),
             ),
-          )),
+          ),
       ],
     );
   }
@@ -542,12 +565,18 @@ class _CateringPageState extends State<CateringPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Get Quote from ${data['name']}', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Get Quote from ${data['name']}',
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Base price: \$${data['pricePerPerson']}/person', style: TextStyle(fontSize: 14.sp)),
+            Text(
+              'Base price: \$${data['pricePerPerson']}/person',
+              style: TextStyle(fontSize: 14.sp),
+            ),
             SizedBox(height: 16.h),
             TextField(
               controller: guestController,
@@ -584,7 +613,10 @@ class _CateringPageState extends State<CateringPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryGreen,
             ),
-            child: Text('Request Quote', style: TextStyle(fontSize: 14.sp, color: Colors.white)),
+            child: Text(
+              'Request Quote',
+              style: TextStyle(fontSize: 14.sp, color: Colors.white),
+            ),
           ),
         ],
       ),

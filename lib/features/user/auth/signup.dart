@@ -32,16 +32,15 @@ class _SignupPageState extends State<SignupPage>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.2),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
   }
@@ -54,11 +53,11 @@ class _SignupPageState extends State<SignupPage>
 
   Future<void> _signupUser() async {
     try {
-      UserCredential userCredential =
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
 
       User? user = userCredential.user;
 
@@ -120,10 +119,7 @@ class _SignupPageState extends State<SignupPage>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF00897B),
-              Color(0xFF1565C0),
-            ],
+            colors: [Color(0xFF00897B), Color(0xFF1565C0)],
           ),
         ),
         child: SafeArea(
@@ -132,11 +128,12 @@ class _SignupPageState extends State<SignupPage>
               return SingleChildScrollView(
                 physics: const ClampingScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.w,
+                      vertical: 16.h,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -147,34 +144,40 @@ class _SignupPageState extends State<SignupPage>
                             opacity: _fadeAnimation,
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(12.r),
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   width: 1.5.w,
                                 ),
                               ),
                               child: IconButton(
-                                icon: Icon(Icons.arrow_back,
-                                    color: Colors.white, size: 20.sp),
+                                icon: Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.white,
+                                  size: 20.sp,
+                                ),
                                 onPressed: () => Navigator.pop(context),
-                                constraints: BoxConstraints.tightFor(width: 40.w, height: 40.w),
+                                constraints: BoxConstraints.tightFor(
+                                  width: 40.w,
+                                  height: 40.w,
+                                ),
                                 padding: EdgeInsets.zero,
                               ),
                             ),
                           ),
                         ),
-                        
+
                         FadeTransition(
                           opacity: _fadeAnimation,
                           child: Container(
                             padding: EdgeInsets.all(12.r),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   blurRadius: 20.r,
                                   spreadRadius: 5.r,
                                 ),
@@ -187,7 +190,7 @@ class _SignupPageState extends State<SignupPage>
                             ),
                           ),
                         ),
-                        
+
                         SlideTransition(
                           position: _slideAnimation,
                           child: FadeTransition(
@@ -208,7 +211,7 @@ class _SignupPageState extends State<SignupPage>
                                   'Join us to manage your events',
                                   style: TextStyle(
                                     fontSize: 13.sp,
-                                    color: Colors.white.withOpacity(0.9),
+                                    color: Colors.white.withValues(alpha: 0.9),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -216,7 +219,7 @@ class _SignupPageState extends State<SignupPage>
                             ),
                           ),
                         ),
-                        
+
                         Column(
                           children: [
                             _buildField(
@@ -260,7 +263,7 @@ class _SignupPageState extends State<SignupPage>
                             ),
                           ],
                         ),
-                        
+
                         Column(
                           children: [
                             FadeTransition(
@@ -272,8 +275,8 @@ class _SignupPageState extends State<SignupPage>
                                   borderRadius: BorderRadius.circular(16.r),
                                   gradient: LinearGradient(
                                     colors: [
-                                      Colors.white.withOpacity(0.95),
-                                      Colors.white.withOpacity(0.85),
+                                      Colors.white.withValues(alpha: 0.95),
+                                      Colors.white.withValues(alpha: 0.85),
                                     ],
                                   ),
                                 ),
@@ -287,12 +290,13 @@ class _SignupPageState extends State<SignupPage>
                                     ),
                                   ),
                                   child: ShaderMask(
-                                    shaderCallback: (bounds) => const LinearGradient(
-                                      colors: [
-                                        Color(0xFF00897B),
-                                        Color(0xFF1565C0),
-                                      ],
-                                    ).createShader(bounds),
+                                    shaderCallback: (bounds) =>
+                                        const LinearGradient(
+                                          colors: [
+                                            Color(0xFF00897B),
+                                            Color(0xFF1565C0),
+                                          ],
+                                        ).createShader(bounds),
                                     child: Text(
                                       'Create Account',
                                       style: TextStyle(
@@ -313,7 +317,8 @@ class _SignupPageState extends State<SignupPage>
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (_) => const LoginPage()),
+                                      builder: (_) => const LoginPage(),
+                                    ),
                                   );
                                 },
                                 child: Text(
@@ -338,11 +343,15 @@ class _SignupPageState extends State<SignupPage>
                                     color: Colors.white.withValues(alpha: 0.3),
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12.w,
+                                    ),
                                     child: Text(
                                       'OR',
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.7),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.7,
+                                        ),
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -363,7 +372,10 @@ class _SignupPageState extends State<SignupPage>
                                 onPressed: () {
                                   Navigator.pushReplacement(
                                     context,
-                                    MaterialPageRoute(builder: (_) => const provider_login.ServiceProviderLoginPage()),
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const provider_login.ServiceProviderLoginPage(),
+                                    ),
                                   );
                                 },
                                 child: Text(
@@ -394,10 +406,10 @@ class _SignupPageState extends State<SignupPage>
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
           width: 1.w,
         ),
       ),

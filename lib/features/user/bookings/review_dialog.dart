@@ -92,7 +92,9 @@ class _ReviewDialogState extends State<ReviewDialog> {
                       ? null
                       : () => setState(() => _rating = starValue.toDouble()),
                   icon: Icon(
-                    starValue <= _rating ? Icons.star_rounded : Icons.star_border_rounded,
+                    starValue <= _rating
+                        ? Icons.star_rounded
+                        : Icons.star_border_rounded,
                     color: Colors.amber,
                     size: 30.sp,
                   ),
@@ -145,4 +147,3 @@ class _ReviewDialogState extends State<ReviewDialog> {
     );
   }
 }
-

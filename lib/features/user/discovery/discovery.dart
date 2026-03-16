@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/colors.dart';
-import '../../../core/constants/styles.dart';
 import 'provider_profile.dart';
 
 class DiscoveryPage extends StatefulWidget {
-  final String? initialCategory;
+  final String initialCategory;
   final bool isEventSaving;
   final String? eventId;
 
   const DiscoveryPage({
     super.key,
-    this.initialCategory,
+    this.initialCategory = 'All',
     this.isEventSaving = false,
     this.eventId,
   });
@@ -22,133 +22,282 @@ class DiscoveryPage extends StatefulWidget {
   State<DiscoveryPage> createState() => _DiscoveryPageState();
 }
 
-class _DiscoveryPageState extends State<DiscoveryPage> {
-  String _selectedCategory = 'All';
-  String _searchQuery = '';
+class _DiscoveryPageState extends State<DiscoveryPage>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  late String _selectedCategory;
+  bool _showSavedOnly = false;
 
-  final List<Map<String, dynamic>> _categories = [
-    {'name': 'All', 'icon': Icons.apps, 'collection': 'service_providers'},
-    {'name': 'Photography', 'icon': Icons.camera_alt, 'collection': 'photographers'},
-    {'name': 'Venue', 'icon': Icons.location_city, 'collection': 'venues'},
-    {'name': 'Catering', 'icon': Icons.restaurant, 'collection': 'caterers'},
-    {'name': 'Music', 'icon': Icons.music_note, 'collection': 'musicians'},
+  final List<String> _categories = [
+    'All',
+    'Catering',
+    'Venue',
+    'Photography',
+    'Music',
+    'Decoration',
+    'Transport',
   ];
+
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
-    if (widget.initialCategory != null) {
-      _selectedCategory = widget.initialCategory!;
-    }
+    _selectedCategory = widget.initialCategory;
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeIn,
+    );
+    _animationController.forward();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _animationController.dispose();
     super.dispose();
+  }
+
+  Future<void> _toggleSaveProvider(
+    String providerId,
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please login to save providers')),
+        );
+        return;
+      }
+
+      final docRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('saved_providers')
+          .doc(providerId);
+
+      final doc = await docRef.get();
+
+      if (doc.exists) {
+        await docRef.delete();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Removed from favorites'),
+              backgroundColor: Colors.orange,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } else {
+        await docRef.set({
+          ...data,
+          'providerId': providerId,
+          'savedAt': FieldValue.serverTimestamp(),
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Added to favorites'),
+              backgroundColor: AppColors.success,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          _buildHeader(),
-          Expanded(
-            child: _buildProviderList(),
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.headerGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(),
+              _buildSearchAndFilter(),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(35.r),
+                    ),
+                  ),
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: _buildProvidersList(),
+                  ),
+                ),
+              ),
+            ],
           ),
+        ),
+      ),
+      bottomNavigationBar: widget.isEventSaving
+          ? null
+          : const AppBottomNav(currentIndex: 2),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 5.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.isEventSaving
+                      ? 'Add Services'
+                      : (_showSavedOnly ? 'My Favorites' : 'Discovery'),
+                  style: TextStyle(
+                    fontSize: 36.sp,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: -1.w,
+                  ),
+                ),
+                Text(
+                  widget.isEventSaving
+                      ? 'Select services for your event'
+                      : 'Quality services for your events',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.white.withOpacity(0.8),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (!widget.isEventSaving)
+            GestureDetector(
+              onTap: () => setState(() => _showSavedOnly = !_showSavedOnly),
+              child: Container(
+                padding: EdgeInsets.all(12.r),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(15.r),
+                ),
+                child: Icon(
+                  _showSavedOnly ? Icons.bookmark : Icons.bookmark_border,
+                  color: Colors.white,
+                  size: 24.sp,
+                ),
+              ),
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(20.w, 60.h, 20.w, 20.h),
-      decoration: const BoxDecoration(
-        gradient: AppColors.headerGradient,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(30.r)),
-      ),
+  Widget _buildSearchAndFilter() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Discover Services',
-            style: TextStyle(
-              fontSize: 28.sp,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          SizedBox(height: 20.h),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15.r),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) =>
+                        setState(() => _searchQuery = value.toLowerCase()),
+                    decoration: InputDecoration(
+                      hintText: 'Search services...',
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade400,
+                        fontSize: 16.sp,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: AppColors.primaryGreen,
+                        size: 24.sp,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 15.h),
+                    ),
+                  ),
                 ),
-              ],
-            ),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value.toLowerCase();
-                });
-              },
-              decoration: InputDecoration(
-                hintText: 'Search for services...',
-                border: InputBorder.none,
-                icon: const Icon(Icons.search, color: AppColors.primaryGreen),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() {
-                            _searchQuery = '';
-                          });
-                        },
-                      )
-                    : null,
               ),
-            ),
+              SizedBox(width: 12.w),
+              Container(
+                padding: EdgeInsets.all(12.r),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(15.r),
+                ),
+                child: Icon(
+                  Icons.tune,
+                  color: Colors.white,
+                  size: 24.sp,
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 20.h),
           SizedBox(
             height: 45.h,
-            child: ListView.builder(
+            child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: _categories.length,
+              separatorBuilder: (_, __) => SizedBox(width: 12.w),
               itemBuilder: (context, index) {
                 final category = _categories[index];
-                final isSelected = _selectedCategory == category['name'];
-                return Padding(
-                  padding: EdgeInsets.only(right: 12.w),
-                  child: FilterChip(
-                    label: Text(category['name']),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedCategory = category['name'];
-                      });
-                    },
-                    selectedColor: Colors.white,
-                    checkmarkColor: AppColors.primaryGreen,
-                    backgroundColor: Colors.white.withOpacity(0.2),
-                    labelStyle: TextStyle(
-                      color: isSelected ? AppColors.primaryGreen : Colors.white,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                final isSelected = _selectedCategory == category;
+                return GestureDetector(
+                  onTap: () => setState(() => _selectedCategory = category),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 25.w),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(25.r),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.r),
+                    alignment: Alignment.center,
+                    child: Text(
+                      category,
+                      style: TextStyle(
+                        color: isSelected
+                            ? AppColors.primaryGreen
+                            : Colors.white,
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        fontSize: 15.sp,
+                      ),
                     ),
                   ),
                 );
@@ -160,163 +309,269 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
     );
   }
 
-  Widget _buildProviderList() {
-    final String collection = _categories.firstWhere(
-      (c) => c['name'] == _selectedCategory,
-      orElse: () => _categories[0],
-    )['collection'];
+  Widget _buildProvidersList() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (_showSavedOnly) {
+      if (user == null) return _buildLoginPrompt();
+      return _buildStreamList(
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('saved_providers'),
+      );
+    }
+
+    Query query = FirebaseFirestore.instance.collection('service_providers');
+    if (_selectedCategory != 'All') {
+      query = query.where('category', isEqualTo: _selectedCategory);
+    }
+    return _buildStreamList(query);
+  }
+
+  Widget _buildStreamList(Query query) {
+    final user = FirebaseAuth.instance.currentUser;
 
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection(collection).snapshots(),
+      stream: query.snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primaryGreen),
+          );
         }
 
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-
-        final providers = snapshot.data?.docs.where((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          final name = (data['businessName'] ?? '').toString().toLowerCase();
-          return name.contains(_searchQuery);
-        }).toList() ?? [];
-
-        if (providers.isEmpty) {
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return _buildEmptyState();
         }
 
-        return ListView.builder(
-          padding: EdgeInsets.all(20.r),
-          itemCount: providers.length,
-          itemBuilder: (context, index) {
-            final provider = providers[index];
-            final data = provider.data() as Map<String, dynamic>;
-            return _buildProviderCard(provider.id, data);
+        final docs = snapshot.data!.docs.where((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          final name = (data['businessName'] ?? '').toString().toLowerCase();
+          return name.contains(_searchQuery);
+        }).toList();
+
+        if (docs.isEmpty) return _buildEmptyState();
+
+        if (user == null) {
+          return ListView.builder(
+            padding: EdgeInsets.fromLTRB(20.w, 25.h, 20.w, 100.h),
+            physics: const BouncingScrollPhysics(),
+            itemCount: docs.length,
+            itemBuilder: (context, index) {
+              final data = docs[index].data() as Map<String, dynamic>;
+              return _buildProviderCard(data, docs[index].id, false);
+            },
+          );
+        }
+
+        return StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .collection('saved_providers')
+              .snapshots(),
+          builder: (context, savedSnapshot) {
+            final savedIds = savedSnapshot.hasData
+                ? savedSnapshot.data!.docs.map((doc) => doc.id).toSet()
+                : <String>{};
+
+            return ListView.builder(
+              padding: EdgeInsets.fromLTRB(20.w, 25.h, 20.w, 100.h),
+              physics: const BouncingScrollPhysics(),
+              itemCount: docs.length,
+              itemBuilder: (context, index) {
+                final data = docs[index].data() as Map<String, dynamic>;
+                final providerId = docs[index].id;
+                final isSaved = savedIds.contains(providerId);
+                return _buildProviderCard(data, providerId, isSaved);
+              },
+            );
           },
         );
       },
     );
   }
 
-  Widget _buildProviderCard(String id, Map<String, dynamic> data) {
-    final String name = data['businessName'] ?? 'Service Provider';
-    final String type = data['providerType'] ?? _selectedCategory;
-    final double rating = (data['rating'] ?? 0.0).toDouble();
-    final double price = (data['price'] ?? 0.0).toDouble();
-    final String imageUrl = data['imageUrl'] ?? '';
+  Widget _buildProviderCard(
+      Map<String, dynamic> data, String id, bool isSaved) {
+    final name = data['businessName'] ?? 'Service Provider';
+    final type = data['category'] ?? 'Service';
+    final rating = (data['rating'] ?? 0.0).toDouble();
+    final imageUrl = data['imageUrl'] ?? '';
 
     return Container(
-      margin: EdgeInsets.only(bottom: 20.h),
+      margin: EdgeInsets.only(bottom: 25.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(30.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            blurRadius: 20.r,
+            offset: Offset(0, 10.h),
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-            child: SizedBox(
-              height: 150.h,
-              width: double.infinity,
-              child: imageUrl.isNotEmpty
-                  ? Image.network(
-                      imageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => _buildPlaceholderImage(),
-                    )
-                  : _buildPlaceholderImage(),
-            ),
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(30.r),
+                child: imageUrl.isNotEmpty
+                    ? Image.network(
+                        imageUrl,
+                        height: 250.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
+                      )
+                    : _buildPlaceholderImage(),
+              ),
+              Positioned(
+                top: 15.h,
+                right: 15.w,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 6.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(15.r),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.star, color: Colors.amber, size: 16.sp),
+                      SizedBox(width: 4.w),
+                      Text(
+                        rating.toStringAsFixed(1),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 20.h,
+                left: 20.w,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 8.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E5BB1),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Text(
+                    type.toLowerCase(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           Padding(
-            padding: EdgeInsets.all(16.r),
+            padding: EdgeInsets.all(20.r),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                SizedBox(height: 8.h),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            name,
-                            style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textDark,
-                            ),
-                          ),
-                          Text(
-                            type,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              color: AppColors.primaryGreen,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      size: 18.sp,
+                      color: Colors.grey,
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-                      decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.star, color: Colors.amber, size: 16),
-                          SizedBox(width: 4.w),
-                          Text(
-                            rating.toString(),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
+                    SizedBox(width: 8.w),
+                    Text(
+                      'Available',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 15.h),
+                SizedBox(height: 20.h),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Starting from \$${price.toStringAsFixed(0)}',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textDark,
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ProviderProfilePage(
-                              providerId: id,
-                              category: _selectedCategory == 'All' ? (data['category'] ?? 'Service') : _selectedCategory,
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProviderProfilePage(
+                                providerId: id,
+                                category: type,
+                                isEventSaving: widget.isEventSaving,
+                                eventId: widget.eventId,
+                              ),
                             ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryGreen,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.r),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryGreen,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                        ),
+                        child: Text(
+                          widget.isEventSaving
+                              ? 'Select Service'
+                              : 'View Profile',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.sp,
+                          ),
                         ),
                       ),
-                      child: const Text('View Profile', style: TextStyle(color: Colors.white)),
+                    ),
+                    SizedBox(width: 12.w),
+                    GestureDetector(
+                      onTap: () => _toggleSaveProvider(id, data),
+                      child: Container(
+                        padding: EdgeInsets.all(12.r),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15.r),
+                          border: Border.all(
+                            color: isSaved
+                                ? AppColors.primaryGreen
+                                : AppColors.primaryGreen.withOpacity(0.5),
+                            width: 2.w,
+                          ),
+                        ),
+                        child: Icon(
+                          isSaved ? Icons.bookmark : Icons.bookmark_border,
+                          color: AppColors.primaryGreen,
+                          size: 24.sp,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -330,8 +585,10 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
 
   Widget _buildPlaceholderImage() {
     return Container(
-      color: Colors.grey[200],
-      child: const Icon(Icons.business, color: Colors.grey, size: 50),
+      height: 250.h,
+      width: double.infinity,
+      color: Colors.grey[100],
+      child: Icon(Icons.image_outlined, size: 60.sp, color: Colors.grey[300]),
     );
   }
 
@@ -340,11 +597,31 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off, size: 60.sp, color: Colors.grey),
+          Icon(Icons.search_off_rounded, size: 100.sp, color: Colors.grey[200]),
+          SizedBox(height: 20.h),
+          Text(
+            _showSavedOnly ? 'No favorites yet' : 'No results found',
+            style: TextStyle(
+              color: AppColors.textDark,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoginPrompt() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.lock_outline, size: 80.sp, color: Colors.grey),
           SizedBox(height: 16.h),
           Text(
-            'No services found',
-            style: TextStyle(fontSize: 18.sp, color: Colors.grey),
+            'Login to see favorites',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
           ),
         ],
       ),

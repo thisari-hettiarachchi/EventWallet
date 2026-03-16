@@ -47,7 +47,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
         .collection('events')
         .where('userId', isEqualTo: user!.uid)
         .get();
-    
+
     if (mounted) {
       setState(() {
         _events = snapshot.docs;
@@ -66,7 +66,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
     try {
       final amount = double.parse(_amountController.text.trim());
-      
+
       await FirebaseFirestore.instance.collection('expenses').add({
         'userId': user!.uid,
         'title': _titleController.text.trim(),
@@ -78,8 +78,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
       });
 
       if (_selectedEventId != null) {
-        final eventRef =
-            FirebaseFirestore.instance.collection('events').doc(_selectedEventId);
+        final eventRef = FirebaseFirestore.instance
+            .collection('events')
+            .doc(_selectedEventId);
         await FirebaseFirestore.instance.runTransaction((transaction) async {
           final snapshot = await transaction.get(eventRef);
           if (snapshot.exists) {
@@ -101,7 +102,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     }
@@ -116,9 +120,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
           // Background gradient header
           Container(
             height: 260.h,
-            decoration: const BoxDecoration(
-              gradient: AppColors.headerGradient,
-            ),
+            decoration: const BoxDecoration(gradient: AppColors.headerGradient),
           ),
 
           // Decorative circles
@@ -130,7 +132,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
               height: 200.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
               ),
             ),
           ),
@@ -142,7 +144,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
               height: 120.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.08),
               ),
             ),
           ),
@@ -157,11 +159,14 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.white),
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                          ),
                           onPressed: () => Navigator.pop(context),
                         ),
                       ),
@@ -189,7 +194,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                       Container(
                         padding: EdgeInsets.all(20.r),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20.r),
                         ),
                         child: Icon(
@@ -229,7 +234,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildCardHeader(Icons.receipt_long, 'Expense Details'),
+                              _buildCardHeader(
+                                Icons.receipt_long,
+                                'Expense Details',
+                              ),
                               SizedBox(height: 20.h),
                               _buildTextField(
                                 controller: _titleController,
@@ -246,8 +254,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                 hint: '0.00',
                                 icon: Icons.attach_money,
                                 keyboardType: TextInputType.number,
-                                validator: (v) =>
-                                    v!.isEmpty ? 'Please enter an amount' : null,
+                                validator: (v) => v!.isEmpty
+                                    ? 'Please enter an amount'
+                                    : null,
                               ),
                               SizedBox(height: 16.h),
                               _buildTextField(
@@ -255,8 +264,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                 label: 'Category',
                                 hint: 'e.g., Food, Venue, Decor',
                                 icon: Icons.category,
-                                validator: (v) =>
-                                    v!.isEmpty ? 'Please enter a category' : null,
+                                validator: (v) => v!.isEmpty
+                                    ? 'Please enter a category'
+                                    : null,
                               ),
                             ],
                           ),
@@ -287,7 +297,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
                             borderRadius: BorderRadius.circular(16.r),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primaryGreen.withOpacity(0.4),
+                                color: AppColors.primaryGreen.withValues(
+                                  alpha: 0.4,
+                                ),
                                 blurRadius: 16.r,
                                 offset: Offset(0, 6.h),
                               ),
@@ -302,8 +314,11 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.add_circle_outline,
-                                        color: Colors.white, size: 22.sp),
+                                    Icon(
+                                      Icons.add_circle_outline,
+                                      color: Colors.white,
+                                      size: 22.sp,
+                                    ),
                                     SizedBox(width: 10.w),
                                     Text(
                                       'Add Expense',
@@ -408,11 +423,15 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
   Widget _buildEventDropdown() {
     return DropdownButtonFormField<String>(
-      value: _selectedEventId,
+      initialValue: _selectedEventId,
       decoration: InputDecoration(
         labelText: 'Event',
         labelStyle: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
-        prefixIcon: Icon(Icons.event_note, color: AppColors.primaryGreen, size: 24.sp),
+        prefixIcon: Icon(
+          Icons.event_note,
+          color: AppColors.primaryGreen,
+          size: 24.sp,
+        ),
         filled: true,
         fillColor: AppColors.background,
         border: OutlineInputBorder(
@@ -433,7 +452,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
         final data = e.data() as Map<String, dynamic>;
         return DropdownMenuItem(
           value: e.id,
-          child: Text(data['eventName'] ?? data['name'] ?? 'Unnamed Event', style: TextStyle(fontSize: 15.sp)),
+          child: Text(
+            data['eventName'] ?? data['name'] ?? 'Unnamed Event',
+            style: TextStyle(fontSize: 15.sp),
+          ),
         );
       }).toList(),
       onChanged: (v) {

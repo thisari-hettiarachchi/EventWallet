@@ -38,7 +38,9 @@ class AllProviderReviewsPage extends StatelessWidget {
         stream: ReviewService().getProviderReviews(providerId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen));
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primaryGreen),
+            );
           }
 
           final reviews = snapshot.data?.docs ?? [];
@@ -115,7 +117,11 @@ class AllProviderReviewsPage extends StatelessWidget {
             SizedBox(height: 10.h),
             Text(
               comment,
-              style: TextStyle(fontSize: 14.sp, color: Colors.grey.shade800, height: 1.4),
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.grey.shade800,
+                height: 1.4,
+              ),
             ),
           ],
         ],

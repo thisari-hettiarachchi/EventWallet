@@ -12,10 +12,7 @@ class AppColors {
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [
-      primaryGreen,
-      primaryBlue,
-    ],
+    colors: [primaryGreen, primaryBlue],
   );
 
   static const LinearGradient headerGradient = LinearGradient(

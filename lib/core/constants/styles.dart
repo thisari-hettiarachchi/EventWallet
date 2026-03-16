@@ -37,10 +37,7 @@ class AppTextStyles {
     color: AppColors.textGrey,
   );
 
-  static TextStyle body = TextStyle(
-    fontSize: 13.sp,
-    color: AppColors.textDark,
-  );
+  static TextStyle body = TextStyle(fontSize: 13.sp, color: AppColors.textDark);
 
   static TextStyle bodyLarge = TextStyle(
     fontSize: 15.sp,
@@ -68,10 +65,7 @@ class AppTextStyles {
   }
 
   static TextStyle greyText({double fontSize = 12}) {
-    return TextStyle(
-      fontSize: fontSize.sp,
-      color: AppColors.textGrey,
-    );
+    return TextStyle(fontSize: fontSize.sp, color: AppColors.textGrey);
   }
 
   static TextStyle budgetAmount = TextStyle(
@@ -136,17 +130,16 @@ class AppDecorations {
   static BoxDecoration overlayButton = BoxDecoration(
     color: Colors.white.withValues(alpha: 0.2),
     borderRadius: BorderRadius.circular(12.r),
-    border: Border.all(
-      color: Colors.white.withValues(alpha: 0.3),
-      width: 1.w,
-    ),
+    border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.w),
   );
 }
 
 // ===== COMMON PADDING & SPACING =====
 class AppSpacing {
-  static EdgeInsets get pagePadding => EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h);
-  static EdgeInsets get horizontalPadding => EdgeInsets.symmetric(horizontal: 20.w);
+  static EdgeInsets get pagePadding =>
+      EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h);
+  static EdgeInsets get horizontalPadding =>
+      EdgeInsets.symmetric(horizontal: 20.w);
   static EdgeInsets get cardPadding => EdgeInsets.all(16.r);
 
   static SizedBox get verticalSmall => SizedBox(height: 12.h);

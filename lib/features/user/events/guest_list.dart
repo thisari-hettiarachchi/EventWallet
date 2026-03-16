@@ -27,9 +27,7 @@ class _GuestListPageState extends State<GuestListPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.headerGradient,
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.headerGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -39,7 +37,9 @@ class _GuestListPageState extends State<GuestListPage> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(35.r),
+                    ),
                   ),
                   child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
@@ -68,7 +68,8 @@ class _GuestListPageState extends State<GuestListPage> {
                               itemCount: guests.length,
                               itemBuilder: (context, index) {
                                 final guest = guests[index];
-                                final data = guest.data() as Map<String, dynamic>;
+                                final data =
+                                    guest.data() as Map<String, dynamic>;
                                 return _buildGuestCard(guest.id, data);
                               },
                             ),
@@ -87,8 +88,14 @@ class _GuestListPageState extends State<GuestListPage> {
         onPressed: () => _showGuestDialog(),
         backgroundColor: AppColors.primaryGreen,
         icon: Icon(Icons.person_add, color: Colors.white, size: 24.sp),
-        label: Text('Add Guest',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp)),
+        label: Text(
+          'Add Guest',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14.sp,
+          ),
+        ),
       ),
     );
   }
@@ -123,9 +130,13 @@ class _GuestListPageState extends State<GuestListPage> {
 
     for (var guest in guests) {
       final status = (guest.data() as Map<String, dynamic>)['status'];
-      if (status == 'Confirmed') confirmed++;
-      else if (status == 'Declined') declined++;
-      else pending++;
+      if (status == 'Confirmed') {
+        confirmed++;
+      } else if (status == 'Declined') {
+        declined++;
+      } else {
+        pending++;
+      }
     }
 
     return Padding(
@@ -156,10 +167,7 @@ class _GuestListPageState extends State<GuestListPage> {
         SizedBox(height: 4.h),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: Colors.grey.shade600,
-          ),
+          style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600),
         ),
       ],
     );
@@ -176,17 +184,27 @@ class _GuestListPageState extends State<GuestListPage> {
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         leading: CircleAvatar(
-          backgroundColor: AppColors.primaryGreen.withOpacity(0.1),
+          backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.1),
           radius: 20.r,
           child: Text(
-            (data['name'] ?? 'G').isNotEmpty ? data['name'][0].toUpperCase() : 'G',
+            (data['name'] ?? 'G').isNotEmpty
+                ? data['name'][0].toUpperCase()
+                : 'G',
             style: TextStyle(
-                color: AppColors.primaryGreen, fontWeight: FontWeight.bold, fontSize: 16.sp),
+              color: AppColors.primaryGreen,
+              fontWeight: FontWeight.bold,
+              fontSize: 16.sp,
+            ),
           ),
         ),
-        title: Text(data['name'] ?? '',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
-        subtitle: Text(data['email'] ?? 'No email', style: TextStyle(fontSize: 14.sp)),
+        title: Text(
+          data['name'] ?? '',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+        ),
+        subtitle: Text(
+          data['email'] ?? 'No email',
+          style: TextStyle(fontSize: 14.sp),
+        ),
         trailing: PopupMenuButton<String>(
           onSelected: (value) {
             if (value == 'delete') {
@@ -203,33 +221,47 @@ class _GuestListPageState extends State<GuestListPage> {
             }
           },
           itemBuilder: (context) => [
-            PopupMenuItem(value: 'Pending', child: Text('Pending', style: TextStyle(fontSize: 14.sp))),
-            PopupMenuItem(value: 'Confirmed', child: Text('Confirmed', style: TextStyle(fontSize: 14.sp))),
-            PopupMenuItem(value: 'Declined', child: Text('Declined', style: TextStyle(fontSize: 14.sp))),
+            PopupMenuItem(
+              value: 'Pending',
+              child: Text('Pending', style: TextStyle(fontSize: 14.sp)),
+            ),
+            PopupMenuItem(
+              value: 'Confirmed',
+              child: Text('Confirmed', style: TextStyle(fontSize: 14.sp)),
+            ),
+            PopupMenuItem(
+              value: 'Declined',
+              child: Text('Declined', style: TextStyle(fontSize: 14.sp)),
+            ),
             const PopupMenuDivider(),
             PopupMenuItem(
-                value: 'edit',
-                child: Row(
-                  children: [
-                    Icon(Icons.edit, size: 20.sp),
-                    SizedBox(width: 8.w),
-                    Text('Edit', style: TextStyle(fontSize: 14.sp)),
-                  ],
-                )),
+              value: 'edit',
+              child: Row(
+                children: [
+                  Icon(Icons.edit, size: 20.sp),
+                  SizedBox(width: 8.w),
+                  Text('Edit', style: TextStyle(fontSize: 14.sp)),
+                ],
+              ),
+            ),
             PopupMenuItem(
-                value: 'delete',
-                child: Row(
-                  children: [
-                    Icon(Icons.delete, color: Colors.red, size: 20.sp),
-                    SizedBox(width: 8.w),
-                    Text('Remove', style: TextStyle(color: Colors.red, fontSize: 14.sp)),
-                  ],
-                )),
+              value: 'delete',
+              child: Row(
+                children: [
+                  Icon(Icons.delete, color: Colors.red, size: 20.sp),
+                  SizedBox(width: 8.w),
+                  Text(
+                    'Remove',
+                    style: TextStyle(color: Colors.red, fontSize: 14.sp),
+                  ),
+                ],
+              ),
+            ),
           ],
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
             decoration: BoxDecoration(
-              color: _getStatusColor(data['status']).withOpacity(0.1),
+              color: _getStatusColor(data['status']).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Text(
@@ -262,13 +294,19 @@ class _GuestListPageState extends State<GuestListPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.people_outline,
-              size: 80.sp, color: Colors.grey.withOpacity(0.3)),
+          Icon(
+            Icons.people_outline,
+            size: 80.sp,
+            color: Colors.grey.withValues(alpha: 0.3),
+          ),
           SizedBox(height: 16.h),
           Text(
             'No guests added yet',
             style: TextStyle(
-                fontSize: 18.sp, color: Colors.grey, fontWeight: FontWeight.bold),
+              fontSize: 18.sp,
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -279,12 +317,19 @@ class _GuestListPageState extends State<GuestListPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Remove Guest', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
-        content: Text('Are you sure you want to remove this guest?', style: TextStyle(fontSize: 14.sp)),
+        title: Text(
+          'Remove Guest',
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Are you sure you want to remove this guest?',
+          style: TextStyle(fontSize: 14.sp),
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: TextStyle(fontSize: 14.sp))),
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
+          ),
           TextButton(
             onPressed: () {
               FirebaseFirestore.instance
@@ -295,7 +340,10 @@ class _GuestListPageState extends State<GuestListPage> {
                   .delete();
               Navigator.pop(context);
             },
-            child: Text('Remove', style: TextStyle(color: Colors.red, fontSize: 14.sp)),
+            child: Text(
+              'Remove',
+              style: TextStyle(color: Colors.red, fontSize: 14.sp),
+            ),
           ),
         ],
       ),
@@ -305,7 +353,7 @@ class _GuestListPageState extends State<GuestListPage> {
   void _showGuestDialog({String? guestId, Map<String, dynamic>? currentData}) {
     final bool isEditing = guestId != null;
     String selectedStatus = currentData?['status'] ?? 'Pending';
-    
+
     if (isEditing) {
       _nameController.text = currentData?['name'] ?? '';
       _emailController.text = currentData?['email'] ?? '';
@@ -318,7 +366,10 @@ class _GuestListPageState extends State<GuestListPage> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text(isEditing ? 'Edit Guest' : 'Add Guest', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+          title: Text(
+            isEditing ? 'Edit Guest' : 'Add Guest',
+            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -348,12 +399,14 @@ class _GuestListPageState extends State<GuestListPage> {
                 ),
                 SizedBox(height: 16.h),
                 DropdownButtonFormField<String>(
-                  value: selectedStatus,
+                  initialValue: selectedStatus,
                   decoration: InputDecoration(
                     labelText: 'Status',
                     labelStyle: TextStyle(fontSize: 14.sp),
                   ),
-                  items: ['Pending', 'Confirmed', 'Declined'].map((String value) {
+                  items: ['Pending', 'Confirmed', 'Declined'].map((
+                    String value,
+                  ) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value, style: TextStyle(fontSize: 14.sp)),
@@ -370,8 +423,9 @@ class _GuestListPageState extends State<GuestListPage> {
           ),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Cancel', style: TextStyle(fontSize: 14.sp))),
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
+            ),
             ElevatedButton(
               onPressed: () {
                 if (_nameController.text.isNotEmpty) {
@@ -400,10 +454,13 @@ class _GuestListPageState extends State<GuestListPage> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h)),
-              child: Text(isEditing ? 'Update' : 'Add',
-                  style: TextStyle(color: Colors.white, fontSize: 14.sp)),
+                backgroundColor: AppColors.primaryGreen,
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+              ),
+              child: Text(
+                isEditing ? 'Update' : 'Add',
+                style: TextStyle(color: Colors.white, fontSize: 14.sp),
+              ),
             ),
           ],
         ),

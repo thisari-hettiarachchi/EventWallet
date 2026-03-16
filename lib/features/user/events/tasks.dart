@@ -19,9 +19,7 @@ class _TasksPageState extends State<TasksPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.headerGradient,
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.headerGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -31,7 +29,9 @@ class _TasksPageState extends State<TasksPage> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(35.r),
+                    ),
                   ),
                   child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
@@ -155,11 +155,19 @@ class _TasksPageState extends State<TasksPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.checklist, size: 80.sp, color: Colors.grey.withOpacity(0.3)),
+          Icon(
+            Icons.checklist,
+            size: 80.sp,
+            color: Colors.grey.withValues(alpha: 0.3),
+          ),
           SizedBox(height: 16.h),
           Text(
             'No tasks yet',
-            style: TextStyle(fontSize: 18.sp, color: Colors.grey, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 18.sp,
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -170,7 +178,10 @@ class _TasksPageState extends State<TasksPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Add New Task', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Add New Task',
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
         content: TextField(
           controller: _taskController,
           style: TextStyle(fontSize: 16.sp),
@@ -181,7 +192,10 @@ class _TasksPageState extends State<TasksPage> {
           autofocus: true,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(fontSize: 14.sp))),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
+          ),
           ElevatedButton(
             onPressed: () {
               if (_taskController.text.isNotEmpty) {
@@ -190,16 +204,21 @@ class _TasksPageState extends State<TasksPage> {
                     .doc(widget.eventId)
                     .collection('tasks')
                     .add({
-                  'title': _taskController.text.trim(),
-                  'isDone': false,
-                  'createdAt': FieldValue.serverTimestamp(),
-                });
+                      'title': _taskController.text.trim(),
+                      'isDone': false,
+                      'createdAt': FieldValue.serverTimestamp(),
+                    });
                 _taskController.clear();
                 Navigator.pop(context);
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryGreen),
-            child: Text('Add', style: TextStyle(color: Colors.white, fontSize: 14.sp)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryGreen,
+            ),
+            child: Text(
+              'Add',
+              style: TextStyle(color: Colors.white, fontSize: 14.sp),
+            ),
           ),
         ],
       ),

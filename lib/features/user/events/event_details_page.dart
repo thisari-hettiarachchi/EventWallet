@@ -9,6 +9,7 @@ import '../../../core/constants/colors.dart';
 import '../discovery/discovery.dart';
 import 'edit_event.dart';
 import '../../../services/events_service.dart';
+import '../../../services/booking_service.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final String eventId;
@@ -93,7 +94,8 @@ class _EventDetailsPageState extends State<EventDetailsPage>
     if (_isDeleting) return;
 
     final user = FirebaseAuth.instance.currentUser;
-    final eventName = (event['eventName'] ?? event['name'] ?? 'this event').toString();
+    final eventName = (event['eventName'] ?? event['name'] ?? 'this event')
+        .toString();
 
     if (user == null || event['userId'] != user.uid) {
       if (!mounted) return;
@@ -117,12 +119,12 @@ class _EventDetailsPageState extends State<EventDetailsPage>
           .doc(user.uid)
           .collection('notifications')
           .add({
-        'title': 'Event Deleted',
-        'message': 'Your event "$eventName" has been deleted.',
-        'timestamp': FieldValue.serverTimestamp(),
-        'isRead': false,
-        'type': 'event',
-      });
+            'title': 'Event Deleted',
+            'message': 'Your event "$eventName" has been deleted.',
+            'timestamp': FieldValue.serverTimestamp(),
+            'isRead': false,
+            'type': 'event',
+          });
 
       if (!mounted) return;
       final messenger = ScaffoldMessenger.of(context);
@@ -133,7 +135,9 @@ class _EventDetailsPageState extends State<EventDetailsPage>
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to delete event. Please try again.')),
+        const SnackBar(
+          content: Text('Failed to delete event. Please try again.'),
+        ),
       );
     } finally {
       if (mounted) {
@@ -199,7 +203,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                   height: 200.w,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                   ),
                 ),
               ),
@@ -211,7 +215,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                   height: 120.w,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.08),
+                    color: Colors.white.withValues(alpha: 0.08),
                   ),
                 ),
               ),
@@ -226,10 +230,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12.r),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 width: 1.w,
                               ),
                             ),
@@ -252,10 +256,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                           const Spacer(),
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12.r),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 width: 1.w,
                               ),
                             ),
@@ -279,10 +283,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                             SizedBox(width: 8.w),
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(12.r),
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   width: 1.w,
                                 ),
                               ),
@@ -317,17 +321,19 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                             SizedBox(width: 8.w),
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.18),
+                                color: Colors.red.withValues(alpha: 0.18),
                                 borderRadius: BorderRadius.circular(12.r),
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   width: 1.w,
                                 ),
                               ),
                               child: Material(
                                 color: Colors.transparent,
                                 child: InkWell(
-                                  onTap: _isDeleting ? null : () => _deleteEvent(event),
+                                  onTap: _isDeleting
+                                      ? null
+                                      : () => _deleteEvent(event),
                                   borderRadius: BorderRadius.circular(12.r),
                                   child: Padding(
                                     padding: EdgeInsets.all(12.r),
@@ -335,10 +341,14 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                         ? SizedBox(
                                             height: 20.sp,
                                             width: 20.sp,
-                                            child: const CircularProgressIndicator(
-                                              strokeWidth: 2.2,
-                                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                            ),
+                                            child:
+                                                const CircularProgressIndicator(
+                                                  strokeWidth: 2.2,
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                        Color
+                                                      >(Colors.white),
+                                                ),
                                           )
                                         : Icon(
                                             Icons.delete_outline,
@@ -363,10 +373,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                           Container(
                             padding: EdgeInsets.all(20.r),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20.r),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 width: 2.w,
                               ),
                             ),
@@ -398,7 +408,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                               borderRadius: BorderRadius.circular(20.r),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: Colors.black.withValues(alpha: 0.1),
                                   blurRadius: 10.r,
                                   offset: Offset(0, 4.h),
                                 ),
@@ -456,7 +466,15 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                     'Expenses',
                                     Icons.account_balance_wallet,
                                     AppColors.primaryGreen,
-                                    () => Navigator.push(context, MaterialPageRoute(builder: (_) => ExpensesPage(eventId: widget.eventId, eventName: widget.eventName))),
+                                    () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ExpensesPage(
+                                          eventId: widget.eventId,
+                                          eventName: widget.eventName,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 SizedBox(width: 12.w),
@@ -465,7 +483,13 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                     'Tasks',
                                     Icons.task_alt,
                                     AppColors.primaryBlue,
-                                    () => Navigator.push(context, MaterialPageRoute(builder: (_) => TasksPage(eventId: widget.eventId))),
+                                    () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            TasksPage(eventId: widget.eventId),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -478,7 +502,14 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                     'Guest List',
                                     Icons.people_outline,
                                     Colors.purple,
-                                    () => Navigator.push(context, MaterialPageRoute(builder: (_) => GuestListPage(eventId: widget.eventId))),
+                                    () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => GuestListPage(
+                                          eventId: widget.eventId,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 SizedBox(width: 12.w),
@@ -513,7 +544,9 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                         padding: EdgeInsets.all(10.r),
                                         decoration: BoxDecoration(
                                           gradient: AppColors.primaryGradient,
-                                          borderRadius: BorderRadius.circular(12.r),
+                                          borderRadius: BorderRadius.circular(
+                                            12.r,
+                                          ),
                                         ),
                                         child: Icon(
                                           Icons.trending_up,
@@ -538,26 +571,41 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                         height: 20.h,
                                         decoration: BoxDecoration(
                                           color: Colors.grey.shade200,
-                                          borderRadius: BorderRadius.circular(10.r),
+                                          borderRadius: BorderRadius.circular(
+                                            10.r,
+                                          ),
                                         ),
                                       ),
                                       FractionallySizedBox(
-                                        widthFactor: progress > 1 ? 1 : progress,
+                                        widthFactor: progress > 1
+                                            ? 1
+                                            : progress,
                                         child: Container(
                                           height: 20.h,
                                           decoration: BoxDecoration(
                                             gradient: LinearGradient(
                                               colors: progress > 0.8
-                                                  ? [Colors.orange.shade400, Colors.red.shade400]
-                                                  : [const Color(0xFF00897B), const Color(0xFF1565C0)],
+                                                  ? [
+                                                      Colors.orange.shade400,
+                                                      Colors.red.shade400,
+                                                    ]
+                                                  : [
+                                                      const Color(0xFF00897B),
+                                                      const Color(0xFF1565C0),
+                                                    ],
                                             ),
-                                            borderRadius: BorderRadius.circular(10.r),
+                                            borderRadius: BorderRadius.circular(
+                                              10.r,
+                                            ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: (progress > 0.8
-                                                    ? Colors.orange
-                                                    : const Color(0xFF00897B))
-                                                    .withOpacity(0.4),
+                                                color:
+                                                    (progress > 0.8
+                                                            ? Colors.orange
+                                                            : const Color(
+                                                                0xFF00897B,
+                                                              ))
+                                                        .withValues(alpha: 0.4),
                                                 blurRadius: 8.r,
                                                 offset: Offset(0, 2.h),
                                               ),
@@ -569,7 +617,8 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                   ),
                                   SizedBox(height: 12.h),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         '\$${spent.toStringAsFixed(2)} spent',
@@ -605,7 +654,9 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                         padding: EdgeInsets.all(10.r),
                                         decoration: BoxDecoration(
                                           gradient: AppColors.primaryGradient,
-                                          borderRadius: BorderRadius.circular(12.r),
+                                          borderRadius: BorderRadius.circular(
+                                            12.r,
+                                          ),
                                         ),
                                         child: Icon(
                                           Icons.info_outline,
@@ -645,7 +696,8 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                   _buildInfoRow(
                                     Icons.people,
                                     'Attendees',
-                                    event['attendees']?.toString() ?? 'Not specified',
+                                    event['attendees']?.toString() ??
+                                        'Not specified',
                                     AppColors.primaryBlue,
                                     isLast: true,
                                   ),
@@ -667,67 +719,51 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                           padding: EdgeInsets.all(10.r),
                                           decoration: BoxDecoration(
                                             gradient: AppColors.primaryGradient,
-                                            borderRadius: BorderRadius.circular(12.r),
+                                            borderRadius: BorderRadius.circular(
+                                              12.r,
+                                            ),
                                           ),
                                           child: Icon(
                                             Icons.description,
                                             color: Colors.white,
                                             size: 20.sp,
-                                          ),
                                         ),
-                                        SizedBox(width: 12.w),
-                                        Text(
-                                          'Description',
-                                          style: TextStyle(
-                                            fontSize: 18.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 16.h),
-                                    Text(
-                                      event['description'],
-                                      style: TextStyle(
-                                        fontSize: 15.sp,
-                                        color: AppColors.textGrey,
-                                        height: 1.6,
                                       ),
+                                      SizedBox(width: 12.w),
+                                      Text(
+                                        'Description',
+                                        style: TextStyle(
+                                          fontSize: 18.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  Text(
+                                    event['description'],
+                                    style: TextStyle(
+                                      fontSize: 15.sp,
+                                      color: AppColors.textGrey,
+                                      height: 1.6,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
+                            ),
                             SizedBox(height: 24.h),
 
-                            // Saved Services Section
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Services for this Event',
-                                  style: TextStyle(
-                                    fontSize: 20.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textDark,
-                                  ),
-                                ),
-                                TextButton.icon(
-                                  onPressed: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => DiscoveryPage(
-                                        eventId: widget.eventId,
-                                        isEventSaving: true,
-                                      ),
-                                    ),
-                                  ),
-                                  icon: Icon(Icons.add, size: 18.sp),
-                                  label: Text('Add', style: TextStyle(fontSize: 14.sp)),
-                                ),
-                              ],
+                            // Booked Services Section
+                            Text(
+                              'Booked Services',
+                              style: TextStyle(
+                                fontSize: 20.sp,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textDark,
+                              ),
                             ),
                             SizedBox(height: 16.h),
-                            _buildSavedServicesSection(),
+                            _buildBookedServicesList(),
 
                             SizedBox(height: 100.h),
                           ],
@@ -744,186 +780,176 @@ class _EventDetailsPageState extends State<EventDetailsPage>
     );
   }
 
-  Widget _buildSavedServicesSection() {
+  Widget _buildBookedServicesList() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return Container(
+        padding: EdgeInsets.all(20.r),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Text(
+          'Please login to view booked services.',
+          style: TextStyle(color: Colors.grey.shade600),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('events')
-          .doc(widget.eventId)
-          .collection('services')
+          .collection('bookings')
+          .where('eventId', isEqualTo: widget.eventId)
+          .where('userId', isEqualTo: user.uid)
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return SizedBox(
-            height: 100.h,
-            child: const Center(child: CircularProgressIndicator()),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
 
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return InkWell(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => DiscoveryPage(
-                  eventId: widget.eventId,
-                  isEventSaving: true,
-                ),
-              ),
+        if (snapshot.hasError) {
+          return Container(
+            padding: EdgeInsets.all(20.r),
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(color: Colors.red.shade100),
             ),
-            borderRadius: BorderRadius.circular(16.r),
-            child: Container(
-              padding: EdgeInsets.all(32.r),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: Column(
-                children: [
-                  Icon(Icons.business_center_outlined, size: 48.sp, color: Colors.grey.shade400),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'No services added yet',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'Tap to discover and add services to your event',
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      color: Colors.grey.shade500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
+            child: Text(
+              'Could not load booked services. Please try again.',
+              style: TextStyle(color: Colors.red.shade700),
+              textAlign: TextAlign.center,
             ),
           );
         }
 
-        final services = snapshot.data!.docs;
+        final bookings = snapshot.data?.docs ?? [];
+        // Filter out rejected bookings
+        final activeBookings = bookings.where((doc) {
+          final status = (doc.data() as Map<String, dynamic>)['status'];
+          return BookingStatuses.normalize(status) != BookingStatuses.rejected;
+        }).toList();
+
+        if (activeBookings.isEmpty) {
+          return Container(
+            padding: EdgeInsets.all(20.r),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            child: Text(
+              'No services booked for this event.',
+              style: TextStyle(color: Colors.grey.shade600),
+              textAlign: TextAlign.center,
+            ),
+          );
+        }
+
         return Column(
-          children: List.generate(
-            services.length,
-            (index) {
-              final data = services[index].data() as Map<String, dynamic>;
-              final name = data['businessName'] ?? data['name'] ?? 'Unknown Service';
-              final type = data['providerType'] ?? data['category'] ?? 'Service';
-              final price = (data['price'] ?? 0.0).toDouble();
-              final rating = (data['rating'] ?? 0.0).toDouble();
+          children: activeBookings.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final providerName = bookingProviderNameFrom(data);
+            final packageName = bookingPackageNameFrom(data);
+            final status = (data['status'] ?? 'pending').toString();
+            final amount = bookingAmountFrom(data['amount']);
+            final isAccepted =
+                BookingStatuses.normalize(status) == BookingStatuses.accepted;
 
-              return Container(
-                margin: EdgeInsets.only(bottom: 12.h),
-                padding: EdgeInsets.all(12.r),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: Colors.grey.shade200),
+            return Container(
+              margin: EdgeInsets.only(bottom: 15.h),
+              padding: EdgeInsets.all(15.r),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15.r),
+                boxShadow: [AppColors.cardShadow()],
+                border: Border.all(
+                  color: isAccepted
+                      ? AppColors.primaryGreen.withValues(alpha: 0.3)
+                      : Colors.orange.withValues(alpha: 0.3),
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(8.r),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryGreen.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Icon(Icons.business, color: AppColors.primaryGreen, size: 20.sp),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(10.r),
+                    decoration: BoxDecoration(
+                      color: (isAccepted ? AppColors.primaryGreen : Colors.orange)
+                          .withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
                     ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.sp,
-                              color: AppColors.textDark,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 4.h),
-                          Row(
-                            children: [
-                              Text(
-                                type,
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  color: AppColors.primaryBlue,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              if (rating > 0) ...[
-                                SizedBox(width: 8.w),
-                                Icon(Icons.star_rounded, size: 12.sp, color: Colors.amber),
-                                SizedBox(width: 2.w),
-                                Text(
-                                  rating.toStringAsFixed(1),
-                                  style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ],
-                      ),
+                    child: Icon(
+                      isAccepted ? Icons.check_circle : Icons.hourglass_empty,
+                      color: isAccepted ? AppColors.primaryGreen : Colors.orange,
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                  ),
+                  SizedBox(width: 15.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (price > 0)
-                          Text(
-                            '\$${price.toInt()}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.sp,
-                              color: AppColors.primaryGreen,
-                            ),
+                        Text(
+                          providerName,
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textDark,
                           ),
-                        SizedBox(height: 4.h),
-                        GestureDetector(
-                          onTap: () {
-                            FirebaseFirestore.instance
-                                .collection('events')
-                                .doc(widget.eventId)
-                                .collection('services')
-                                .doc(services[index].id)
-                                .delete();
-                          },
-                          child: Icon(Icons.close, size: 18.sp, color: Colors.grey.shade600),
+                        ),
+                        Text(
+                          packageName,
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: AppColors.textGrey,
+                          ),
                         ),
                       ],
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '\$${amount.toStringAsFixed(0)}',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryGreen,
+                        ),
+                      ),
+                      Text(
+                        isAccepted ? 'Confirmed' : 'Pending',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: isAccepted ? AppColors.primaryGreen : Colors.orange,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
         );
       },
     );
   }
 
   Widget _buildSmallActionCard(
-      String label,
-      IconData icon,
-      Color color,
-      VoidCallback onTap,
-      ) {
+    String label,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.05),
+            color: color.withValues(alpha: 0.05),
             blurRadius: 8.r,
             offset: Offset(0, 4.h),
           ),
@@ -941,7 +967,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                 Container(
                   padding: EdgeInsets.all(8.r),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(icon, color: color, size: 20.sp),
@@ -976,12 +1002,12 @@ class _EventDetailsPageState extends State<EventDetailsPage>
   }
 
   Widget _buildInfoRow(
-      IconData icon,
-      String label,
-      String value,
-      Color color, {
-        bool isLast = false,
-      }) {
+    IconData icon,
+    String label,
+    String value,
+    Color color, {
+    bool isLast = false,
+  }) {
     return Padding(
       padding: EdgeInsets.only(bottom: isLast ? 0 : 16.h),
       child: Row(
@@ -989,7 +1015,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
           Container(
             padding: EdgeInsets.all(8.r),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: Icon(icon, size: 18.sp, color: color),
@@ -1067,8 +1093,18 @@ class _EventDetailsPageState extends State<EventDetailsPage>
       return 'Invalid Date';
     }
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }

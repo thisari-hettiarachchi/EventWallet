@@ -15,9 +15,7 @@ class NotificationsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.headerGradient,
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.headerGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -27,7 +25,9 @@ class NotificationsPage extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(35.r),
+                    ),
                   ),
                   child: user == null
                       ? _buildLoginPrompt()
@@ -39,11 +39,15 @@ class NotificationsPage extends StatelessWidget {
                               .orderBy('timestamp', descending: true)
                               .snapshots(),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(child: CircularProgressIndicator());
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
                             }
 
-                            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                            if (!snapshot.hasData ||
+                                snapshot.data!.docs.isEmpty) {
                               return _buildEmptyState();
                             }
 
@@ -98,21 +102,26 @@ class NotificationsPage extends StatelessWidget {
 
   Widget _buildNotificationCard(String id, Map<String, dynamic> data) {
     final bool isRead = data['isRead'] ?? false;
-    final timestamp = (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now();
+    final timestamp =
+        (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now();
     final String timeAgo = _formatTimestamp(timestamp);
 
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: isRead ? Colors.white : AppColors.primaryGreen.withOpacity(0.05),
+        color: isRead
+            ? Colors.white
+            : AppColors.primaryGreen.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16.r),
-        border: isRead ? null : Border.all(color: AppColors.primaryGreen.withOpacity(0.2)),
+        border: isRead
+            ? null
+            : Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.2)),
         boxShadow: [AppColors.cardShadow()],
       ),
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         leading: CircleAvatar(
-          backgroundColor: _getIconColor(data['type']).withOpacity(0.1),
+          backgroundColor: _getIconColor(data['type']).withValues(alpha: 0.1),
           child: Icon(
             _getIcon(data['type']),
             color: _getIconColor(data['type']),
@@ -148,18 +157,12 @@ class NotificationsPage extends StatelessWidget {
             SizedBox(height: 4.h),
             Text(
               data['message'] ?? '',
-              style: TextStyle(
-                color: Colors.grey.shade700,
-                fontSize: 14.sp,
-              ),
+              style: TextStyle(color: Colors.grey.shade700, fontSize: 14.sp),
             ),
             SizedBox(height: 8.h),
             Text(
               timeAgo,
-              style: TextStyle(
-                color: Colors.grey.shade500,
-                fontSize: 12.sp,
-              ),
+              style: TextStyle(color: Colors.grey.shade500, fontSize: 12.sp),
             ),
           ],
         ),
@@ -170,21 +173,31 @@ class NotificationsPage extends StatelessWidget {
 
   IconData _getIcon(String? type) {
     switch (type) {
-      case 'event': return Icons.event;
-      case 'payment': return Icons.payment;
-      case 'budget': return Icons.account_balance_wallet;
-      case 'service': return Icons.build;
-      default: return Icons.notifications;
+      case 'event':
+        return Icons.event;
+      case 'payment':
+        return Icons.payment;
+      case 'budget':
+        return Icons.account_balance_wallet;
+      case 'service':
+        return Icons.build;
+      default:
+        return Icons.notifications;
     }
   }
 
   Color _getIconColor(String? type) {
     switch (type) {
-      case 'event': return Colors.blue;
-      case 'payment': return Colors.green;
-      case 'budget': return Colors.orange;
-      case 'service': return Colors.purple;
-      default: return AppColors.primaryGreen;
+      case 'event':
+        return Colors.blue;
+      case 'payment':
+        return Colors.green;
+      case 'budget':
+        return Colors.orange;
+      case 'service':
+        return Colors.purple;
+      default:
+        return AppColors.primaryGreen;
     }
   }
 
@@ -210,11 +223,19 @@ class NotificationsPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.notifications_none_rounded, size: 80.sp, color: Colors.grey.shade300),
+          Icon(
+            Icons.notifications_none_rounded,
+            size: 80.sp,
+            color: Colors.grey.shade300,
+          ),
           SizedBox(height: 16.h),
           Text(
             'All caught up!',
-            style: TextStyle(fontSize: 18.sp, color: Colors.grey.shade600, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 18.sp,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           SizedBox(height: 8.h),
           Text(
@@ -227,7 +248,12 @@ class NotificationsPage extends StatelessWidget {
   }
 
   Widget _buildLoginPrompt() {
-    return Center(child: Text('Please login to view notifications', style: TextStyle(fontSize: 16.sp)));
+    return Center(
+      child: Text(
+        'Please login to view notifications',
+        style: TextStyle(fontSize: 16.sp),
+      ),
+    );
   }
 
   Future<void> _markAsRead(String id) async {

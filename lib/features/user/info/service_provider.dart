@@ -4,7 +4,7 @@ import '../../service_provider/auth/login.dart';
 import '../../service_provider/auth/signup.dart';
 
 class ServiceProviderPage extends StatelessWidget {
-  const ServiceProviderPage({Key? key}) : super(key: key);
+  const ServiceProviderPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +18,7 @@ class ServiceProviderPage extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF00897B),
-                    Color(0xFF1565C0),
-                  ],
+                  colors: [Color(0xFF00897B), Color(0xFF1565C0)],
                 ),
               ),
               child: SafeArea(
@@ -33,15 +30,19 @@ class ServiceProviderPage extends StatelessWidget {
                         alignment: Alignment.centerLeft,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                               width: 1.5.w,
                             ),
                           ),
                           child: IconButton(
-                            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 24.sp,
+                            ),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ),
@@ -79,7 +80,10 @@ class ServiceProviderPage extends StatelessWidget {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const ServiceProviderLoginPage()),
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ServiceProviderLoginPage(),
+                                  ),
                                 );
                               },
                               style: ElevatedButton.styleFrom(
@@ -106,7 +110,10 @@ class ServiceProviderPage extends StatelessWidget {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const ServiceProviderSignupPage()),
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ServiceProviderSignupPage(),
+                                  ),
                                 );
                               },
                               style: ElevatedButton.styleFrom(
@@ -156,28 +163,28 @@ class ServiceProviderPage extends StatelessWidget {
                     icon: Icons.people,
                     title: 'Reach More Customers',
                     description:
-                    'Connect with thousands of potential clients actively looking for services like yours.',
+                        'Connect with thousands of potential clients actively looking for services like yours.',
                     color: const Color(0xFF1565C0),
                   ),
                   _buildBenefitCard(
                     icon: Icons.trending_up,
                     title: 'Grow Your Business',
                     description:
-                    'Access powerful tools and analytics to manage and expand your service offerings.',
+                        'Access powerful tools and analytics to manage and expand your service offerings.',
                     color: const Color(0xFF00897B),
                   ),
                   _buildBenefitCard(
                     icon: Icons.schedule,
                     title: 'Flexible Schedule',
                     description:
-                    'Work on your own terms with complete control over your availability and pricing.',
+                        'Work on your own terms with complete control over your availability and pricing.',
                     color: const Color(0xFF1565C0),
                   ),
                   _buildBenefitCard(
                     icon: Icons.payment,
                     title: 'Secure Payments',
                     description:
-                    'Get paid quickly and securely with our integrated payment processing system.',
+                        'Get paid quickly and securely with our integrated payment processing system.',
                     color: const Color(0xFF00897B),
                   ),
                 ],
@@ -187,9 +194,7 @@ class ServiceProviderPage extends StatelessWidget {
             // How It Works Section
             Container(
               width: double.infinity,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF5F7FA),
-              ),
+              decoration: const BoxDecoration(color: Color(0xFFF5F7FA)),
               padding: EdgeInsets.all(24.r),
               child: Column(
                 children: [
@@ -206,21 +211,21 @@ class ServiceProviderPage extends StatelessWidget {
                     stepNumber: '1',
                     title: 'Create Your Profile',
                     description:
-                    'Sign up and complete your professional profile with your services and expertise.',
+                        'Sign up and complete your professional profile with your services and expertise.',
                     color: const Color(0xFF1565C0),
                   ),
                   _buildStepCard(
                     stepNumber: '2',
                     title: 'Get Verified',
                     description:
-                    'Complete our quick verification process to build trust with customers.',
+                        'Complete our quick verification process to build trust with customers.',
                     color: const Color(0xFF00897B),
                   ),
                   _buildStepCard(
                     stepNumber: '3',
                     title: 'Start Receiving Jobs',
                     description:
-                    'Accept requests, provide excellent service, and grow your reputation.',
+                        'Accept requests, provide excellent service, and grow your reputation.',
                     color: const Color(0xFF1565C0),
                   ),
                 ],
@@ -234,10 +239,7 @@ class ServiceProviderPage extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF00897B),
-                    Color(0xFF1565C0),
-                  ],
+                  colors: [Color(0xFF00897B), Color(0xFF1565C0)],
                 ),
               ),
               padding: EdgeInsets.all(40.r),
@@ -255,10 +257,7 @@ class ServiceProviderPage extends StatelessWidget {
                   SizedBox(height: 16.h),
                   Text(
                     'Join our platform today and start building your success story',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.white70,
-                    ),
+                    style: TextStyle(fontSize: 16.sp, color: Colors.white70),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 32.h),
@@ -268,7 +267,10 @@ class ServiceProviderPage extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const ServiceProviderSignupPage()),
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const ServiceProviderSignupPage(),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -325,14 +327,10 @@ class ServiceProviderPage extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(12.r),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10.r),
             ),
-            child: Icon(
-              icon,
-              size: 32.sp,
-              color: color,
-            ),
+            child: Icon(icon, size: 32.sp, color: color),
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -378,10 +376,7 @@ class ServiceProviderPage extends StatelessWidget {
           Container(
             width: 50.w,
             height: 50.w,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
             child: Center(
               child: Text(
                 stepNumber,

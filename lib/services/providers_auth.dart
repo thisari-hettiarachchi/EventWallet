@@ -7,13 +7,12 @@ class ServiceProviderAuthService {
 
   // SERVICE PROVIDER SIGN UP
   Future<User?> signUpServiceProvider(
-      String email,
-      String password,
-      String businessName,
-      String providerType,
-      ) async {
-    UserCredential userCredential =
-    await _auth.createUserWithEmailAndPassword(
+    String email,
+    String password,
+    String businessName,
+    String providerType,
+  ) async {
+    UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
@@ -23,10 +22,7 @@ class ServiceProviderAuthService {
     if (user != null) {
       await user.updateDisplayName(businessName);
 
-      await _firestore
-          .collection('service_providers')
-          .doc(user.uid)
-          .set({
+      await _firestore.collection('service_providers').doc(user.uid).set({
         'uid': user.uid,
         'businessName': businessName,
         'email': email,
@@ -40,10 +36,8 @@ class ServiceProviderAuthService {
   }
 
   // SERVICE PROVIDER LOGIN
-  Future<User?> loginServiceProvider(
-      String email, String password) async {
-    UserCredential userCredential =
-    await _auth.signInWithEmailAndPassword(
+  Future<User?> loginServiceProvider(String email, String password) async {
+    UserCredential userCredential = await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );

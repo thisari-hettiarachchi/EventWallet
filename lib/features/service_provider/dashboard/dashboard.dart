@@ -513,10 +513,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                     color: Colors.red,
                     borderRadius: BorderRadius.circular(10.r),
                   ),
-                  constraints: BoxConstraints(
-                    minWidth: 16.w,
-                    minHeight: 16.w,
-                  ),
+                  constraints: BoxConstraints(minWidth: 16.w, minHeight: 16.w),
                   child: Text(
                     unreadCount > 9 ? '9+' : '$unreadCount',
                     style: TextStyle(

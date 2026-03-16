@@ -75,7 +75,7 @@ class ProfilePage extends StatelessWidget {
                       border: Border.all(color: Colors.white, width: 4.w),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           blurRadius: 10.r,
                           offset: Offset(0, 5.h),
                         ),
@@ -106,7 +106,7 @@ class ProfilePage extends StatelessWidget {
                     email,
                     style: AppTextStyles.whiteText(
                       fontSize: 15,
-                    ).copyWith(color: Colors.white.withOpacity(0.9)),
+                    ).copyWith(color: Colors.white.withValues(alpha: 0.9)),
                   ),
                   SizedBox(height: 24.h),
                   if (!isServiceProvider)
@@ -134,7 +134,7 @@ class ProfilePage extends StatelessWidget {
                           padding: EdgeInsets.all(20.r),
                           decoration: AppDecorations.overlayButton.copyWith(
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                               width: 1.5.w,
                             ),
                           ),
@@ -145,15 +145,21 @@ class ProfilePage extends StatelessWidget {
                               Container(
                                 width: 1.w,
                                 height: 40.h,
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                               ),
-                              _buildStatItem('Total Budget', '\$${totalBudget.toStringAsFixed(0)}'),
+                              _buildStatItem(
+                                'Total Budget',
+                                '\$${totalBudget.toStringAsFixed(0)}',
+                              ),
                               Container(
                                 width: 1.w,
                                 height: 40.h,
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                               ),
-                              _buildStatItem('Amount Spent', '\$${totalSpent.toStringAsFixed(0)}'),
+                              _buildStatItem(
+                                'Amount Spent',
+                                '\$${totalSpent.toStringAsFixed(0)}',
+                              ),
                             ],
                           ),
                         );
@@ -392,7 +398,7 @@ class ProfilePage extends StatelessWidget {
           style: AppTextStyles.whiteText(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-          ).copyWith(color: Colors.white.withOpacity(0.9)),
+          ).copyWith(color: Colors.white.withValues(alpha: 0.9)),
         ),
       ],
     );
@@ -419,7 +425,7 @@ class ProfilePage extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(10.r),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   child: Icon(icon, color: color, size: 22.sp),

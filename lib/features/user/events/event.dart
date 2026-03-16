@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/colors.dart';
-import '../../../core/constants/styles.dart';
 import 'create_event.dart';
 import 'event_details_page.dart';
 
@@ -15,7 +14,8 @@ class EventsPage extends StatefulWidget {
   State<EventsPage> createState() => _EventsPageState();
 }
 
-class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateMixin {
+class _EventsPageState extends State<EventsPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _searchQuery = '';
   final user = FirebaseAuth.instance.currentUser;
@@ -64,9 +64,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
         children: [
           // Header with Gradient
           Container(
-            decoration: const BoxDecoration(
-              gradient: AppColors.headerGradient,
-            ),
+            decoration: const BoxDecoration(gradient: AppColors.headerGradient),
             child: SafeArea(
               bottom: false,
               child: Column(
@@ -88,10 +86,10 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                               width: 1.w,
                             ),
                           ),
@@ -101,15 +99,24 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (_) => const CreateEventPage()),
+                                  MaterialPageRoute(
+                                    builder: (_) => const CreateEventPage(),
+                                  ),
                                 );
                               },
                               borderRadius: BorderRadius.circular(12.r),
                               child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16.w,
+                                  vertical: 10.h,
+                                ),
                                 child: Row(
                                   children: [
-                                    Icon(Icons.add, color: Colors.white, size: 20.sp),
+                                    Icon(
+                                      Icons.add,
+                                      color: Colors.white,
+                                      size: 20.sp,
+                                    ),
                                     SizedBox(width: 6.w),
                                     Text(
                                       'New Event',
@@ -145,10 +152,20 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                         style: TextStyle(fontSize: 15.sp),
                         decoration: InputDecoration(
                           hintText: 'Search events...',
-                          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15.sp),
-                          prefixIcon: Icon(Icons.search, color: AppColors.primaryGreen, size: 24.sp),
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade400,
+                            fontSize: 15.sp,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: AppColors.primaryGreen,
+                            size: 24.sp,
+                          ),
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 14.h,
+                          ),
                         ),
                       ),
                     ),
@@ -176,7 +193,10 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     indicatorColor: AppColors.primaryGreen,
                     indicatorWeight: 3.h,
                     indicatorSize: TabBarIndicatorSize.label,
-                    labelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+                    labelStyle: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                     unselectedLabelStyle: TextStyle(fontSize: 14.sp),
                     tabs: const [
                       Tab(text: 'Upcoming'),
@@ -204,7 +224,7 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
 
   Widget _buildEventList(String statusFilter) {
     if (user == null) {
-       return const Center(child: Text('Please login to view events'));
+      return const Center(child: Text('Please login to view events'));
     }
 
     return StreamBuilder<QuerySnapshot>(
@@ -215,26 +235,45 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-           return const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen));
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primaryGreen),
+          );
         }
 
         if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+          return Center(
+            child: Text(
+              'Error: ${snapshot.error}',
+              style: const TextStyle(color: Colors.red),
+            ),
+          );
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(child: Text('No events found.', style: TextStyle(color: Colors.grey, fontSize: 14.sp)));
+          return Center(
+            child: Text(
+              'No events found.',
+              style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+            ),
+          );
         }
 
         final events = snapshot.data!.docs.where((doc) {
           final data = doc.data() as Map<String, dynamic>;
-          final title = (data['eventName'] ?? data['name'] ?? '').toString().toLowerCase();
+          final title = (data['eventName'] ?? data['name'] ?? '')
+              .toString()
+              .toLowerCase();
           final status = _getEventStatus(data['date']);
           return title.contains(_searchQuery) && status == statusFilter;
         }).toList();
 
         if (events.isEmpty) {
-          return Center(child: Text('No $statusFilter events found.', style: TextStyle(color: Colors.grey, fontSize: 14.sp)));
+          return Center(
+            child: Text(
+              'No $statusFilter events found.',
+              style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+            ),
+          );
         }
 
         return ListView.separated(
@@ -256,7 +295,9 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
 
             final double budgetValue = (data['budget'] ?? 0).toDouble();
             final double spentValue = (data['spent'] ?? 0).toDouble();
-            final double progress = budgetValue > 0 ? (spentValue / budgetValue).clamp(0.0, 1.0) : 0.0;
+            final double progress = budgetValue > 0
+                ? (spentValue / budgetValue).clamp(0.0, 1.0)
+                : 0.0;
 
             return GestureDetector(
               onTap: () {
@@ -298,7 +339,20 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
     } else {
       return 'Invalid Date';
     }
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
@@ -322,16 +376,16 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
   }
 
   Widget _buildEventCard(
-      String title,
-      String date,
-      String venue,
-      String budget,
-      String spent,
-      double progress,
-      Color color,
-      IconData icon,
-      String status,
-      ) {
+    String title,
+    String date,
+    String venue,
+    String budget,
+    String spent,
+    double progress,
+    Color color,
+    IconData icon,
+    String status,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -351,7 +405,10 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     padding: EdgeInsets.all(14.r),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+                        colors: [
+                          color.withValues(alpha: 0.2),
+                          color.withValues(alpha: 0.1),
+                        ],
                       ),
                       borderRadius: BorderRadius.circular(14.r),
                     ),
@@ -373,7 +430,11 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                         SizedBox(height: 6.h),
                         Row(
                           children: [
-                            Icon(Icons.calendar_today, size: 14.sp, color: Colors.grey.shade600),
+                            Icon(
+                              Icons.calendar_today,
+                              size: 14.sp,
+                              color: Colors.grey.shade600,
+                            ),
                             SizedBox(width: 6.w),
                             Text(
                               date,
@@ -388,9 +449,12 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 6.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.1),
+                      color: color.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Text(
@@ -407,7 +471,11 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
               SizedBox(height: 12.h),
               Row(
                 children: [
-                  Icon(Icons.location_on, size: 14.sp, color: Colors.grey.shade600),
+                  Icon(
+                    Icons.location_on,
+                    size: 14.sp,
+                    color: Colors.grey.shade600,
+                  ),
                   SizedBox(width: 6.w),
                   Text(
                     venue,
@@ -425,8 +493,21 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Budget', style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600)),
-                        Text(budget, style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold, color: AppColors.textDark)),
+                        Text(
+                          'Budget',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        Text(
+                          budget,
+                          style: TextStyle(
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textDark,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -434,8 +515,21 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Spent', style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600)),
-                        Text(spent, style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.bold, color: color)),
+                        Text(
+                          'Spent',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        Text(
+                          spent,
+                          style: TextStyle(
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.bold,
+                            color: color,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -443,8 +537,21 @@ class _EventsPageState extends State<EventsPage> with SingleTickerProviderStateM
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text('${(progress * 100).toInt()}%', style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: color)),
-                        Text('of budget', style: TextStyle(fontSize: 11.sp, color: Colors.grey.shade600)),
+                        Text(
+                          '${(progress * 100).toInt()}%',
+                          style: TextStyle(
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.bold,
+                            color: color,
+                          ),
+                        ),
+                        Text(
+                          'of budget',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
                       ],
                     ),
                   ),

@@ -36,7 +36,7 @@ class _EditEventPageState extends State<EditEventPage> {
     'Conference',
     'Party',
     'Charity',
-    'Other'
+    'Other',
   ];
 
   final List<String> _statuses = ['Upcoming', 'In Progress', 'Completed'];
@@ -44,11 +44,23 @@ class _EditEventPageState extends State<EditEventPage> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.eventData['eventName'] ?? widget.eventData['name'] ?? '');
-    _venueController = TextEditingController(text: widget.eventData['venue'] ?? '');
-    _budgetController = TextEditingController(text: (widget.eventData['budget'] ?? 0).toString());
-    _attendeesController = TextEditingController(text: (widget.eventData['attendees'] ?? widget.eventData['guestCount'] ?? 0).toString());
-    _descriptionController = TextEditingController(text: widget.eventData['description'] ?? widget.eventData['notes'] ?? '');
+    _nameController = TextEditingController(
+      text: widget.eventData['eventName'] ?? widget.eventData['name'] ?? '',
+    );
+    _venueController = TextEditingController(
+      text: widget.eventData['venue'] ?? '',
+    );
+    _budgetController = TextEditingController(
+      text: (widget.eventData['budget'] ?? 0).toString(),
+    );
+    _attendeesController = TextEditingController(
+      text:
+          (widget.eventData['attendees'] ?? widget.eventData['guestCount'] ?? 0)
+              .toString(),
+    );
+    _descriptionController = TextEditingController(
+      text: widget.eventData['description'] ?? widget.eventData['notes'] ?? '',
+    );
     _selectedStatus = widget.eventData['status'] ?? 'Upcoming';
     _selectedCategory = widget.eventData['category'] ?? 'Other';
 
@@ -73,19 +85,22 @@ class _EditEventPageState extends State<EditEventPage> {
     if (_formKey.currentState!.validate()) {
       try {
         final user = FirebaseAuth.instance.currentUser;
-        await FirebaseFirestore.instance.collection('events').doc(widget.eventId).update({
-          'eventName': _nameController.text.trim(),
-          'name': _nameController.text.trim(),
-          'venue': _venueController.text.trim(),
-          'budget': double.tryParse(_budgetController.text) ?? 0,
-          'attendees': int.tryParse(_attendeesController.text) ?? 0,
-          'guestCount': int.tryParse(_attendeesController.text) ?? 0,
-          'description': _descriptionController.text.trim(),
-          'notes': _descriptionController.text.trim(),
-          'status': _selectedStatus,
-          'category': _selectedCategory,
-          'date': Timestamp.fromDate(_selectedDate),
-        });
+        await FirebaseFirestore.instance
+            .collection('events')
+            .doc(widget.eventId)
+            .update({
+              'eventName': _nameController.text.trim(),
+              'name': _nameController.text.trim(),
+              'venue': _venueController.text.trim(),
+              'budget': double.tryParse(_budgetController.text) ?? 0,
+              'attendees': int.tryParse(_attendeesController.text) ?? 0,
+              'guestCount': int.tryParse(_attendeesController.text) ?? 0,
+              'description': _descriptionController.text.trim(),
+              'notes': _descriptionController.text.trim(),
+              'status': _selectedStatus,
+              'category': _selectedCategory,
+              'date': Timestamp.fromDate(_selectedDate),
+            });
 
         if (user != null) {
           await FirebaseFirestore.instance
@@ -93,12 +108,13 @@ class _EditEventPageState extends State<EditEventPage> {
               .doc(user.uid)
               .collection('notifications')
               .add({
-            'title': 'Event Updated',
-            'message': 'Your event "${_nameController.text.trim()}" has been updated.',
-            'timestamp': FieldValue.serverTimestamp(),
-            'isRead': false,
-            'type': 'event',
-          });
+                'title': 'Event Updated',
+                'message':
+                    'Your event "${_nameController.text.trim()}" has been updated.',
+                'timestamp': FieldValue.serverTimestamp(),
+                'isRead': false,
+                'type': 'event',
+              });
         }
 
         if (mounted) {
@@ -109,9 +125,9 @@ class _EditEventPageState extends State<EditEventPage> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error updating event: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error updating event: $e')));
         }
       }
     }
@@ -160,9 +176,7 @@ class _EditEventPageState extends State<EditEventPage> {
           // Background gradient header
           Container(
             height: 300.h,
-            decoration: const BoxDecoration(
-              gradient: AppColors.headerGradient,
-            ),
+            decoration: const BoxDecoration(gradient: AppColors.headerGradient),
           ),
 
           // Decorative circles
@@ -174,7 +188,7 @@ class _EditEventPageState extends State<EditEventPage> {
               height: 200.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
               ),
             ),
           ),
@@ -186,7 +200,7 @@ class _EditEventPageState extends State<EditEventPage> {
               height: 120.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.08),
               ),
             ),
           ),
@@ -201,10 +215,10 @@ class _EditEventPageState extends State<EditEventPage> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12.r),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             width: 1.w,
                           ),
                         ),
@@ -249,10 +263,10 @@ class _EditEventPageState extends State<EditEventPage> {
                       Container(
                         padding: EdgeInsets.all(20.r),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             width: 2.w,
                           ),
                         ),
@@ -279,13 +293,16 @@ class _EditEventPageState extends State<EditEventPage> {
                       ),
                       SizedBox(height: 10.h),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 8.h,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20.r),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 10.r,
                               offset: Offset(0, 4.h),
                             ),
@@ -331,10 +348,17 @@ class _EditEventPageState extends State<EditEventPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildCardHeader(Icons.event_note, 'Event Details'),
+                              _buildCardHeader(
+                                Icons.event_note,
+                                'Event Details',
+                              ),
                               SizedBox(height: 20.h),
-                              _buildTextField('Event Name', _nameController, Icons.event,
-                                  onChanged: (_) => setState(() {})),
+                              _buildTextField(
+                                'Event Name',
+                                _nameController,
+                                Icons.event,
+                                onChanged: (_) => setState(() {}),
+                              ),
                               SizedBox(height: 16.h),
                               _buildCategoryDropdown(),
                               SizedBox(height: 16.h),
@@ -349,12 +373,23 @@ class _EditEventPageState extends State<EditEventPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildCardHeader(Icons.location_on, 'Location & Capacity'),
+                              _buildCardHeader(
+                                Icons.location_on,
+                                'Location & Capacity',
+                              ),
                               SizedBox(height: 20.h),
-                              _buildTextField('Venue', _venueController, Icons.location_on),
+                              _buildTextField(
+                                'Venue',
+                                _venueController,
+                                Icons.location_on,
+                              ),
                               SizedBox(height: 16.h),
-                              _buildTextField('Attendees', _attendeesController, Icons.people,
-                                  isNumber: true),
+                              _buildTextField(
+                                'Attendees',
+                                _attendeesController,
+                                Icons.people,
+                                isNumber: true,
+                              ),
                             ],
                           ),
                         ),
@@ -365,10 +400,17 @@ class _EditEventPageState extends State<EditEventPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildCardHeader(Icons.account_balance_wallet, 'Budget & Status'),
+                              _buildCardHeader(
+                                Icons.account_balance_wallet,
+                                'Budget & Status',
+                              ),
                               SizedBox(height: 20.h),
-                              _buildTextField('Budget', _budgetController, Icons.attach_money,
-                                  isNumber: true),
+                              _buildTextField(
+                                'Budget',
+                                _budgetController,
+                                Icons.attach_money,
+                                isNumber: true,
+                              ),
                               SizedBox(height: 16.h),
                               _buildStatusDropdown(),
                             ],
@@ -381,7 +423,10 @@ class _EditEventPageState extends State<EditEventPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildCardHeader(Icons.description, 'Description'),
+                              _buildCardHeader(
+                                Icons.description,
+                                'Description',
+                              ),
                               SizedBox(height: 20.h),
                               _buildTextField(
                                 'Description (optional)',
@@ -404,7 +449,9 @@ class _EditEventPageState extends State<EditEventPage> {
                             borderRadius: BorderRadius.circular(16.r),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primaryGreen.withOpacity(0.4),
+                                color: AppColors.primaryGreen.withValues(
+                                  alpha: 0.4,
+                                ),
                                 blurRadius: 16.r,
                                 offset: Offset(0, 6.h),
                               ),
@@ -419,7 +466,11 @@ class _EditEventPageState extends State<EditEventPage> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.save_rounded, color: Colors.white, size: 22.sp),
+                                    Icon(
+                                      Icons.save_rounded,
+                                      color: Colors.white,
+                                      size: 22.sp,
+                                    ),
                                     SizedBox(width: 10.w),
                                     Text(
                                       'Save Changes',
@@ -531,11 +582,15 @@ class _EditEventPageState extends State<EditEventPage> {
 
   Widget _buildCategoryDropdown() {
     return DropdownButtonFormField<String>(
-      value: _selectedCategory,
+      initialValue: _selectedCategory,
       decoration: InputDecoration(
         labelText: 'Category',
         labelStyle: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
-        prefixIcon: Icon(Icons.category, color: AppColors.primaryGreen, size: 24.sp),
+        prefixIcon: Icon(
+          Icons.category,
+          color: AppColors.primaryGreen,
+          size: 24.sp,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -552,18 +607,29 @@ class _EditEventPageState extends State<EditEventPage> {
         fillColor: AppColors.background,
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
-      items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c, style: TextStyle(fontSize: 15.sp)))).toList(),
+      items: _categories
+          .map(
+            (c) => DropdownMenuItem(
+              value: c,
+              child: Text(c, style: TextStyle(fontSize: 15.sp)),
+            ),
+          )
+          .toList(),
       onChanged: (val) => setState(() => _selectedCategory = val!),
     );
   }
 
   Widget _buildStatusDropdown() {
     return DropdownButtonFormField<String>(
-      value: _selectedStatus,
+      initialValue: _selectedStatus,
       decoration: InputDecoration(
         labelText: 'Status',
         labelStyle: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
-        prefixIcon: Icon(Icons.info_outline, color: AppColors.primaryGreen, size: 24.sp),
+        prefixIcon: Icon(
+          Icons.info_outline,
+          color: AppColors.primaryGreen,
+          size: 24.sp,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -580,14 +646,33 @@ class _EditEventPageState extends State<EditEventPage> {
         fillColor: AppColors.background,
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
-      items: _statuses.map((s) => DropdownMenuItem(value: s, child: Text(s, style: TextStyle(fontSize: 15.sp)))).toList(),
+      items: _statuses
+          .map(
+            (s) => DropdownMenuItem(
+              value: s,
+              child: Text(s, style: TextStyle(fontSize: 15.sp)),
+            ),
+          )
+          .toList(),
       onChanged: (val) => setState(() => _selectedStatus = val!),
     );
   }
 
   Widget _buildDatePicker() {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     final formatted =
         '${months[_selectedDate.month - 1]} ${_selectedDate.day}, ${_selectedDate.year}';
 
@@ -615,7 +700,11 @@ class _EditEventPageState extends State<EditEventPage> {
         decoration: InputDecoration(
           labelText: 'Date',
           labelStyle: TextStyle(color: AppColors.textGrey, fontSize: 14.sp),
-          prefixIcon: Icon(Icons.calendar_today, color: AppColors.primaryGreen, size: 24.sp),
+          prefixIcon: Icon(
+            Icons.calendar_today,
+            color: AppColors.primaryGreen,
+            size: 24.sp,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),
             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -626,7 +715,10 @@ class _EditEventPageState extends State<EditEventPage> {
           ),
           filled: true,
           fillColor: AppColors.background,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 16.w,
+            vertical: 16.h,
+          ),
         ),
         child: Text(
           formatted,

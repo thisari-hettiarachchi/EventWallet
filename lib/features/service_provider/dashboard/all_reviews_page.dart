@@ -38,7 +38,9 @@ class AllReviewsPage extends StatelessWidget {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen));
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primaryGreen),
+            );
           }
 
           if (snapshot.hasError) {
@@ -52,7 +54,11 @@ class AllReviewsPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.rate_review_outlined, size: 64.sp, color: Colors.grey[300]),
+                  Icon(
+                    Icons.rate_review_outlined,
+                    size: 64.sp,
+                    color: Colors.grey[300],
+                  ),
                   SizedBox(height: 16.h),
                   Text(
                     'No reviews yet',

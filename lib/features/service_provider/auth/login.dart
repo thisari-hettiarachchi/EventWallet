@@ -15,7 +15,8 @@ class ServiceProviderLoginPage extends StatefulWidget {
       _ServiceProviderLoginPageState();
 }
 
-class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> with SingleTickerProviderStateMixin {
+class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -32,9 +33,10 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.2),
@@ -89,7 +91,7 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                     providerType: providerType,
                   ),
                 ),
-                    (_) => false,
+                (_) => false,
               );
             },
           ),
@@ -118,10 +120,7 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF00897B),
-              Color(0xFF1565C0),
-            ],
+            colors: [Color(0xFF00897B), Color(0xFF1565C0)],
           ),
         ),
         child: SafeArea(
@@ -130,11 +129,12 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
               return SingleChildScrollView(
                 physics: const ClampingScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.w,
+                      vertical: 16.h,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -144,10 +144,10 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                             padding: EdgeInsets.all(16.r),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   blurRadius: 20.r,
                                   spreadRadius: 5.r,
                                 ),
@@ -240,8 +240,8 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                                     borderRadius: BorderRadius.circular(16.r),
                                     gradient: LinearGradient(
                                       colors: [
-                                        Colors.white.withOpacity(0.95),
-                                        Colors.white.withOpacity(0.85),
+                                        Colors.white.withValues(alpha: 0.95),
+                                        Colors.white.withValues(alpha: 0.85),
                                       ],
                                     ),
                                   ),
@@ -251,16 +251,19 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                                       backgroundColor: Colors.transparent,
                                       shadowColor: Colors.transparent,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16.r),
+                                        borderRadius: BorderRadius.circular(
+                                          16.r,
+                                        ),
                                       ),
                                     ),
                                     child: ShaderMask(
-                                      shaderCallback: (bounds) => const LinearGradient(
-                                        colors: [
-                                          Color(0xFF00897B),
-                                          Color(0xFF1565C0),
-                                        ],
-                                      ).createShader(bounds),
+                                      shaderCallback: (bounds) =>
+                                          const LinearGradient(
+                                            colors: [
+                                              Color(0xFF00897B),
+                                              Color(0xFF1565C0),
+                                            ],
+                                          ).createShader(bounds),
                                       child: Text(
                                         'Login',
                                         style: TextStyle(
@@ -283,7 +286,8 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => const ServiceProviderSignupPage(),
+                                      builder: (_) =>
+                                          const ServiceProviderSignupPage(),
                                     ),
                                   );
                                 },
@@ -309,11 +313,15 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                                     color: Colors.white.withValues(alpha: 0.3),
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12.w,
+                                    ),
                                     child: Text(
                                       'OR',
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.7),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.7,
+                                        ),
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -335,7 +343,8 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => const user_login.LoginPage(),
+                                      builder: (_) =>
+                                          const user_login.LoginPage(),
                                     ),
                                   );
                                 },
@@ -372,10 +381,10 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
           width: 1.w,
         ),
       ),
@@ -385,10 +394,16 @@ class _ServiceProviderLoginPageState extends State<ServiceProviderLoginPage> wit
         style: TextStyle(color: Colors.white, fontSize: 15.sp),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14.sp),
+          labelStyle: TextStyle(
+            color: Colors.white.withValues(alpha: 0.9),
+            fontSize: 14.sp,
+          ),
           prefixIcon: Icon(icon, color: Colors.white, size: 20.sp),
           suffixIcon: suffix,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 16.w,
+            vertical: 12.h,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16.r),
             borderSide: BorderSide.none,

@@ -8,7 +8,11 @@ class ExpensesPage extends StatefulWidget {
   final String eventId;
   final String eventName;
 
-  const ExpensesPage({super.key, required this.eventId, required this.eventName});
+  const ExpensesPage({
+    super.key,
+    required this.eventId,
+    required this.eventName,
+  });
 
   @override
   State<ExpensesPage> createState() => _ExpensesPageState();
@@ -24,9 +28,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
           // Background gradient header
           Container(
             height: 280.h,
-            decoration: const BoxDecoration(
-              gradient: AppColors.headerGradient,
-            ),
+            decoration: const BoxDecoration(gradient: AppColors.headerGradient),
           ),
 
           // Decorative circles
@@ -38,7 +40,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
               height: 200.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
               ),
             ),
           ),
@@ -50,7 +52,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
               height: 120.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.08),
               ),
             ),
           ),
@@ -65,10 +67,10 @@ class _ExpensesPageState extends State<ExpensesPage> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12.r),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             width: 1.w,
                           ),
                         ),
@@ -91,10 +93,10 @@ class _ExpensesPageState extends State<ExpensesPage> {
                       const Spacer(),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12.r),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             width: 1.w,
                           ),
                         ),
@@ -135,10 +137,10 @@ class _ExpensesPageState extends State<ExpensesPage> {
                       Container(
                         padding: EdgeInsets.all(20.r),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             width: 2.w,
                           ),
                         ),
@@ -163,9 +165,12 @@ class _ExpensesPageState extends State<ExpensesPage> {
                       ),
                       SizedBox(height: 6.h),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 8.h,
+                        ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20.r),
                         ),
                         child: Text(
@@ -191,7 +196,12 @@ class _ExpensesPageState extends State<ExpensesPage> {
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(fontSize: 14.sp)));
+                        return Center(
+                          child: Text(
+                            'Error: ${snapshot.error}',
+                            style: TextStyle(fontSize: 14.sp),
+                          ),
+                        );
                       }
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(
@@ -201,16 +211,22 @@ class _ExpensesPageState extends State<ExpensesPage> {
 
                       final docs = snapshot.data?.docs.toList() ?? [];
                       docs.sort((a, b) {
-                        final aTime = (a.data() as Map)['timestamp'] as Timestamp?;
-                        final bTime = (b.data() as Map)['timestamp'] as Timestamp?;
+                        final aTime =
+                            (a.data() as Map)['timestamp'] as Timestamp?;
+                        final bTime =
+                            (b.data() as Map)['timestamp'] as Timestamp?;
                         if (aTime == null) return -1;
                         if (bTime == null) return 1;
                         return bTime.compareTo(aTime);
                       });
 
-                      final totalSpent = docs.fold<double>(0, (sum, doc) {
+                      final totalSpent = docs.fold<double>(0, (
+                        runningTotal,
+                        doc,
+                      ) {
                         final data = doc.data() as Map<String, dynamic>;
-                        return sum + (data['amount'] ?? 0.0).toDouble();
+                        return runningTotal +
+                            (data['amount'] ?? 0.0).toDouble();
                       });
 
                       return ListView(
@@ -229,11 +245,22 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                       .doc(widget.eventId)
                                       .snapshots(),
                                   builder: (context, eventSnap) {
-                                    final budget = eventSnap.hasData && eventSnap.data!.exists
-                                        ? ((eventSnap.data!.data() as Map<String, dynamic>)['budget'] ?? 0).toDouble()
+                                    final budget =
+                                        eventSnap.hasData &&
+                                            eventSnap.data!.exists
+                                        ? ((eventSnap.data!.data()
+                                                      as Map<
+                                                        String,
+                                                        dynamic
+                                                      >)['budget'] ??
+                                                  0)
+                                              .toDouble()
                                         : 0.0;
-                                    final progress = budget > 0 ? (totalSpent / budget).clamp(0.0, 1.0) : 0.0;
-                                    final isOver = totalSpent > budget && budget > 0;
+                                    final progress = budget > 0
+                                        ? (totalSpent / budget).clamp(0.0, 1.0)
+                                        : 0.0;
+                                    final isOver =
+                                        totalSpent > budget && budget > 0;
 
                                     return Column(
                                       children: [
@@ -266,7 +293,10 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                                 height: 20.h,
                                                 decoration: BoxDecoration(
                                                   color: Colors.grey.shade200,
-                                                  borderRadius: BorderRadius.circular(10.r),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        10.r,
+                                                      ),
                                                 ),
                                               ),
                                               FractionallySizedBox(
@@ -276,14 +306,39 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                                   decoration: BoxDecoration(
                                                     gradient: LinearGradient(
                                                       colors: isOver
-                                                          ? [Colors.orange.shade400, Colors.red.shade400]
-                                                          : [const Color(0xFF00897B), const Color(0xFF1565C0)],
+                                                          ? [
+                                                              Colors
+                                                                  .orange
+                                                                  .shade400,
+                                                              Colors
+                                                                  .red
+                                                                  .shade400,
+                                                            ]
+                                                          : [
+                                                              const Color(
+                                                                0xFF00897B,
+                                                              ),
+                                                              const Color(
+                                                                0xFF1565C0,
+                                                              ),
+                                                            ],
                                                     ),
-                                                    borderRadius: BorderRadius.circular(10.r),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10.r,
+                                                        ),
                                                     boxShadow: [
                                                       BoxShadow(
-                                                        color: (isOver ? Colors.orange : const Color(0xFF00897B))
-                                                            .withOpacity(0.4),
+                                                        color:
+                                                            (isOver
+                                                                    ? Colors
+                                                                          .orange
+                                                                    : const Color(
+                                                                        0xFF00897B,
+                                                                      ))
+                                                                .withValues(
+                                                                  alpha: 0.4,
+                                                                ),
                                                         blurRadius: 8.r,
                                                         offset: Offset(0, 2.h),
                                                       ),
@@ -295,7 +350,8 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                           ),
                                           SizedBox(height: 10.h),
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
                                                 '\$${totalSpent.toStringAsFixed(2)} spent',
@@ -392,11 +448,16 @@ class _ExpensesPageState extends State<ExpensesPage> {
     );
   }
 
-  Widget _buildSummaryItem(String label, String value, IconData icon, Color color) {
+  Widget _buildSummaryItem(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: EdgeInsets.all(14.r),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14.r),
       ),
       child: Row(
@@ -404,7 +465,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
           Container(
             padding: EdgeInsets.all(8.r),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 18.sp),
@@ -489,10 +550,14 @@ class _ExpensesPageState extends State<ExpensesPage> {
           Container(
             padding: EdgeInsets.all(10.r),
             decoration: BoxDecoration(
-              color: AppColors.primaryBlue.withOpacity(0.1),
+              color: AppColors.primaryBlue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(Icons.receipt, color: AppColors.primaryBlue, size: 22.sp),
+            child: Icon(
+              Icons.receipt,
+              color: AppColors.primaryBlue,
+              size: 22.sp,
+            ),
           ),
           SizedBox(width: 14.w),
           Expanded(
@@ -511,9 +576,12 @@ class _ExpensesPageState extends State<ExpensesPage> {
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 3.h,
+                      ),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Text(
@@ -529,7 +597,10 @@ class _ExpensesPageState extends State<ExpensesPage> {
                       SizedBox(width: 8.w),
                       Text(
                         _formatDate(timestamp),
-                        style: TextStyle(fontSize: 11.sp, color: Colors.grey.shade500),
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: Colors.grey.shade500,
+                        ),
                       ),
                     ],
                   ],
@@ -551,7 +622,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
               SizedBox(height: 4.h),
               GestureDetector(
                 onTap: () => _deleteExpense(docId, amount),
-                child: Icon(Icons.delete_outline, color: Colors.red.shade400, size: 20.sp),
+                child: Icon(
+                  Icons.delete_outline,
+                  color: Colors.red.shade400,
+                  size: 20.sp,
+                ),
               ),
             ],
           ),
@@ -564,14 +639,28 @@ class _ExpensesPageState extends State<ExpensesPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-        title: Text('Delete Expense', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
-        content: Text('Are you sure you want to delete this expense?', style: TextStyle(fontSize: 14.sp)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        title: Text(
+          'Delete Expense',
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Are you sure you want to delete this expense?',
+          style: TextStyle(fontSize: 14.sp),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel', style: TextStyle(fontSize: 14.sp))),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Delete', style: TextStyle(color: Colors.red, fontSize: 14.sp)),
+            child: Text(
+              'Delete',
+              style: TextStyle(color: Colors.red, fontSize: 14.sp),
+            ),
           ),
         ],
       ),
@@ -579,20 +668,27 @@ class _ExpensesPageState extends State<ExpensesPage> {
 
     if (confirmed == true) {
       try {
-        await FirebaseFirestore.instance.collection('expenses').doc(docId).delete();
-        final eventRef = FirebaseFirestore.instance.collection('events').doc(widget.eventId);
+        await FirebaseFirestore.instance
+            .collection('expenses')
+            .doc(docId)
+            .delete();
+        final eventRef = FirebaseFirestore.instance
+            .collection('events')
+            .doc(widget.eventId);
         await FirebaseFirestore.instance.runTransaction((transaction) async {
           final snapshot = await transaction.get(eventRef);
           if (snapshot.exists) {
             final currentSpent = (snapshot.data()?['spent'] ?? 0).toDouble();
-            transaction.update(eventRef, {'spent': (currentSpent - amount).clamp(0.0, double.infinity)});
+            transaction.update(eventRef, {
+              'spent': (currentSpent - amount).clamp(0.0, double.infinity),
+            });
           }
         });
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error deleting expense: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error deleting expense: $e')));
         }
       }
     }
@@ -608,8 +704,20 @@ class _ExpensesPageState extends State<ExpensesPage> {
     } else {
       return 'Invalid Date';
     }
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }
