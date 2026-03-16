@@ -58,7 +58,8 @@ class SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: padding ?? EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+      padding:
+          padding ?? EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -90,21 +91,11 @@ class StatCard extends StatelessWidget {
     return Column(
       children: [
         if (icon != null)
-          Icon(
-            icon,
-            color: color ?? AppColors.textLight,
-            size: 28.sp,
-          ),
+          Icon(icon, color: color ?? AppColors.textLight, size: 28.sp),
         if (icon != null) SizedBox(height: 8.h),
-        Text(
-          value,
-          style: AppTextStyles.statsNumber.copyWith(color: color),
-        ),
+        Text(value, style: AppTextStyles.statsNumber.copyWith(color: color)),
         SizedBox(height: 4.h),
-        Text(
-          label,
-          style: AppTextStyles.statsLabel.copyWith(color: color),
-        ),
+        Text(label, style: AppTextStyles.statsLabel.copyWith(color: color)),
       ],
     );
   }
@@ -139,7 +130,9 @@ class InfoTile extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(12.r),
             decoration: BoxDecoration(
-              color: (iconColor ?? AppColors.primaryGreen).withValues(alpha: 0.1),
+              color: (iconColor ?? AppColors.primaryGreen).withValues(
+                alpha: 0.1,
+              ),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Icon(
@@ -162,11 +155,7 @@ class InfoTile extends StatelessWidget {
             ),
           ),
           trailing ??
-              Icon(
-                Icons.chevron_right,
-                color: AppColors.textGrey,
-                size: 24.sp,
-              ),
+              Icon(Icons.chevron_right, color: AppColors.textGrey, size: 24.sp),
         ],
       ),
     );
@@ -213,14 +202,10 @@ class EmptyState extends StatelessWidget {
               style: AppTextStyles.bodyMedium,
               textAlign: TextAlign.center,
             ),
-            if (action != null) ...[
-              SizedBox(height: 24.h),
-              action!,
-            ],
+            if (action != null) ...[SizedBox(height: 24.h), action!],
           ],
         ),
       ),
     );
   }
 }
-

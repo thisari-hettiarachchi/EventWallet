@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../core/constants/colors.dart';
-import '../../../core/constants/styles.dart';
 import '../../result/result_page.dart';
 
 class PrivacySecurityPage extends StatefulWidget {
@@ -57,9 +55,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       }
 
       // 🔑 Update password
-      await refreshedUser.updatePassword(
-        _newPasswordController.text.trim(),
-      );
+      await refreshedUser.updatePassword(_newPasswordController.text.trim());
 
       if (!mounted) return;
 
@@ -128,7 +124,11 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       appBar: AppBar(
         title: Text(
           'Privacy & Security',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.sp),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20.sp,
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -139,10 +139,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF00897B),
-              Color(0xFF1565C0),
-            ],
+            colors: [Color(0xFF00897B), Color(0xFF1565C0)],
             stops: [0.0, 0.3],
           ),
         ),
@@ -153,7 +150,9 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
               child: Container(
                 decoration: BoxDecoration(
                   color: const Color(0xFFF5F7FA),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(35.r),
+                  ),
                 ),
                 child: SingleChildScrollView(
                   child: Column(
@@ -166,7 +165,9 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                             Container(
                               padding: EdgeInsets.all(16.r),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF00897B).withOpacity(0.1),
+                                color: const Color(
+                                  0xFF00897B,
+                                ).withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
@@ -216,18 +217,22 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                                 controller: _currentPasswordController,
                                 label: 'Current Password',
                                 isVisible: _showCurrentPassword,
-                                onToggle: () =>
-                                    setState(() => _showCurrentPassword = !_showCurrentPassword),
-                                validator: (value) =>
-                                value!.isEmpty ? 'Enter current password' : null,
+                                onToggle: () => setState(
+                                  () => _showCurrentPassword =
+                                      !_showCurrentPassword,
+                                ),
+                                validator: (value) => value!.isEmpty
+                                    ? 'Enter current password'
+                                    : null,
                               ),
                               SizedBox(height: 16.h),
                               _buildPasswordField(
                                 controller: _newPasswordController,
                                 label: 'New Password',
                                 isVisible: _showNewPassword,
-                                onToggle: () =>
-                                    setState(() => _showNewPassword = !_showNewPassword),
+                                onToggle: () => setState(
+                                  () => _showNewPassword = !_showNewPassword,
+                                ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Enter new password';
@@ -243,10 +248,12 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                                 controller: _confirmPasswordController,
                                 label: 'Confirm New Password',
                                 isVisible: _showConfirmPassword,
-                                onToggle: () =>
-                                    setState(() => _showConfirmPassword = !_showConfirmPassword),
+                                onToggle: () => setState(
+                                  () => _showConfirmPassword =
+                                      !_showConfirmPassword,
+                                ),
                                 validator: (value) =>
-                                value != _newPasswordController.text
+                                    value != _newPasswordController.text
                                     ? 'Passwords do not match'
                                     : null,
                               ),
@@ -257,29 +264,38 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                                 child: Container(
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
-                                      colors: [Color(0xFF00897B), Color(0xFF1565C0)],
+                                      colors: [
+                                        Color(0xFF00897B),
+                                        Color(0xFF1565C0),
+                                      ],
                                     ),
                                     borderRadius: BorderRadius.circular(12.r),
                                   ),
                                   child: ElevatedButton(
-                                    onPressed: _isLoading ? null : _changePassword,
+                                    onPressed: _isLoading
+                                        ? null
+                                        : _changePassword,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.transparent,
                                       shadowColor: Colors.transparent,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12.r),
+                                        borderRadius: BorderRadius.circular(
+                                          12.r,
+                                        ),
                                       ),
                                     ),
                                     child: _isLoading
-                                        ? const CircularProgressIndicator(color: Colors.white)
+                                        ? const CircularProgressIndicator(
+                                            color: Colors.white,
+                                          )
                                         : Text(
-                                      'Change Password',
-                                      style: TextStyle(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
+                                            'Change Password',
+                                            style: TextStyle(
+                                              fontSize: 16.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
                                   ),
                                 ),
                               ),
@@ -313,7 +329,11 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(color: const Color(0xFF4A5568), fontSize: 14.sp),
-        prefixIcon: Icon(Icons.lock_outline, color: const Color(0xFF00897B), size: 24.sp),
+        prefixIcon: Icon(
+          Icons.lock_outline,
+          color: const Color(0xFF00897B),
+          size: 24.sp,
+        ),
         suffixIcon: IconButton(
           icon: Icon(
             isVisible ? Icons.visibility : Icons.visibility_off,

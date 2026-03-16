@@ -9,7 +9,10 @@ class AboutPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: Text('About', style: TextStyle(color: Colors.white, fontSize: 18.sp)),
+        title: Text(
+          'About',
+          style: TextStyle(color: Colors.white, fontSize: 18.sp),
+        ),
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -69,7 +72,7 @@ class AboutPage extends StatelessWidget {
                       vertical: 4.h,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Text(
@@ -86,7 +89,7 @@ class AboutPage extends StatelessWidget {
                     'Your Complete Event Management Solution',
                     style: TextStyle(
                       fontSize: 13.sp,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -114,7 +117,7 @@ class AboutPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16.r),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10.r,
                           offset: Offset(0, 4.h),
                         ),
@@ -142,7 +145,8 @@ class AboutPage extends StatelessWidget {
                   _buildFeatureCard(
                     icon: Icons.event_note,
                     title: 'Event Management',
-                    description: 'Create, edit, and organize all your events in one place',
+                    description:
+                        'Create, edit, and organize all your events in one place',
                     color: Colors.blue,
                   ),
                   SizedBox(height: 10.h),
@@ -183,7 +187,7 @@ class AboutPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16.r),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10.r,
                           offset: Offset(0, 4.h),
                         ),
@@ -195,7 +199,10 @@ class AboutPage extends StatelessWidget {
                           padding: EdgeInsets.all(10.r),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [Colors.blue.shade600, Colors.teal.shade400],
+                              colors: [
+                                Colors.blue.shade600,
+                                Colors.teal.shade400,
+                              ],
                             ),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
@@ -237,15 +244,10 @@ class AboutPage extends StatelessWidget {
                     padding: EdgeInsets.all(16.r),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [
-                          Colors.blue.shade50,
-                          Colors.teal.shade50,
-                        ],
+                        colors: [Colors.blue.shade50, Colors.teal.shade50],
                       ),
                       borderRadius: BorderRadius.circular(16.r),
-                      border: Border.all(
-                        color: Colors.blue.shade200,
-                      ),
+                      border: Border.all(color: Colors.blue.shade200),
                     ),
                     child: Column(
                       children: [
@@ -291,7 +293,13 @@ class AboutPage extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            Text('|', style: TextStyle(color: Colors.grey.shade400, fontSize: 11.sp)),
+                            Text(
+                              '|',
+                              style: TextStyle(
+                                color: Colors.grey.shade400,
+                                fontSize: 11.sp,
+                              ),
+                            ),
                             TextButton(
                               onPressed: () {},
                               style: TextButton.styleFrom(
@@ -335,7 +343,7 @@ class AboutPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10.r,
             offset: Offset(0, 4.h),
           ),
@@ -346,7 +354,7 @@ class AboutPage extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(10.r),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: Icon(icon, color: color, size: 20.sp),

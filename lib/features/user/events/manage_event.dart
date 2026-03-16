@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 import 'edit_event.dart';
+import 'event_details_page.dart';
 
 class ManageEventsPage extends StatefulWidget {
   const ManageEventsPage({super.key});
@@ -20,9 +21,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.headerGradient,
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.headerGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -32,36 +31,47 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(35.r),
+                    ),
                   ),
                   child: user == null
-                      ? Center(child: Text('Please login to view events', style: TextStyle(fontSize: 16.sp)))
+                      ? Center(
+                          child: Text(
+                            'Please login to view events',
+                            style: TextStyle(fontSize: 16.sp),
+                          ),
+                        )
                       : StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('events')
-                        .where('userId', isEqualTo: user!.uid)
-                        .orderBy('createdAt', descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
+                          stream: FirebaseFirestore.instance
+                              .collection('events')
+                              .where('userId', isEqualTo: user!.uid)
+                              .orderBy('createdAt', descending: true)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
 
-                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                        return _buildEmptyState();
-                      }
+                            if (!snapshot.hasData ||
+                                snapshot.data!.docs.isEmpty) {
+                              return _buildEmptyState();
+                            }
 
-                      return ListView.builder(
-                        padding: EdgeInsets.all(20.r),
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          final doc = snapshot.data!.docs[index];
-                          final data = doc.data() as Map<String, dynamic>;
-                          return _buildEventCard(doc.id, data);
-                        },
-                      );
-                    },
-                  ),
+                            return ListView.builder(
+                              padding: EdgeInsets.all(20.r),
+                              itemCount: snapshot.data!.docs.length,
+                              itemBuilder: (context, index) {
+                                final doc = snapshot.data!.docs[index];
+                                final data = doc.data() as Map<String, dynamic>;
+                                return _buildEventCard(doc.id, data);
+                              },
+                            );
+                          },
+                        ),
                 ),
               ),
             ],
@@ -78,7 +88,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: IconButton(
@@ -108,7 +118,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
           Icon(
             Icons.event_busy,
             size: 80.sp,
-            color: Colors.grey.withOpacity(0.4),
+            color: Colors.grey.withValues(alpha: 0.4),
           ),
           SizedBox(height: 16.h),
           Text(
@@ -130,118 +140,151 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
     final spent = data['spent'] ?? 0;
     final date = _formatDate(data['date']);
 
-    return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20.r),
-        boxShadow: [AppColors.cardShadow()],
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(16.r),
-            decoration: BoxDecoration(
-              gradient: AppColors.cardGradient,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.r),
-                topRight: Radius.circular(20.r),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EventDetailsPage(
+              eventId: eventId,
+              eventName: eventName,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 16.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.r),
+          boxShadow: [AppColors.cardShadow()],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(16.r),
+              decoration: BoxDecoration(
+                gradient: AppColors.cardGradient,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.r),
+                  topRight: Radius.circular(20.r),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(10.r),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Icon(Icons.event, color: Colors.white, size: 24.sp),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          eventName,
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          date,
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(10.r),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Icon(Icons.event, color: Colors.white, size: 24.sp),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            Padding(
+              padding: EdgeInsets.all(16.r),
+              child: Column(
+                children: [
+                  Row(
                     children: [
-                      Text(
-                        eventName,
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      Expanded(
+                        child: _buildStatBox(
+                          'Budget',
+                          '\$$budget',
+                          AppColors.primaryGreen,
+                          Icons.account_balance_wallet,
                         ),
                       ),
-                      Text(
-                        date,
-                        style: TextStyle(fontSize: 13.sp, color: Colors.white70),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: _buildStatBox(
+                          'Spent',
+                          '\$$spent',
+                          AppColors.primaryBlue,
+                          Icons.shopping_cart,
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(16.r),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatBox('Budget', '\$$budget', AppColors.primaryGreen, Icons.account_balance_wallet),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: _buildStatBox('Spent', '\$$spent', AppColors.primaryBlue, Icons.shopping_cart),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16.h),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditEventPage(
-                                eventId: eventId,
-                                eventData: data,
+                  SizedBox(height: 16.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditEventPage(
+                                  eventId: eventId,
+                                  eventData: data,
+                                ),
                               ),
+                            );
+                          },
+                          icon: Icon(Icons.edit, size: 18.sp),
+                          label: Text('Edit', style: TextStyle(fontSize: 14.sp)),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.primaryBlue,
+                            side: const BorderSide(color: AppColors.primaryBlue),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
                             ),
-                          );
-                        },
-                        icon: Icon(Icons.edit, size: 18.sp),
-                        label: Text('Edit', style: TextStyle(fontSize: 14.sp)),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primaryBlue,
-                          side: const BorderSide(color: AppColors.primaryBlue),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                            padding: EdgeInsets.symmetric(vertical: 12.h),
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _deleteEvent(eventId, eventName),
-                        icon: Icon(Icons.delete, size: 18.sp),
-                        label: Text('Delete', style: TextStyle(fontSize: 14.sp)),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.red.shade700,
-                          side: BorderSide(color: Colors.red.shade700),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _deleteEvent(eventId, eventName),
+                          icon: Icon(Icons.delete, size: 18.sp),
+                          label: Text(
+                            'Delete',
+                            style: TextStyle(fontSize: 14.sp),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.red.shade700,
+                            side: BorderSide(color: Colors.red.shade700),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: 12.h),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -250,9 +293,9 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
     return Container(
       padding: EdgeInsets.all(12.r),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -262,8 +305,21 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 11.sp, color: Colors.grey.shade600)),
-                Text(value, style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: color)),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
               ],
             ),
           ),
@@ -282,7 +338,20 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
     } else {
       return 'Invalid Date';
     }
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
@@ -290,33 +359,51 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Event', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
-        content: Text('Are you sure you want to delete this event?', style: TextStyle(fontSize: 14.sp)),
+        title: Text(
+          'Delete Event',
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Are you sure you want to delete this event?',
+          style: TextStyle(fontSize: 14.sp),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(fontSize: 14.sp))),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
+          ),
           ElevatedButton(
             onPressed: () async {
               final user = FirebaseAuth.instance.currentUser;
-              await FirebaseFirestore.instance.collection('events').doc(eventId).delete();
-              
+              await FirebaseFirestore.instance
+                  .collection('events')
+                  .doc(eventId)
+                  .delete();
+
               if (user != null) {
                 await FirebaseFirestore.instance
                     .collection('users')
                     .doc(user.uid)
                     .collection('notifications')
                     .add({
-                  'title': 'Event Deleted',
-                  'message': 'Your event "$eventName" has been deleted.',
-                  'timestamp': FieldValue.serverTimestamp(),
-                  'isRead': false,
-                  'type': 'event',
-                });
+                      'title': 'Event Deleted',
+                      'message': 'Your event "$eventName" has been deleted.',
+                      'timestamp': FieldValue.serverTimestamp(),
+                      'isRead': false,
+                      'type': 'event',
+                    });
               }
 
-              if (mounted) Navigator.pop(context);
+              if (!context.mounted) return;
+              Navigator.pop(context);
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700),
-            child: Text('Delete', style: TextStyle(color: Colors.white, fontSize: 14.sp)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade700,
+            ),
+            child: Text(
+              'Delete',
+              style: TextStyle(color: Colors.white, fontSize: 14.sp),
+            ),
           ),
         ],
       ),

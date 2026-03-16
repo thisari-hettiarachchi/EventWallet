@@ -11,7 +11,8 @@ class EditBusinessProfilePage extends StatefulWidget {
   const EditBusinessProfilePage({super.key});
 
   @override
-  State<EditBusinessProfilePage> createState() => _EditBusinessProfilePageState();
+  State<EditBusinessProfilePage> createState() =>
+      _EditBusinessProfilePageState();
 }
 
 class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
@@ -24,11 +25,11 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
   final _websiteController = TextEditingController();
   final _facebookController = TextEditingController();
   final _instagramController = TextEditingController();
-  
+
   String _profileImageUrl = '';
   File? _imageFile;
   final _picker = ImagePicker();
-  
+
   String _selectedProviderType = 'Photography';
   bool _isLoading = false;
 
@@ -39,7 +40,7 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
     'Music',
     'Decoration',
     'Transport',
-    'Other'
+    'Other',
   ];
 
   @override
@@ -67,7 +68,7 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
           _facebookController.text = data['facebook'] ?? '';
           _instagramController.text = data['instagram'] ?? '';
           _profileImageUrl = data['imageUrl'] ?? '';
-          
+
           String type = data['providerType'] ?? 'Photography';
           if (type.isNotEmpty) {
             type = type[0].toUpperCase() + type.substring(1);
@@ -99,7 +100,7 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
           .ref()
           .child('provider_profiles')
           .child('$uid.jpg');
-      
+
       await ref.putFile(_imageFile!);
       return await ref.getDownloadURL();
     } catch (e) {
@@ -117,18 +118,21 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         String? imageUrl = await _uploadImage(user.uid);
-        
-        await FirebaseFirestore.instance.collection('service_providers').doc(user.uid).update({
-          'businessName': _businessNameController.text.trim(),
-          'phone': _phoneController.text.trim(),
-          'location': _locationController.text.trim(),
-          'description': _descriptionController.text.trim(),
-          'website': _websiteController.text.trim(),
-          'facebook': _facebookController.text.trim(),
-          'instagram': _instagramController.text.trim(),
-          'imageUrl': imageUrl ?? _profileImageUrl,
-          'providerType': _selectedProviderType.toLowerCase(),
-        });
+
+        await FirebaseFirestore.instance
+            .collection('service_providers')
+            .doc(user.uid)
+            .update({
+              'businessName': _businessNameController.text.trim(),
+              'phone': _phoneController.text.trim(),
+              'location': _locationController.text.trim(),
+              'description': _descriptionController.text.trim(),
+              'website': _websiteController.text.trim(),
+              'facebook': _facebookController.text.trim(),
+              'instagram': _instagramController.text.trim(),
+              'imageUrl': imageUrl ?? _profileImageUrl,
+              'providerType': _selectedProviderType.toLowerCase(),
+            });
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -159,11 +163,16 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Edit Business Profile', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.sp)),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: AppColors.headerGradient,
+        title: Text(
+          'Edit Business Profile',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20.sp,
           ),
+        ),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(gradient: AppColors.headerGradient),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
@@ -173,10 +182,7 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              AppColors.primaryGreen,
-              AppColors.primaryBlue,
-            ],
+            colors: [AppColors.primaryGreen, AppColors.primaryBlue],
             stops: [0.0, 0.3],
           ),
         ),
@@ -187,7 +193,9 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
               child: Container(
                 decoration: BoxDecoration(
                   color: AppColors.background,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(35.r),
+                  ),
                 ),
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(24.r),
@@ -207,10 +215,15 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: Colors.grey[200],
-                                    border: Border.all(color: Colors.white, width: 4.w),
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 4.w,
+                                    ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         blurRadius: 10.r,
                                         offset: Offset(0, 5.h),
                                       ),
@@ -221,13 +234,17 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
                                             fit: BoxFit.cover,
                                           )
                                         : (_profileImageUrl.isNotEmpty
-                                            ? DecorationImage(
-                                                image: NetworkImage(_profileImageUrl),
-                                                fit: BoxFit.cover,
-                                              )
-                                            : null),
+                                              ? DecorationImage(
+                                                  image: NetworkImage(
+                                                    _profileImageUrl,
+                                                  ),
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : null),
                                   ),
-                                  child: _imageFile == null && _profileImageUrl.isEmpty
+                                  child:
+                                      _imageFile == null &&
+                                          _profileImageUrl.isEmpty
                                       ? Icon(
                                           Icons.business,
                                           size: 60.sp,
@@ -246,7 +263,10 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
                                     decoration: BoxDecoration(
                                       color: AppColors.primaryBlue,
                                       shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white, width: 3.w),
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 3.w,
+                                      ),
                                     ),
                                     child: Icon(
                                       Icons.camera_alt,
@@ -369,7 +389,9 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
                             borderRadius: BorderRadius.circular(12.r),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primaryGreen.withOpacity(0.3),
+                                color: AppColors.primaryGreen.withValues(
+                                  alpha: 0.3,
+                                ),
                                 blurRadius: 12.r,
                                 offset: Offset(0, 6.h),
                               ),
@@ -386,21 +408,21 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
                             ),
                             child: _isLoading
                                 ? SizedBox(
-                              height: 24.w,
-                              width: 24.w,
-                              child: const CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
+                                    height: 24.w,
+                                    width: 24.w,
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
                                 : Text(
-                              'Save Changes',
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
+                                    'Save Changes',
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
                         ),
                         SizedBox(height: 20.h),
@@ -488,7 +510,11 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
             child: DropdownButton<String>(
               value: value,
               isExpanded: true,
-              icon: Icon(Icons.arrow_drop_down, color: AppColors.primaryGreen, size: 24.sp),
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: AppColors.primaryGreen,
+                size: 24.sp,
+              ),
               items: items.map((String type) {
                 return DropdownMenuItem<String>(
                   value: type,

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 import 'booking_service.dart';
 
@@ -127,7 +128,9 @@ class ChatService {
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> watchMessages(String bookingId) {
-    return messagesRef(bookingId).orderBy('createdAt', descending: true).snapshots();
+    return messagesRef(
+      bookingId,
+    ).orderBy('createdAt', descending: true).snapshots();
   }
 
   Future<void> ensureThreadExistsForBooking({
@@ -179,7 +182,7 @@ class ChatService {
         }, SetOptions(merge: true));
       });
     } catch (e) {
-      print('ChatService: ensureThreadExistsForBooking error: $e');
+      debugPrint('ChatService: ensureThreadExistsForBooking error: $e');
     }
   }
 
@@ -207,7 +210,7 @@ class ChatService {
         );
       }
     } catch (e) {
-      print('ChatService: ensureThreadsForRole error: $e');
+      debugPrint('ChatService: ensureThreadsForRole error: $e');
     }
   }
 
@@ -252,15 +255,19 @@ class ChatService {
       });
       await batch.commit();
     } catch (e) {
-      print('ChatService: sendMessage fallback triggered: $e');
-      
+      debugPrint('ChatService: sendMessage fallback triggered: $e');
+
       // Fallback: If update fails (doc might still be missing), use set with merge.
       // We MUST resolve metadata to ensure userId/providerId are present for security rules.
-      final resolvedBooking = bookingData ?? 
+      final resolvedBooking =
+          bookingData ??
           (await _firestore.collection('bookings').doc(bookingId).get()).data();
-          
-      final metadata = resolvedBooking != null 
-          ? buildBookingChatThreadMetadata(bookingId: bookingId, bookingData: resolvedBooking)
+
+      final metadata = resolvedBooking != null
+          ? buildBookingChatThreadMetadata(
+              bookingId: bookingId,
+              bookingData: resolvedBooking,
+            )
           : <String, dynamic>{};
 
       final batch = _firestore.batch();

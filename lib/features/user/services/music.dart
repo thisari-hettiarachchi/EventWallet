@@ -68,9 +68,7 @@ class _MusicPageState extends State<MusicPage>
       body: Column(
         children: [
           Container(
-            decoration: const BoxDecoration(
-              gradient: AppColors.headerGradient,
-            ),
+            decoration: const BoxDecoration(gradient: AppColors.headerGradient),
             child: SafeArea(
               child: Column(
                 children: [
@@ -148,10 +146,7 @@ class _MusicPageState extends State<MusicPage>
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [
-                _buildBrowseTab(),
-                _buildPopularTab(),
-              ],
+              children: [_buildBrowseTab(), _buildPopularTab()],
             ),
           ),
         ],
@@ -270,9 +265,7 @@ class _MusicPageState extends State<MusicPage>
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.horizontal(
-              left: Radius.circular(20.r),
-            ),
+            borderRadius: BorderRadius.horizontal(left: Radius.circular(20.r)),
             child: imageUrl.isNotEmpty
                 ? Image.network(
                     imageUrl,
@@ -369,7 +362,9 @@ class _MusicPageState extends State<MusicPage>
                             vertical: 3.h,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                            color: AppColors.primaryGreen.withValues(
+                              alpha: 0.1,
+                            ),
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Text(
@@ -541,11 +536,7 @@ class _MusicPageState extends State<MusicPage>
           ],
         ),
       ),
-      child: Icon(
-        Icons.music_note,
-        size: 48.sp,
-        color: Colors.white,
-      ),
+      child: Icon(Icons.music_note, size: 48.sp, color: Colors.white),
     );
   }
 
@@ -619,23 +610,16 @@ class _MusicPageState extends State<MusicPage>
             ),
             Text(
               data['name'] ?? 'Musician',
-              style: TextStyle(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 24.h),
             Container(
               padding: EdgeInsets.all(40.r),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: AppColors.primaryGradient,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.play_arrow,
-                size: 64.sp,
-                color: Colors.white,
-              ),
+              child: Icon(Icons.play_arrow, size: 64.sp, color: Colors.white),
             ),
             SizedBox(height: 24.h),
             Text(

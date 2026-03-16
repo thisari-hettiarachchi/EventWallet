@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
-import '../../../core/widgets/gradient.dart';
 
 class VenuesPage extends StatefulWidget {
   const VenuesPage({super.key});
@@ -13,7 +12,14 @@ class VenuesPage extends StatefulWidget {
 
 class _VenuesPageState extends State<VenuesPage> {
   String _selectedFilter = 'All';
-  final List<String> _filters = ['All', 'Indoor', 'Outdoor', 'Banquet Hall', 'Garden', 'Beach'];
+  final List<String> _filters = [
+    'All',
+    'Indoor',
+    'Outdoor',
+    'Banquet Hall',
+    'Garden',
+    'Beach',
+  ];
 
   List<DocumentSnapshot> _venues = [];
   bool _isLoading = true;
@@ -53,9 +59,7 @@ class _VenuesPageState extends State<VenuesPage> {
       body: Column(
         children: [
           Container(
-            decoration: const BoxDecoration(
-              gradient: AppColors.headerGradient,
-            ),
+            decoration: const BoxDecoration(gradient: AppColors.headerGradient),
             child: SafeArea(
               child: Column(
                 children: [
@@ -65,11 +69,15 @@ class _VenuesPageState extends State<VenuesPage> {
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: IconButton(
-                            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 24.sp,
+                            ),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ),
@@ -89,7 +97,7 @@ class _VenuesPageState extends State<VenuesPage> {
                               Text(
                                 '${_venues.length} venues available',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   fontSize: 15.sp,
                                 ),
                               ),
@@ -97,7 +105,11 @@ class _VenuesPageState extends State<VenuesPage> {
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.map, color: Colors.white, size: 28.sp),
+                          icon: Icon(
+                            Icons.map,
+                            color: Colors.white,
+                            size: 28.sp,
+                          ),
                           onPressed: () => _showMapView(),
                         ),
                       ],
@@ -114,19 +126,19 @@ class _VenuesPageState extends State<VenuesPage> {
                 : _filteredVenues.isEmpty
                 ? _buildEmptyState()
                 : GridView.builder(
-              padding: EdgeInsets.all(20.r),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                childAspectRatio: 0.85,
-                mainAxisSpacing: 16.h,
-              ),
-              itemCount: _filteredVenues.length,
-              itemBuilder: (context, index) {
-                final doc = _filteredVenues[index];
-                final data = doc.data() as Map<String, dynamic>;
-                return _buildVenueCard(data, doc.id);
-              },
-            ),
+                    padding: EdgeInsets.all(20.r),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 1,
+                      childAspectRatio: 0.85,
+                      mainAxisSpacing: 16.h,
+                    ),
+                    itemCount: _filteredVenues.length,
+                    itemBuilder: (context, index) {
+                      final doc = _filteredVenues[index];
+                      final data = doc.data() as Map<String, dynamic>;
+                      return _buildVenueCard(data, doc.id);
+                    },
+                  ),
           ),
         ],
       ),
@@ -159,11 +171,11 @@ class _VenuesPageState extends State<VenuesPage> {
             onSelected: (selected) {
               setState(() => _selectedFilter = filter);
             },
-            backgroundColor: Colors.white.withOpacity(0.2),
-            selectedColor: Colors.white.withOpacity(0.3),
+            backgroundColor: Colors.white.withValues(alpha: 0.2),
+            selectedColor: Colors.white.withValues(alpha: 0.3),
             checkmarkColor: Colors.white,
             side: BorderSide(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               width: 1.w,
             ),
           );
@@ -198,18 +210,21 @@ class _VenuesPageState extends State<VenuesPage> {
               children: [
                 imageUrl.isNotEmpty
                     ? Image.network(
-                  imageUrl,
-                  height: 220.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
-                )
+                        imageUrl,
+                        height: 220.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
+                      )
                     : _buildPlaceholderImage(),
                 Positioned(
                   top: 16.h,
                   left: 16.w,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 6.h,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primaryGreen,
                       borderRadius: BorderRadius.circular(20.r),
@@ -228,9 +243,12 @@ class _VenuesPageState extends State<VenuesPage> {
                   top: 16.h,
                   right: 16.w,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 6.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
+                      color: Colors.black.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Row(
@@ -272,9 +290,10 @@ class _VenuesPageState extends State<VenuesPage> {
                   SizedBox(height: 8.h),
                   Row(
                     children: [
-                      Icon(Icons.location_on,
+                      Icon(
+                        Icons.location_on,
                         size: 16.sp,
-                        color: AppColors.textGrey.withOpacity(0.7),
+                        color: AppColors.textGrey.withValues(alpha: 0.7),
                       ),
                       SizedBox(width: 4.w),
                       Expanded(
@@ -282,7 +301,7 @@ class _VenuesPageState extends State<VenuesPage> {
                           location,
                           style: TextStyle(
                             fontSize: 13.sp,
-                            color: AppColors.textGrey.withOpacity(0.8),
+                            color: AppColors.textGrey.withValues(alpha: 0.8),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -295,7 +314,10 @@ class _VenuesPageState extends State<VenuesPage> {
                     children: [
                       _infoChip(Icons.people, 'Cap: $capacity'),
                       SizedBox(width: 8.w),
-                      _infoChip(Icons.attach_money, '\$${pricePerPerson.toInt()}/person'),
+                      _infoChip(
+                        Icons.attach_money,
+                        '\$${pricePerPerson.toInt()}/person',
+                      ),
                     ],
                   ),
                   SizedBox(height: 12.h),
@@ -305,9 +327,12 @@ class _VenuesPageState extends State<VenuesPage> {
                       runSpacing: 6.h,
                       children: amenities.take(3).map((amenity) {
                         return Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 5.h,
+                          ),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryBlue.withOpacity(0.1),
+                            color: AppColors.primaryBlue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10.r),
                           ),
                           child: Text(
@@ -331,13 +356,18 @@ class _VenuesPageState extends State<VenuesPage> {
                           onPressed: () => _viewDetails(id, data),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.primaryGreen,
-                            side: const BorderSide(color: AppColors.primaryGreen),
+                            side: const BorderSide(
+                              color: AppColors.primaryGreen,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.r),
                             ),
                             padding: EdgeInsets.symmetric(vertical: 12.h),
                           ),
-                          child: Text('Details', style: TextStyle(fontSize: 14.sp)),
+                          child: Text(
+                            'Details',
+                            style: TextStyle(fontSize: 14.sp),
+                          ),
                         ),
                       ),
                       SizedBox(width: 12.w),
@@ -352,7 +382,13 @@ class _VenuesPageState extends State<VenuesPage> {
                             ),
                             padding: EdgeInsets.symmetric(vertical: 12.h),
                           ),
-                          child: Text('Book', style: TextStyle(fontSize: 14.sp, color: Colors.white)),
+                          child: Text(
+                            'Book',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -370,7 +406,7 @@ class _VenuesPageState extends State<VenuesPage> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: AppColors.primaryGreen.withOpacity(0.1),
+        color: AppColors.primaryGreen.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
@@ -398,16 +434,12 @@ class _VenuesPageState extends State<VenuesPage> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primaryGreen.withOpacity(0.3),
-            AppColors.primaryBlue.withOpacity(0.3),
+            AppColors.primaryGreen.withValues(alpha: 0.3),
+            AppColors.primaryBlue.withValues(alpha: 0.3),
           ],
         ),
       ),
-      child: Icon(
-        Icons.location_city,
-        size: 64.sp,
-        color: Colors.white,
-      ),
+      child: Icon(Icons.location_city, size: 64.sp, color: Colors.white),
     );
   }
 
@@ -419,14 +451,14 @@ class _VenuesPageState extends State<VenuesPage> {
           Icon(
             Icons.business_outlined,
             size: 80.sp,
-            color: AppColors.textGrey.withOpacity(0.3),
+            color: AppColors.textGrey.withValues(alpha: 0.3),
           ),
           SizedBox(height: 16.h),
           Text(
             'No venues found',
             style: TextStyle(
               fontSize: 18.sp,
-              color: AppColors.textGrey.withOpacity(0.6),
+              color: AppColors.textGrey.withValues(alpha: 0.6),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -436,9 +468,9 @@ class _VenuesPageState extends State<VenuesPage> {
   }
 
   void _showMapView() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Map view coming soon!')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Map view coming soon!')));
   }
 
   void _viewDetails(String id, Map<String, dynamic> data) {
@@ -479,7 +511,10 @@ class _VenuesPageState extends State<VenuesPage> {
                     SizedBox(height: 8.h),
                     Text(
                       data['location'] ?? '',
-                      style: TextStyle(fontSize: 15.sp, color: AppColors.textGrey),
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        color: AppColors.textGrey,
+                      ),
                     ),
                     SizedBox(height: 16.h),
                     Text(
@@ -489,14 +524,24 @@ class _VenuesPageState extends State<VenuesPage> {
                     SizedBox(height: 24.h),
                     Text(
                       'Amenities',
-                      style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     SizedBox(height: 12.h),
                     Wrap(
                       spacing: 12.w,
                       runSpacing: 12.h,
                       children: (data['amenities'] as List<dynamic>? ?? [])
-                          .map((a) => Chip(label: Text(a.toString(), style: TextStyle(fontSize: 12.sp))))
+                          .map(
+                            (a) => Chip(
+                              label: Text(
+                                a.toString(),
+                                style: TextStyle(fontSize: 12.sp),
+                              ),
+                            ),
+                          )
                           .toList(),
                     ),
                   ],
@@ -513,13 +558,22 @@ class _VenuesPageState extends State<VenuesPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Book ${data['name']}', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Book ${data['name']}',
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Capacity: ${data['capacity']} guests', style: TextStyle(fontSize: 14.sp)),
-            Text('Price: \$${data['pricePerPerson']}/person', style: TextStyle(fontSize: 14.sp)),
+            Text(
+              'Capacity: ${data['capacity']} guests',
+              style: TextStyle(fontSize: 14.sp),
+            ),
+            Text(
+              'Price: \$${data['pricePerPerson']}/person',
+              style: TextStyle(fontSize: 14.sp),
+            ),
             SizedBox(height: 16.h),
             Text('Select event date:', style: TextStyle(fontSize: 14.sp)),
           ],
@@ -539,8 +593,13 @@ class _VenuesPageState extends State<VenuesPage> {
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryGreen),
-            child: Text('Confirm', style: TextStyle(fontSize: 14.sp, color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryGreen,
+            ),
+            child: Text(
+              'Confirm',
+              style: TextStyle(fontSize: 14.sp, color: Colors.white),
+            ),
           ),
         ],
       ),

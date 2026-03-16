@@ -20,9 +20,7 @@ class _TasksPageState extends State<TasksPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.headerGradient,
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.headerGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -32,7 +30,9 @@ class _TasksPageState extends State<TasksPage> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(35.r),
+                    ),
                   ),
                   child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
@@ -109,7 +109,7 @@ class _TasksPageState extends State<TasksPage> {
           Icon(
             Icons.task_alt,
             size: 80.sp,
-            color: Colors.grey.withOpacity(0.4),
+            color: Colors.grey.withValues(alpha: 0.4),
           ),
           SizedBox(height: 16.h),
           Text(
@@ -123,10 +123,7 @@ class _TasksPageState extends State<TasksPage> {
           SizedBox(height: 8.h),
           Text(
             'Click the + button to add one.',
-            style: TextStyle(
-              fontSize: 16.sp,
-              color: Colors.grey,
-            ),
+            style: TextStyle(fontSize: 16.sp, color: Colors.grey),
           ),
         ],
       ),
@@ -152,7 +149,9 @@ class _TasksPageState extends State<TasksPage> {
             fontSize: 16.sp,
             fontWeight: FontWeight.w600,
             color: AppColors.textDark,
-            decoration: isDone ? TextDecoration.lineThrough : TextDecoration.none,
+            decoration: isDone
+                ? TextDecoration.lineThrough
+                : TextDecoration.none,
           ),
         ),
         leading: Transform.scale(
@@ -190,7 +189,10 @@ class _TasksPageState extends State<TasksPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Add a new task', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+          title: Text(
+            'Add a new task',
+            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+          ),
           content: TextField(
             controller: _taskController,
             autofocus: true,
@@ -213,15 +215,18 @@ class _TasksPageState extends State<TasksPage> {
                       .doc(widget.eventId)
                       .collection('tasks')
                       .add({
-                    'title': _taskController.text,
-                    'isDone': false,
-                    'createdAt': FieldValue.serverTimestamp(),
-                  });
+                        'title': _taskController.text,
+                        'isDone': false,
+                        'createdAt': FieldValue.serverTimestamp(),
+                      });
                   _taskController.clear();
                   Navigator.pop(context);
                 }
               },
-              child: Text('Add', style: TextStyle(fontSize: 14.sp, color: Colors.white)),
+              child: Text(
+                'Add',
+                style: TextStyle(fontSize: 14.sp, color: Colors.white),
+              ),
             ),
           ],
         );

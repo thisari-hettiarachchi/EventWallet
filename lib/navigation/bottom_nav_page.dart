@@ -20,9 +20,7 @@ class _BottomNavPageState extends State<BottomNavPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: widget.child,
-      bottomNavigationBar: AppBottomNav(
-        currentIndex: widget.currentIndex,
-      ),
+      bottomNavigationBar: AppBottomNav(currentIndex: widget.currentIndex),
     );
   }
 }

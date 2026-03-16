@@ -14,9 +14,7 @@ class ServiceProviderNotificationsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.primaryGradient,
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -26,7 +24,9 @@ class ServiceProviderNotificationsPage extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(35.r),
+                    ),
                   ),
                   child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
@@ -37,7 +37,11 @@ class ServiceProviderNotificationsPage extends StatelessWidget {
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen));
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primaryGreen,
+                          ),
+                        );
                       }
 
                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -95,15 +99,20 @@ class ServiceProviderNotificationsPage extends StatelessWidget {
 
   Widget _buildNotificationCard(String id, Map<String, dynamic> data) {
     final bool isRead = data['isRead'] ?? false;
-    final timestamp = (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now();
+    final timestamp =
+        (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now();
     final String timeAgo = _formatTimestamp(timestamp);
 
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: isRead ? Colors.white : AppColors.primaryGreen.withValues(alpha: 0.05),
+        color: isRead
+            ? Colors.white
+            : AppColors.primaryGreen.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16.r),
-        border: isRead ? null : Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.2)),
+        border: isRead
+            ? null
+            : Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -151,18 +160,12 @@ class ServiceProviderNotificationsPage extends StatelessWidget {
             SizedBox(height: 4.h),
             Text(
               data['message'] ?? '',
-              style: TextStyle(
-                color: Colors.grey.shade700,
-                fontSize: 14.sp,
-              ),
+              style: TextStyle(color: Colors.grey.shade700, fontSize: 14.sp),
             ),
             SizedBox(height: 8.h),
             Text(
               timeAgo,
-              style: TextStyle(
-                color: Colors.grey.shade500,
-                fontSize: 12.sp,
-              ),
+              style: TextStyle(color: Colors.grey.shade500, fontSize: 12.sp),
             ),
           ],
         ),
@@ -173,21 +176,31 @@ class ServiceProviderNotificationsPage extends StatelessWidget {
 
   IconData _getIcon(String? type) {
     switch (type) {
-      case 'booking': return Icons.event_available;
-      case 'message': return Icons.chat_bubble_outline;
-      case 'review': return Icons.rate_review_outlined;
-      case 'payment': return Icons.payment;
-      default: return Icons.notifications;
+      case 'booking':
+        return Icons.event_available;
+      case 'message':
+        return Icons.chat_bubble_outline;
+      case 'review':
+        return Icons.rate_review_outlined;
+      case 'payment':
+        return Icons.payment;
+      default:
+        return Icons.notifications;
     }
   }
 
   Color _getIconColor(String? type) {
     switch (type) {
-      case 'booking': return Colors.blue;
-      case 'message': return Colors.green;
-      case 'review': return Colors.orange;
-      case 'payment': return Colors.purple;
-      default: return AppColors.primaryGreen;
+      case 'booking':
+        return Colors.blue;
+      case 'message':
+        return Colors.green;
+      case 'review':
+        return Colors.orange;
+      case 'payment':
+        return Colors.purple;
+      default:
+        return AppColors.primaryGreen;
     }
   }
 
@@ -213,11 +226,19 @@ class ServiceProviderNotificationsPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.notifications_none_rounded, size: 80.sp, color: Colors.grey.shade300),
+          Icon(
+            Icons.notifications_none_rounded,
+            size: 80.sp,
+            color: Colors.grey.shade300,
+          ),
           SizedBox(height: 16.h),
           Text(
             'All caught up!',
-            style: TextStyle(fontSize: 18.sp, color: Colors.grey.shade600, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 18.sp,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           SizedBox(height: 8.h),
           Text(

@@ -29,13 +29,14 @@ class ServiceProviderProfilePage extends StatelessWidget {
           );
         }
       });
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseFirestore.instance.collection('service_providers').doc(user.uid).get(),
+      future: FirebaseFirestore.instance
+          .collection('service_providers')
+          .doc(user.uid)
+          .get(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -50,9 +51,10 @@ class ServiceProviderProfilePage extends StatelessWidget {
         }
 
         final providerData = snapshot.data!.data() as Map<String, dynamic>;
-        final String businessName = providerData['businessName'] ?? 'Business Name';
+        final String businessName =
+            providerData['businessName'] ?? 'Business Name';
         final String email = providerData['email'] ?? 'No email';
-        
+
         final initials = businessName.isNotEmpty
             ? businessName.trim().split(' ').map((e) => e[0]).take(2).join()
             : 'SP';
@@ -113,16 +115,18 @@ class ServiceProviderProfilePage extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 24.h),
-                  
+
                   // Stats Section
                   _buildProviderStats(user.uid),
-                  
+
                   SizedBox(height: 20.h),
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
                         color: AppColors.background,
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(35.r),
+                        ),
                       ),
                       child: ListView(
                         padding: EdgeInsets.all(20.r),
@@ -144,7 +148,10 @@ class ServiceProviderProfilePage extends StatelessWidget {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const EditBusinessProfilePage()),
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const EditBusinessProfilePage(),
+                                ),
                               );
                             },
                           ),
@@ -157,7 +164,9 @@ class ServiceProviderProfilePage extends StatelessWidget {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const MyServicesPage()),
+                                MaterialPageRoute(
+                                  builder: (_) => const MyServicesPage(),
+                                ),
                               );
                             },
                           ),
@@ -170,7 +179,9 @@ class ServiceProviderProfilePage extends StatelessWidget {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const EarningsAnalyticsPage()),
+                                MaterialPageRoute(
+                                  builder: (_) => const EarningsAnalyticsPage(),
+                                ),
                               );
                             },
                           ),
@@ -192,7 +203,9 @@ class ServiceProviderProfilePage extends StatelessWidget {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const PrivacySecurityPage()),
+                                MaterialPageRoute(
+                                  builder: (_) => const PrivacySecurityPage(),
+                                ),
                               );
                             },
                           ),
@@ -205,12 +218,14 @@ class ServiceProviderProfilePage extends StatelessWidget {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const HelpSupportPage()),
+                                MaterialPageRoute(
+                                  builder: (_) => const HelpSupportPage(),
+                                ),
                               );
                             },
                           ),
                           SizedBox(height: 24.h),
-                          
+
                           // Logout Button
                           Container(
                             decoration: BoxDecoration(
@@ -231,10 +246,15 @@ class ServiceProviderProfilePage extends StatelessWidget {
                                         padding: EdgeInsets.all(10.r),
                                         decoration: BoxDecoration(
                                           color: Colors.red.shade100,
-                                          borderRadius: BorderRadius.circular(10.r),
+                                          borderRadius: BorderRadius.circular(
+                                            10.r,
+                                          ),
                                         ),
-                                        child: Icon(Icons.logout,
-                                            color: Colors.red.shade700, size: 22.sp),
+                                        child: Icon(
+                                          Icons.logout,
+                                          color: Colors.red.shade700,
+                                          size: 22.sp,
+                                        ),
                                       ),
                                       SizedBox(width: 12.w),
                                       Expanded(
@@ -247,8 +267,11 @@ class ServiceProviderProfilePage extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      Icon(Icons.arrow_forward_ios,
-                                          color: Colors.red.shade400, size: 16.sp),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: Colors.red.shade400,
+                                        size: 16.sp,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -413,8 +436,11 @@ class ServiceProviderProfilePage extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(Icons.arrow_forward_ios,
-                    color: Colors.grey.shade400, size: 16.sp),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.grey.shade400,
+                  size: 16.sp,
+                ),
               ],
             ),
           ),
@@ -427,8 +453,14 @@ class ServiceProviderProfilePage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Logout', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp)),
-        content: Text('Are you sure you want to logout from your business account?', style: TextStyle(fontSize: 14.sp)),
+        title: Text(
+          'Logout',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
+        ),
+        content: Text(
+          'Are you sure you want to logout from your business account?',
+          style: TextStyle(fontSize: 14.sp),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -449,13 +481,21 @@ class ServiceProviderProfilePage extends StatelessWidget {
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error logging out: $e'), backgroundColor: Colors.red),
+                    SnackBar(
+                      content: Text('Error logging out: $e'),
+                      backgroundColor: Colors.red,
+                    ),
                   );
                 }
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700),
-            child: Text('Logout', style: TextStyle(color: Colors.white, fontSize: 14.sp)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade700,
+            ),
+            child: Text(
+              'Logout',
+              style: TextStyle(color: Colors.white, fontSize: 14.sp),
+            ),
           ),
         ],
       ),

@@ -25,9 +25,10 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.2),
@@ -51,10 +52,7 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF00897B),
-              Color(0xFF1565C0),
-            ],
+            colors: [Color(0xFF00897B), Color(0xFF1565C0)],
           ),
         ),
         child: SafeArea(
@@ -63,11 +61,12 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
               return SingleChildScrollView(
                 physics: const ClampingScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 32.w,
+                      vertical: 16.h,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -78,10 +77,10 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                             padding: EdgeInsets.all(16.r),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   blurRadius: 20.r,
                                   spreadRadius: 5.r,
                                 ),
@@ -125,7 +124,7 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 14.sp,
-                                    color: Colors.white.withOpacity(0.9),
+                                    color: Colors.white.withValues(alpha: 0.9),
                                     fontWeight: FontWeight.w500,
                                     letterSpacing: 0.5,
                                   ),
@@ -149,12 +148,14 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                                   onPressed: () {
                                     Navigator.pushReplacement(
                                       context,
-                                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                                      MaterialPageRoute(
+                                        builder: (_) => const LoginPage(),
+                                      ),
                                     );
                                   },
                                 ),
                                 SizedBox(height: 16.h),
-                                
+
                                 // User Signup Button
                                 _buildOutlinedButton(
                                   text: 'Create Account',
@@ -162,7 +163,9 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                                   onPressed: () {
                                     Navigator.pushReplacement(
                                       context,
-                                      MaterialPageRoute(builder: (_) => const SignupPage()),
+                                      MaterialPageRoute(
+                                        builder: (_) => const SignupPage(),
+                                      ),
                                     );
                                   },
                                 ),
@@ -180,21 +183,37 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                               children: [
                                 Row(
                                   children: [
-                                    Expanded(child: Divider(color: Colors.white.withOpacity(0.3))),
+                                    Expanded(
+                                      child: Divider(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                      ),
+                                    ),
                                     Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 16.w,
+                                      ),
                                       child: Text(
                                         'ARE YOU A PROVIDER?',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          color: Colors.white.withOpacity(0.6),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.6,
+                                          ),
                                           fontSize: 10.sp,
                                           fontWeight: FontWeight.bold,
                                           letterSpacing: 1.2,
                                         ),
                                       ),
                                     ),
-                                    Expanded(child: Divider(color: Colors.white.withOpacity(0.3))),
+                                    Expanded(
+                                      child: Divider(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 SizedBox(height: 16.h),
@@ -242,13 +261,13 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
         borderRadius: BorderRadius.circular(16.r),
         gradient: LinearGradient(
           colors: [
-            Colors.white.withOpacity(0.95),
-            Colors.white.withOpacity(0.85),
+            Colors.white.withValues(alpha: 0.95),
+            Colors.white.withValues(alpha: 0.85),
           ],
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10.r,
             offset: Offset(0, 4.h),
           ),
@@ -307,12 +326,15 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
       height: 56.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.white.withOpacity(0.5), width: 1.5.w),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.5),
+          width: 1.5.w,
+        ),
       ),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white.withOpacity(0.1),
+          backgroundColor: Colors.white.withValues(alpha: 0.1),
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.r),
@@ -358,18 +380,22 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
           padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 20.w),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16.r),
-            color: Colors.white.withOpacity(0.15),
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
+            color: Colors.white.withValues(alpha: 0.15),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
           ),
           child: Row(
             children: [
               Container(
                 padding: EdgeInsets.all(6.r),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.business_center_rounded, color: Colors.white, size: 18.sp),
+                child: Icon(
+                  Icons.business_center_rounded,
+                  color: Colors.white,
+                  size: 18.sp,
+                ),
               ),
               SizedBox(width: 12.w),
               Expanded(
@@ -388,15 +414,16 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
                     ),
                     Text(
                       'Manage your business profile',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 11.sp,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 11.sp),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: Colors.white70, size: 20.sp),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.white70,
+                size: 20.sp,
+              ),
             ],
           ),
         ),

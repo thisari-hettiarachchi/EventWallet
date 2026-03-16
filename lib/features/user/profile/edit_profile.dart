@@ -48,10 +48,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
-          'name': _nameController.text.trim(),
-          'phone': _phoneController.text.trim(),
-        });
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .update({
+              'name': _nameController.text.trim(),
+              'phone': _phoneController.text.trim(),
+            });
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -82,11 +85,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Edit Profile', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.sp)),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: AppColors.headerGradient,
+        title: Text(
+          'Edit Profile',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20.sp,
           ),
+        ),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(gradient: AppColors.headerGradient),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
@@ -96,10 +104,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              AppColors.primaryGreen,
-              AppColors.primaryBlue,
-            ],
+            colors: [AppColors.primaryGreen, AppColors.primaryBlue],
             stops: [0.0, 0.3],
           ),
         ),
@@ -110,7 +115,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
               child: Container(
                 decoration: BoxDecoration(
                   color: AppColors.background,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(35.r)),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(35.r),
+                  ),
                 ),
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(24.r),
@@ -130,7 +137,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   gradient: AppColors.primaryGradient,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.primaryBlue.withOpacity(0.3),
+                                      color: AppColors.primaryBlue.withValues(
+                                        alpha: 0.3,
+                                      ),
                                       blurRadius: 20.r,
                                       offset: Offset(0, 10.h),
                                     ),
@@ -150,7 +159,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   decoration: BoxDecoration(
                                     color: AppColors.primaryBlue,
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white, width: 3.w),
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 3.w,
+                                    ),
                                   ),
                                   child: Icon(
                                     Icons.camera_alt,
@@ -207,7 +219,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             borderRadius: BorderRadius.circular(12.r),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primaryGreen.withOpacity(0.3),
+                                color: AppColors.primaryGreen.withValues(
+                                  alpha: 0.3,
+                                ),
                                 blurRadius: 12.r,
                                 offset: Offset(0, 6.h),
                               ),
@@ -224,21 +238,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             ),
                             child: _isLoading
                                 ? SizedBox(
-                              height: 24.w,
-                              width: 24.w,
-                              child: const CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
+                                    height: 24.w,
+                                    width: 24.w,
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
                                 : Text(
-                              'Save Changes',
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
+                                    'Save Changes',
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],

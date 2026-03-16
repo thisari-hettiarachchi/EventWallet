@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
-import '../../../core/constants/strings.dart';
-import '../../../core/widgets/gradient.dart';
 
 class PhotographyPage extends StatefulWidget {
   const PhotographyPage({super.key});
@@ -14,7 +12,13 @@ class PhotographyPage extends StatefulWidget {
 
 class _PhotographyPageState extends State<PhotographyPage> {
   String _selectedFilter = 'All';
-  final List<String> _filters = ['All', 'Wedding', 'Portrait', 'Event', 'Commercial'];
+  final List<String> _filters = [
+    'All',
+    'Wedding',
+    'Portrait',
+    'Event',
+    'Commercial',
+  ];
 
   List<DocumentSnapshot> _photographers = [];
   bool _isLoading = true;
@@ -55,9 +59,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
       body: Column(
         children: [
           Container(
-            decoration: const BoxDecoration(
-              gradient: AppColors.headerGradient,
-            ),
+            decoration: const BoxDecoration(gradient: AppColors.headerGradient),
             child: SafeArea(
               child: Column(
                 children: [
@@ -67,11 +69,15 @@ class _PhotographyPageState extends State<PhotographyPage> {
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: IconButton(
-                            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 24.sp,
+                            ),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ),
@@ -91,7 +97,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
                               Text(
                                 '${_photographers.length} photographers available',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   fontSize: 15.sp,
                                 ),
                               ),
@@ -99,7 +105,11 @@ class _PhotographyPageState extends State<PhotographyPage> {
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.search, color: Colors.white, size: 28.sp),
+                          icon: Icon(
+                            Icons.search,
+                            color: Colors.white,
+                            size: 28.sp,
+                          ),
                           onPressed: () => _showSearchDialog(),
                         ),
                       ],
@@ -116,14 +126,14 @@ class _PhotographyPageState extends State<PhotographyPage> {
                 : _filteredPhotographers.isEmpty
                 ? _buildEmptyState()
                 : ListView.builder(
-              padding: EdgeInsets.all(20.r),
-              itemCount: _filteredPhotographers.length,
-              itemBuilder: (context, index) {
-                final doc = _filteredPhotographers[index];
-                final data = doc.data() as Map<String, dynamic>;
-                return _buildPhotographerCard(data, doc.id);
-              },
-            ),
+                    padding: EdgeInsets.all(20.r),
+                    itemCount: _filteredPhotographers.length,
+                    itemBuilder: (context, index) {
+                      final doc = _filteredPhotographers[index];
+                      final data = doc.data() as Map<String, dynamic>;
+                      return _buildPhotographerCard(data, doc.id);
+                    },
+                  ),
           ),
         ],
       ),
@@ -156,11 +166,11 @@ class _PhotographyPageState extends State<PhotographyPage> {
             onSelected: (selected) {
               setState(() => _selectedFilter = filter);
             },
-            backgroundColor: Colors.white.withOpacity(0.2),
-            selectedColor: Colors.white.withOpacity(0.3),
+            backgroundColor: Colors.white.withValues(alpha: 0.2),
+            selectedColor: Colors.white.withValues(alpha: 0.3),
             checkmarkColor: Colors.white,
             side: BorderSide(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               width: 1.w,
             ),
           );
@@ -195,20 +205,23 @@ class _PhotographyPageState extends State<PhotographyPage> {
               children: [
                 imageUrl.isNotEmpty
                     ? Image.network(
-                  imageUrl,
-                  height: 200.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
-                )
+                        imageUrl,
+                        height: 200.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
+                      )
                     : _buildPlaceholderImage(),
                 Positioned(
                   top: 12.h,
                   right: 12.w,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 6.h,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
+                      color: Colors.black.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Row(
@@ -261,9 +274,10 @@ class _PhotographyPageState extends State<PhotographyPage> {
                 SizedBox(height: 8.h),
                 Row(
                   children: [
-                    Icon(Icons.location_on,
+                    Icon(
+                      Icons.location_on,
                       size: 16.sp,
-                      color: AppColors.textGrey.withOpacity(0.7),
+                      color: AppColors.textGrey.withValues(alpha: 0.7),
                     ),
                     SizedBox(width: 4.w),
                     Expanded(
@@ -271,7 +285,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
                         location,
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: AppColors.textGrey.withOpacity(0.8),
+                          color: AppColors.textGrey.withValues(alpha: 0.8),
                         ),
                       ),
                     ),
@@ -279,7 +293,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
                       '$reviews reviews',
                       style: TextStyle(
                         fontSize: 13.sp,
-                        color: AppColors.textGrey.withOpacity(0.8),
+                        color: AppColors.textGrey.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -290,9 +304,12 @@ class _PhotographyPageState extends State<PhotographyPage> {
                   runSpacing: 8.h,
                   children: specialties.map((specialty) {
                     return Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 6.h,
+                      ),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Text(
@@ -313,7 +330,10 @@ class _PhotographyPageState extends State<PhotographyPage> {
                       child: OutlinedButton.icon(
                         onPressed: () => _viewDetails(id, data),
                         icon: Icon(Icons.info_outline, size: 18.sp),
-                        label: Text('Details', style: TextStyle(fontSize: 14.sp)),
+                        label: Text(
+                          'Details',
+                          style: TextStyle(fontSize: 14.sp),
+                        ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.primaryGreen,
                           side: const BorderSide(color: AppColors.primaryGreen),
@@ -357,16 +377,12 @@ class _PhotographyPageState extends State<PhotographyPage> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primaryGreen.withOpacity(0.3),
-            AppColors.primaryBlue.withOpacity(0.3),
+            AppColors.primaryGreen.withValues(alpha: 0.3),
+            AppColors.primaryBlue.withValues(alpha: 0.3),
           ],
         ),
       ),
-      child: Icon(
-        Icons.camera_alt,
-        size: 64.sp,
-        color: Colors.white,
-      ),
+      child: Icon(Icons.camera_alt, size: 64.sp, color: Colors.white),
     );
   }
 
@@ -378,14 +394,14 @@ class _PhotographyPageState extends State<PhotographyPage> {
           Icon(
             Icons.photo_camera_outlined,
             size: 80.sp,
-            color: AppColors.textGrey.withOpacity(0.3),
+            color: AppColors.textGrey.withValues(alpha: 0.3),
           ),
           SizedBox(height: 16.h),
           Text(
             'No photographers found',
             style: TextStyle(
               fontSize: 18.sp,
-              color: AppColors.textGrey.withOpacity(0.6),
+              color: AppColors.textGrey.withValues(alpha: 0.6),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -394,7 +410,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
             'Try changing your filter',
             style: TextStyle(
               fontSize: 14.sp,
-              color: AppColors.textGrey.withOpacity(0.5),
+              color: AppColors.textGrey.withValues(alpha: 0.5),
             ),
           ),
         ],
@@ -406,7 +422,10 @@ class _PhotographyPageState extends State<PhotographyPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Search Photographers', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Search Photographers',
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
         content: TextField(
           style: TextStyle(fontSize: 15.sp),
           decoration: InputDecoration(
@@ -479,7 +498,10 @@ class _PhotographyPageState extends State<PhotographyPage> {
                     ),
                     SizedBox(height: 12.h),
                     // Add portfolio images grid here
-                    Text('Portfolio images coming soon...', style: TextStyle(fontSize: 14.sp)),
+                    Text(
+                      'Portfolio images coming soon...',
+                      style: TextStyle(fontSize: 14.sp),
+                    ),
                   ],
                 ),
               ),
@@ -494,14 +516,23 @@ class _PhotographyPageState extends State<PhotographyPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Book ${data['name']}', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Book ${data['name']}',
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Rate: \$${data['hourlyRate']}/hour', style: TextStyle(fontSize: 14.sp)),
+            Text(
+              'Rate: \$${data['hourlyRate']}/hour',
+              style: TextStyle(fontSize: 14.sp),
+            ),
             SizedBox(height: 16.h),
-            Text('Select a date and time for your event:', style: TextStyle(fontSize: 14.sp)),
+            Text(
+              'Select a date and time for your event:',
+              style: TextStyle(fontSize: 14.sp),
+            ),
             // Add date picker here
           ],
         ),
@@ -523,7 +554,10 @@ class _PhotographyPageState extends State<PhotographyPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryGreen,
             ),
-            child: Text('Confirm', style: TextStyle(fontSize: 14.sp, color: Colors.white)),
+            child: Text(
+              'Confirm',
+              style: TextStyle(fontSize: 14.sp, color: Colors.white),
+            ),
           ),
         ],
       ),

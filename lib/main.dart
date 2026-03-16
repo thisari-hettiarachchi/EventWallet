@@ -3,15 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'features/user/onboarding/splash_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase only on supported platforms
-  // Windows support is experimental and may have issues
+  // Firebase initialization
   if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.windows)) {
-    debugPrint("Firebase on Windows is experimental. Skipping initialization for development.");
-    // You can add a mock Firebase or alternative backend here
+    debugPrint(
+      "Firebase on Windows is experimental. Skipping initialization for development.",
+    );
   } else {
     try {
       await Firebase.initializeApp();
@@ -20,6 +21,13 @@ void main() async {
       debugPrint("Firebase initialization error: $e");
     }
   }
+
+  // Supabase initialization
+  await Supabase.initialize(
+    url: 'https://tdzfarrefnpywjrggqpn.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkemZhcnJlZm5weXdqcmdncXBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTA2NTIsImV4cCI6MjA4OTIyNjY1Mn0.9wm90GvRqQ6PnZbMXycfYH1ZoIELz8xwfYCy4yJ5flk',
+  );
 
   runApp(const EventWalletApp());
 }
@@ -65,7 +73,10 @@ class EventWalletApp extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
               ),
             ),
             inputDecorationTheme: InputDecorationTheme(
@@ -79,7 +90,10 @@ class EventWalletApp extends StatelessWidget {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFF00897B), width: 2),
+                borderSide: const BorderSide(
+                  color: Color(0xFF00897B),
+                  width: 2,
+                ),
               ),
             ),
           ),

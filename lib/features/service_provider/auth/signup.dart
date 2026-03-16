@@ -33,16 +33,15 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.2),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
   }
@@ -111,7 +110,7 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       Navigator.pop(context); // Remove loading indicator
-      
+
       String message = e.message ?? 'Signup failed';
       if (e.code == 'email-already-in-use') {
         message = 'This email is already registered. Try logging in.';
@@ -132,7 +131,7 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context); // Remove loading indicator
-      
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -156,10 +155,7 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF00897B),
-              Color(0xFF1565C0),
-            ],
+            colors: [Color(0xFF00897B), Color(0xFF1565C0)],
           ),
         ),
         child: SafeArea(
@@ -168,11 +164,12 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
               return SingleChildScrollView(
                 physics: const ClampingScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.w,
+                      vertical: 16.h,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -183,34 +180,40 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
                             opacity: _fadeAnimation,
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(12.r),
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   width: 1.5.w,
                                 ),
                               ),
                               child: IconButton(
-                                icon: Icon(Icons.arrow_back,
-                                    color: Colors.white, size: 20.sp),
+                                icon: Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.white,
+                                  size: 20.sp,
+                                ),
                                 onPressed: () => Navigator.pop(context),
-                                constraints: BoxConstraints.tightFor(width: 40.w, height: 40.w),
+                                constraints: BoxConstraints.tightFor(
+                                  width: 40.w,
+                                  height: 40.w,
+                                ),
                                 padding: EdgeInsets.zero,
                               ),
                             ),
                           ),
                         ),
-                        
+
                         FadeTransition(
                           opacity: _fadeAnimation,
                           child: Container(
                             padding: EdgeInsets.all(12.r),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   blurRadius: 20.r,
                                   spreadRadius: 5.r,
                                 ),
@@ -223,7 +226,7 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
                             ),
                           ),
                         ),
-                        
+
                         SlideTransition(
                           position: _slideAnimation,
                           child: FadeTransition(
@@ -244,7 +247,7 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
                                   'Join us as a service provider',
                                   style: TextStyle(
                                     fontSize: 13.sp,
-                                    color: Colors.white.withOpacity(0.9),
+                                    color: Colors.white.withValues(alpha: 0.9),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -252,7 +255,7 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
                             ),
                           ),
                         ),
-                        
+
                         Column(
                           children: [
                             _buildField(
@@ -304,7 +307,7 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
                             ),
                           ],
                         ),
-                        
+
                         Column(
                           children: [
                             FadeTransition(
@@ -316,8 +319,8 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
                                   borderRadius: BorderRadius.circular(16.r),
                                   gradient: LinearGradient(
                                     colors: [
-                                      Colors.white.withOpacity(0.95),
-                                      Colors.white.withOpacity(0.85),
+                                      Colors.white.withValues(alpha: 0.95),
+                                      Colors.white.withValues(alpha: 0.85),
                                     ],
                                   ),
                                 ),
@@ -331,12 +334,13 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
                                     ),
                                   ),
                                   child: ShaderMask(
-                                    shaderCallback: (bounds) => const LinearGradient(
-                                      colors: [
-                                        Color(0xFF00897B),
-                                        Color(0xFF1565C0),
-                                      ],
-                                    ).createShader(bounds),
+                                    shaderCallback: (bounds) =>
+                                        const LinearGradient(
+                                          colors: [
+                                            Color(0xFF00897B),
+                                            Color(0xFF1565C0),
+                                          ],
+                                        ).createShader(bounds),
                                     child: Text(
                                       'Create Account',
                                       style: TextStyle(
@@ -357,7 +361,9 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (_) => const ServiceProviderLoginPage()),
+                                      builder: (_) =>
+                                          const ServiceProviderLoginPage(),
+                                    ),
                                   );
                                 },
                                 child: Text(
@@ -388,10 +394,10 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
           width: 1.w,
         ),
       ),

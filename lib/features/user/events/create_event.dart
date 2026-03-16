@@ -30,7 +30,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
     'Conference',
     'Party',
     'Charity',
-    'Other'
+    'Other',
   ];
 
   String _selectedStatus = 'Upcoming';
@@ -99,8 +99,18 @@ class _CreateEventPageState extends State<CreateEventPage> {
 
   String _formatDate(DateTime date) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
@@ -174,12 +184,13 @@ class _CreateEventPageState extends State<CreateEventPage> {
       'notes': _notesController.text.trim(),
       'category': _selectedCategory,
       'date': Timestamp.fromDate(_selectedDate!),
-      'time': _selectedTime != null ? '${_selectedTime!.hour}:${_selectedTime!.minute}' : null,
+      'time': _selectedTime != null
+          ? '${_selectedTime!.hour}:${_selectedTime!.minute}'
+          : null,
       'createdAt': FieldValue.serverTimestamp(),
       'userId': user.uid,
       'status': _selectedStatus,
     };
-
 
     try {
       await _db.collection('events').add(data);
@@ -187,7 +198,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
       // Add notification
       await _db.collection('users').doc(user.uid).collection('notifications').add({
         'title': 'Event Created',
-        'message': 'Your new event "${_eventNameController.text.trim()}" has been created successfully.',
+        'message':
+            'Your new event "${_eventNameController.text.trim()}" has been created successfully.',
         'timestamp': FieldValue.serverTimestamp(),
         'isRead': false,
         'type': 'event',
@@ -196,9 +208,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (_) => const EventsPage(),
-          ),
+          MaterialPageRoute(builder: (_) => const EventsPage()),
         );
       }
     } catch (e) {
@@ -261,10 +271,14 @@ class _CreateEventPageState extends State<CreateEventPage> {
                   Container(
                     padding: EdgeInsets.all(16.r),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
-                    child: Icon(Icons.event_available, color: Colors.white, size: 32.sp),
+                    child: Icon(
+                      Icons.event_available,
+                      color: Colors.white,
+                      size: 32.sp,
+                    ),
                   ),
                   SizedBox(width: 16.w),
                   Expanded(
@@ -296,7 +310,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
               hint: 'e.g., Sarah & John\'s Wedding',
               icon: Icons.title,
               validator: (value) {
-                if (value == null || value.isEmpty) return 'Please enter event name';
+                if (value == null || value.isEmpty) {
+                  return 'Please enter event name';
+                }
                 return null;
               },
             ),
@@ -308,20 +324,31 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: DropdownButtonFormField<String>(
-                value: _selectedCategory,
+                initialValue: _selectedCategory,
                 decoration: InputDecoration(
                   labelText: 'Event Category',
                   labelStyle: TextStyle(fontSize: 14.sp),
-                  prefixIcon: Icon(_getCategoryIcon(_selectedCategory), color: const Color(0xFF00897B), size: 24.sp),
+                  prefixIcon: Icon(
+                    _getCategoryIcon(_selectedCategory),
+                    color: const Color(0xFF00897B),
+                    size: 24.sp,
+                  ),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 16.h,
+                  ),
                 ),
                 items: _categories.map((category) {
                   return DropdownMenuItem(
                     value: category,
                     child: Row(
                       children: [
-                        Icon(_getCategoryIcon(category), size: 20.sp, color: Colors.grey.shade600),
+                        Icon(
+                          _getCategoryIcon(category),
+                          size: 20.sp,
+                          color: Colors.grey.shade600,
+                        ),
                         SizedBox(width: 12.w),
                         Text(category, style: TextStyle(fontSize: 14.sp)),
                       ],
@@ -341,7 +368,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 Expanded(
                   child: _buildDateTimePicker(
                     label: 'Event Date',
-                    value: _selectedDate != null ? _formatDate(_selectedDate!) : 'Select Date',
+                    value: _selectedDate != null
+                        ? _formatDate(_selectedDate!)
+                        : 'Select Date',
                     icon: Icons.calendar_today,
                     onTap: () => _selectDate(context),
                   ),
@@ -350,7 +379,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 Expanded(
                   child: _buildDateTimePicker(
                     label: 'Event Time',
-                    value: _selectedTime != null ? _selectedTime!.format(context) : 'Select Time',
+                    value: _selectedTime != null
+                        ? _selectedTime!.format(context)
+                        : 'Select Time',
                     icon: Icons.access_time,
                     onTap: () => _selectTime(context),
                   ),
@@ -413,13 +444,20 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: DropdownButtonFormField<String>(
-                value: _selectedStatus,
+                initialValue: _selectedStatus,
                 decoration: InputDecoration(
                   labelText: 'Event Status',
                   labelStyle: TextStyle(fontSize: 14.sp),
-                  prefixIcon: Icon(Icons.info, color: const Color(0xFF00897B), size: 24.sp),
+                  prefixIcon: Icon(
+                    Icons.info,
+                    color: const Color(0xFF00897B),
+                    size: 24.sp,
+                  ),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 16.h,
+                  ),
                 ),
                 items: _statusOptions.map((status) {
                   return DropdownMenuItem(
@@ -452,7 +490,11 @@ class _CreateEventPageState extends State<CreateEventPage> {
                   hintStyle: TextStyle(fontSize: 14.sp),
                   prefixIcon: Padding(
                     padding: EdgeInsets.only(bottom: 60.h),
-                    child: Icon(Icons.notes, color: const Color(0xFF00897B), size: 24.sp),
+                    child: Icon(
+                      Icons.notes,
+                      color: const Color(0xFF00897B),
+                      size: 24.sp,
+                    ),
                   ),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.all(16.r),
@@ -464,13 +506,18 @@ class _CreateEventPageState extends State<CreateEventPage> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: _isCreating
-                      ? [const Color(0xFF00897B).withOpacity(0.7), const Color(0xFF1565C0).withOpacity(0.7)]
+                      ? [
+                          const Color(0xFF00897B).withValues(alpha: 0.7),
+                          const Color(0xFF1565C0).withValues(alpha: 0.7),
+                        ]
                       : [const Color(0xFF00897B), const Color(0xFF1565C0)],
                 ),
                 borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF00897B).withOpacity(_isCreating ? 0.18 : 0.3),
+                    color: const Color(
+                      0xFF00897B,
+                    ).withValues(alpha: _isCreating ? 0.18 : 0.3),
                     blurRadius: 12.r,
                     offset: Offset(0, 6.h),
                   ),
@@ -493,7 +540,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
                               width: 18.sp,
                               child: const CircularProgressIndicator(
                                 strokeWidth: 2.2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             ),
                             SizedBox(width: 12.w),
@@ -546,7 +595,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
           hintStyle: TextStyle(fontSize: 14.sp),
           prefixIcon: Icon(icon, color: const Color(0xFF00897B), size: 24.sp),
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 16.w,
+            vertical: 16.h,
+          ),
         ),
       ),
     );

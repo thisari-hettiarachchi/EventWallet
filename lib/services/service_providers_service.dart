@@ -34,16 +34,14 @@ class ServiceProvidersService {
 
   // 🔹 Get service providers by CATEGORY
   Stream<QuerySnapshot> getServicesByCategory(String category) {
-    return _serviceProviders
-        .where('category', isEqualTo: category)
-        .snapshots();
+    return _serviceProviders.where('category', isEqualTo: category).snapshots();
   }
 
   // 🔹 Update service provider
   Future<void> updateServiceProvider(
-      String docId, {
-        required Map<String, dynamic> data,
-      }) async {
+    String docId, {
+    required Map<String, dynamic> data,
+  }) async {
     await _serviceProviders.doc(docId).update(data);
   }
 

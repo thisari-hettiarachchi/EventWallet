@@ -14,7 +14,8 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -31,9 +32,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.2),
@@ -53,9 +55,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
 
       if (userCredential.user != null) {
         final userDoc = await FirebaseFirestore.instance
@@ -67,7 +69,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           await FirebaseAuth.instance.signOut();
           throw FirebaseAuthException(
             code: 'user-not-found',
-            message: 'No user account found. You might be registered as a service provider.',
+            message:
+                'No user account found. You might be registered as a service provider.',
           );
         }
 
@@ -83,7 +86,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (_) => const HomePage()),
-                      (route) => false,
+                  (route) => false,
                 );
               },
             ),
@@ -131,7 +134,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,10 +142,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF00897B),
-              Color(0xFF1565C0),
-            ],
+            colors: [Color(0xFF00897B), Color(0xFF1565C0)],
           ),
         ),
         child: SafeArea(
@@ -152,11 +151,12 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
               return SingleChildScrollView(
                 physics: const ClampingScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.w,
+                      vertical: 16.h,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -166,10 +166,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             padding: EdgeInsets.all(16.r),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   blurRadius: 20.r,
                                   spreadRadius: 5.r,
                                 ),
@@ -182,7 +182,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             ),
                           ),
                         ),
-                        
+
                         SlideTransition(
                           position: _slideAnimation,
                           child: FadeTransition(
@@ -205,7 +205,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             ),
                           ),
                         ),
-                        
+
                         Column(
                           children: [
                             SlideTransition(
@@ -213,9 +213,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                               child: FadeTransition(
                                 opacity: _fadeAnimation,
                                 child: _buildTextField(
-                                    controller: _emailController,
-                                    label: 'Email',
-                                    icon: Icons.email),
+                                  controller: _emailController,
+                                  label: 'Email',
+                                  icon: Icons.email,
+                                ),
                               ),
                             ),
                             SizedBox(height: 12.h),
@@ -247,7 +248,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             ),
                           ],
                         ),
-                        
+
                         Column(
                           children: [
                             SlideTransition(
@@ -261,8 +262,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                     borderRadius: BorderRadius.circular(16.r),
                                     gradient: LinearGradient(
                                       colors: [
-                                        Colors.white.withOpacity(0.95),
-                                        Colors.white.withOpacity(0.85),
+                                        Colors.white.withValues(alpha: 0.95),
+                                        Colors.white.withValues(alpha: 0.85),
                                       ],
                                     ),
                                   ),
@@ -272,16 +273,19 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                       backgroundColor: Colors.transparent,
                                       shadowColor: Colors.transparent,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16.r),
+                                        borderRadius: BorderRadius.circular(
+                                          16.r,
+                                        ),
                                       ),
                                     ),
                                     child: ShaderMask(
-                                      shaderCallback: (bounds) => const LinearGradient(
-                                        colors: [
-                                          Color(0xFF00897B),
-                                          Color(0xFF1565C0),
-                                        ],
-                                      ).createShader(bounds),
+                                      shaderCallback: (bounds) =>
+                                          const LinearGradient(
+                                            colors: [
+                                              Color(0xFF00897B),
+                                              Color(0xFF1565C0),
+                                            ],
+                                          ).createShader(bounds),
                                       child: Text(
                                         'Login',
                                         style: TextStyle(
@@ -304,7 +308,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (_) => const SignupPage()),
+                                      builder: (_) => const SignupPage(),
+                                    ),
                                   );
                                 },
                                 child: Text(
@@ -329,11 +334,15 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                     color: Colors.white.withValues(alpha: 0.3),
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12.w,
+                                    ),
                                     child: Text(
                                       'OR',
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.7),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.7,
+                                        ),
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -354,7 +363,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                 onPressed: () {
                                   Navigator.pushReplacement(
                                     context,
-                                    MaterialPageRoute(builder: (_) => const provider_login.ServiceProviderLoginPage()),
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const provider_login.ServiceProviderLoginPage(),
+                                    ),
                                   );
                                 },
                                 child: Text(
@@ -390,10 +402,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
           width: 1.w,
         ),
       ),
@@ -403,10 +415,16 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         style: TextStyle(color: Colors.white, fontSize: 15.sp),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14.sp),
+          labelStyle: TextStyle(
+            color: Colors.white.withValues(alpha: 0.9),
+            fontSize: 14.sp,
+          ),
           prefixIcon: Icon(icon, color: Colors.white, size: 20.sp),
           suffixIcon: suffix,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 16.w,
+            vertical: 12.h,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16.r),
             borderSide: BorderSide.none,

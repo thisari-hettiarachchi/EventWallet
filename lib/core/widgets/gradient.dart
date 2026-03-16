@@ -51,9 +51,7 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: AppColors.headerGradient,
-      ),
+      decoration: const BoxDecoration(gradient: AppColors.headerGradient),
       child: AppBar(
         title: Text(
           title,
@@ -139,9 +137,7 @@ class GradientHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: AppColors.headerGradient,
-      ),
+      decoration: const BoxDecoration(gradient: AppColors.headerGradient),
       child: SafeArea(
         child: Column(
           children: [
@@ -202,8 +198,8 @@ class GradientIconContainer extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primaryGreen.withOpacity(0.2),
-            AppColors.primaryBlue.withOpacity(0.1),
+            AppColors.primaryGreen.withValues(alpha: 0.2),
+            AppColors.primaryBlue.withValues(alpha: 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(14.r),
@@ -238,7 +234,7 @@ class GradientFAB extends StatelessWidget {
         borderRadius: BorderRadius.circular(30.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryGreen.withOpacity(0.4),
+            color: AppColors.primaryGreen.withValues(alpha: 0.4),
             blurRadius: 16.r,
             offset: Offset(0, 8.h),
           ),

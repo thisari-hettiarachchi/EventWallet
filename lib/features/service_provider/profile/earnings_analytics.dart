@@ -12,7 +12,9 @@ class EarningsAnalyticsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return const Scaffold(body: Center(child: Text('Not logged in')));
+    if (user == null) {
+      return const Scaffold(body: Center(child: Text('Not logged in')));
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -26,9 +28,7 @@ class EarningsAnalyticsPage extends StatelessWidget {
           ),
         ),
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: AppColors.primaryGradient,
-          ),
+          decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
         ),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -59,7 +59,11 @@ class EarningsAnalyticsPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.analytics_outlined, size: 80.sp, color: Colors.grey.shade300),
+          Icon(
+            Icons.analytics_outlined,
+            size: 80.sp,
+            color: Colors.grey.shade300,
+          ),
           SizedBox(height: 16.h),
           Text(
             'No booking data yet',
@@ -73,10 +77,7 @@ class EarningsAnalyticsPage extends StatelessWidget {
           Text(
             'Your earnings will appear here once you complete bookings.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: AppColors.textGrey,
-            ),
+            style: TextStyle(fontSize: 14.sp, color: AppColors.textGrey),
           ),
         ],
       ),
@@ -87,8 +88,7 @@ class EarningsAnalyticsPage extends StatelessWidget {
     double totalRevenue = 0;
     int completedCount = 0;
     int pendingCount = 0;
-    int rejectedCount = 0;
-    
+
     final List<Map<String, dynamic>> completedBookings = [];
 
     for (var doc in docs) {
@@ -100,10 +100,9 @@ class EarningsAnalyticsPage extends StatelessWidget {
         completedCount++;
         totalRevenue += amount;
         completedBookings.add(data);
-      } else if (status == BookingStatuses.pending || status == BookingStatuses.accepted) {
+      } else if (status == BookingStatuses.pending ||
+          status == BookingStatuses.accepted) {
         pendingCount++;
-      } else if (status == BookingStatuses.rejected) {
-        rejectedCount++;
       }
     }
 
@@ -114,7 +113,9 @@ class EarningsAnalyticsPage extends StatelessWidget {
       return dateB.compareTo(dateA);
     });
 
-    final avgBookingValue = completedCount > 0 ? totalRevenue / completedCount : 0.0;
+    final avgBookingValue = completedCount > 0
+        ? totalRevenue / completedCount
+        : 0.0;
 
     return ListView(
       padding: EdgeInsets.all(20.r),
@@ -138,9 +139,21 @@ class EarningsAnalyticsPage extends StatelessWidget {
           crossAxisSpacing: 12.w,
           childAspectRatio: 1.5,
           children: [
-            _buildStatBox('Total Bookings', docs.length.toString(), Colors.blue),
-            _buildStatBox('Completed', completedCount.toString(), AppColors.primaryGreen),
-            _buildStatBox('Avg. Value', '\$${avgBookingValue.toStringAsFixed(0)}', Colors.orange),
+            _buildStatBox(
+              'Total Bookings',
+              docs.length.toString(),
+              Colors.blue,
+            ),
+            _buildStatBox(
+              'Completed',
+              completedCount.toString(),
+              AppColors.primaryGreen,
+            ),
+            _buildStatBox(
+              'Avg. Value',
+              '\$${avgBookingValue.toStringAsFixed(0)}',
+              Colors.orange,
+            ),
             _buildStatBox('Pending', pendingCount.toString(), Colors.purple),
           ],
         ),
@@ -157,10 +170,7 @@ class EarningsAnalyticsPage extends StatelessWidget {
               ),
             ),
             if (completedBookings.length > 5)
-              TextButton(
-                onPressed: () {},
-                child: const Text('View All'),
-              ),
+              TextButton(onPressed: () {}, child: const Text('View All')),
           ],
         ),
         SizedBox(height: 12.h),
@@ -175,7 +185,9 @@ class EarningsAnalyticsPage extends StatelessWidget {
             ),
           )
         else
-          ...completedBookings.take(5).map((booking) => _buildEarningItem(booking)),
+          ...completedBookings
+              .take(5)
+              .map((booking) => _buildEarningItem(booking)),
       ],
     );
   }
@@ -287,7 +299,9 @@ class EarningsAnalyticsPage extends StatelessWidget {
     final clientName = bookingClientNameFrom(booking);
     final amount = bookingAmountFrom(booking['amount']);
     final date = bookingEventDateFromMap(booking);
-    final dateStr = date != null ? DateFormat('MMM dd, yyyy').format(date) : 'N/A';
+    final dateStr = date != null
+        ? DateFormat('MMM dd, yyyy').format(date)
+        : 'N/A';
     final service = bookingPackageNameFrom(booking);
 
     return Container(
@@ -306,7 +320,11 @@ class EarningsAnalyticsPage extends StatelessWidget {
               color: AppColors.primaryGreen.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.attach_money, color: AppColors.primaryGreen, size: 20.sp),
+            child: Icon(
+              Icons.attach_money,
+              color: AppColors.primaryGreen,
+              size: 20.sp,
+            ),
           ),
           SizedBox(width: 12.w),
           Expanded(
@@ -323,10 +341,7 @@ class EarningsAnalyticsPage extends StatelessWidget {
                 ),
                 Text(
                   '$service • $dateStr',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: AppColors.textGrey,
-                  ),
+                  style: TextStyle(fontSize: 12.sp, color: AppColors.textGrey),
                 ),
               ],
             ),

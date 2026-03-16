@@ -68,72 +68,72 @@ class _BookingChatListPageState extends State<BookingChatListPage> {
                   child: user == null
                       ? _buildLoginPrompt()
                       : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                          stream: widget.isProviderView
-                              ? _chatService.watchThreadsForProvider(user.uid)
-                              : _chatService.watchThreadsForUser(user.uid),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.waiting &&
-                                !snapshot.hasData) {
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                  color: AppColors.primaryGreen,
-                                ),
-                              );
-                            }
+                    stream: widget.isProviderView
+                        ? _chatService.watchThreadsForProvider(user.uid)
+                        : _chatService.watchThreadsForUser(user.uid),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState ==
+                          ConnectionState.waiting &&
+                          !snapshot.hasData) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primaryGreen,
+                          ),
+                        );
+                      }
 
-                            if (snapshot.hasError) {
-                              return _buildInfoState(
-                                icon: Icons.error_outline,
-                                title: 'Could not load messages',
-                                subtitle: 'Please try again in a moment.',
-                              );
-                            }
+                      if (snapshot.hasError) {
+                        return _buildInfoState(
+                          icon: Icons.error_outline,
+                          title: 'Could not load messages',
+                          subtitle: 'Please try again in a moment.',
+                        );
+                      }
 
-                            final threads =
-                                snapshot.data?.docs.toList() ??
-                                <QueryDocumentSnapshot<Map<String, dynamic>>>[];
-                            threads.sort(
-                              (a, b) => bookingChatSortDateFrom(
-                                b.data(),
-                              ).compareTo(bookingChatSortDateFrom(a.data())),
-                            );
+                      final threads =
+                          snapshot.data?.docs.toList() ??
+                              <QueryDocumentSnapshot<Map<String, dynamic>>>[];
+                      threads.sort(
+                            (a, b) => bookingChatSortDateFrom(
+                          b.data(),
+                        ).compareTo(bookingChatSortDateFrom(a.data())),
+                      );
 
-                            if (threads.isEmpty) {
-                              return _buildInfoState(
-                                icon: Icons.chat_bubble_outline,
-                                title: 'No booking chats yet',
-                                subtitle: widget.isProviderView
-                                    ? 'Booking conversations with clients will appear here.'
-                                    : 'Your conversations with providers will appear here.',
-                              );
-                            }
+                      if (threads.isEmpty) {
+                        return _buildInfoState(
+                          icon: Icons.chat_bubble_outline,
+                          title: 'No booking chats yet',
+                          subtitle: widget.isProviderView
+                              ? 'Booking conversations with clients will appear here.'
+                              : 'Your conversations with providers will appear here.',
+                        );
+                      }
 
-                            return RefreshIndicator(
-                              color: AppColors.primaryGreen,
-                              onRefresh: _ensureThreadsExist,
-                              child: ListView.builder(
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                padding: EdgeInsets.fromLTRB(
-                                  20.w,
-                                  18.h,
-                                  20.w,
-                                  32.h,
-                                ),
-                                itemCount: threads.length,
-                                itemBuilder: (context, index) {
-                                  final doc = threads[index];
-                                  return _BookingChatThreadCard(
-                                    threadId: doc.id,
-                                    data: doc.data(),
-                                    currentUserId: user.uid,
-                                    isProviderView: widget.isProviderView,
-                                  );
-                                },
-                              ),
+                      return RefreshIndicator(
+                        color: AppColors.primaryGreen,
+                        onRefresh: _ensureThreadsExist,
+                        child: ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.fromLTRB(
+                            20.w,
+                            18.h,
+                            20.w,
+                            32.h,
+                          ),
+                          itemCount: threads.length,
+                          itemBuilder: (context, index) {
+                            final doc = threads[index];
+                            return _BookingChatThreadCard(
+                              threadId: doc.id,
+                              data: doc.data(),
+                              currentUserId: user.uid,
+                              isProviderView: widget.isProviderView,
                             );
                           },
                         ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
@@ -488,8 +488,8 @@ class _ThreadStatusBadge extends StatelessWidget {
       ),
       child: Text(
         (userFacing && normalized == BookingStatuses.accepted
-                ? 'Booked'
-                : BookingStatuses.label(normalized))
+            ? 'Booked'
+            : BookingStatuses.label(normalized))
             .toUpperCase(),
         style: TextStyle(
           color: color,

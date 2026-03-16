@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class ReviewService {
   ReviewService({FirebaseFirestore? firestore, FirebaseAuth? auth})
-      : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance,
+      _auth = auth ?? FirebaseAuth.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
@@ -19,9 +19,9 @@ class ReviewService {
   Stream<QuerySnapshot<Map<String, dynamic>>> getProviderReviews(
     String providerId,
   ) {
-    return _reviewsRef(providerId)
-        .orderBy('createdAt', descending: true)
-        .snapshots();
+    return _reviewsRef(
+      providerId,
+    ).orderBy('createdAt', descending: true).snapshots();
   }
 
   Future<void> submitReview({
@@ -38,14 +38,11 @@ class ReviewService {
 
     final userDoc = await _firestore.collection('users').doc(user.uid).get();
     final userData = userDoc.data() ?? <String, dynamic>{};
-    final userName = [
-      userData['name'],
-      user.displayName,
-      user.email?.split('@').first,
-    ].whereType<String>().map((e) => e.trim()).firstWhere(
-          (value) => value.isNotEmpty,
-          orElse: () => 'User',
-        );
+    final userName =
+        [userData['name'], user.displayName, user.email?.split('@').first]
+            .whereType<String>()
+            .map((e) => e.trim())
+            .firstWhere((value) => value.isNotEmpty, orElse: () => 'User');
 
     final reviewsSnapshot = await _reviewsRef(providerId).get();
     final existingRatings = reviewsSnapshot.docs
@@ -55,13 +52,19 @@ class ReviewService {
 
     final updatedCount = existingRatings.length + 1;
     final updatedAverage =
-        ((existingRatings.fold<double>(0, (sum, value) => sum + value) + rating) /
+        ((existingRatings.fold<double>(
+                      0,
+                      (runningTotal, value) => runningTotal + value,
+                    ) +
+                    rating) /
                 updatedCount)
             .clamp(0, 5)
             .toDouble();
 
     final reviewRef = _reviewsRef(providerId).doc();
-    final providerRef = _firestore.collection('service_providers').doc(providerId);
+    final providerRef = _firestore
+        .collection('service_providers')
+        .doc(providerId);
     final bookingRef = _firestore.collection('bookings').doc(bookingId);
     final notificationRef = providerRef.collection('notifications').doc();
 
@@ -86,11 +89,12 @@ class ReviewService {
       'reviewedAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
-    
+
     // Notify provider
     batch.set(notificationRef, {
       'title': 'New Review Received',
-      'message': '$userName gave you a $rating star review: "${comment.length > 50 ? comment.substring(0, 47) + '...' : comment}"',
+      'message':
+          '$userName gave you a $rating star review: "${comment.length > 50 ? '${comment.substring(0, 47)}...' : comment}"',
       'timestamp': FieldValue.serverTimestamp(),
       'isRead': false,
       'type': 'review',

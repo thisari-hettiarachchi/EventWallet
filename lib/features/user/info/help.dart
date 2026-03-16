@@ -12,7 +12,14 @@ class HelpSupportPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: Text('Help & Support', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.sp)),
+        title: Text(
+          'Help & Support',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20.sp,
+          ),
+        ),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -48,14 +55,17 @@ class HelpSupportPage extends StatelessWidget {
                   SizedBox(height: 16.h),
                   Text(
                     'We\'re Here to Help',
-                    style: AppTextStyles.whiteText(fontSize: 22, fontWeight: FontWeight.bold),
+                    style: AppTextStyles.whiteText(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     'Get assistance for your events and queries',
-                    style: AppTextStyles.whiteText(fontSize: 14).copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
-                    ),
+                    style: AppTextStyles.whiteText(
+                      fontSize: 14,
+                    ).copyWith(color: Colors.white.withValues(alpha: 0.9)),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -66,10 +76,7 @@ class HelpSupportPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Contact Us',
-                    style: AppTextStyles.sectionTitle,
-                  ),
+                  Text('Contact Us', style: AppTextStyles.sectionTitle),
                   SizedBox(height: 16.h),
                   _buildContactCard(
                     icon: Icons.email_outlined,
@@ -94,23 +101,28 @@ class HelpSupportPage extends StatelessWidget {
                   SizedBox(height: 16.h),
                   _buildFAQItem(
                     question: 'How do I create an event?',
-                    answer: 'To create an event, go to the Home screen and tap the "+" button. Fill in the event details like name, date, and budget, then tap "Create Event".',
+                    answer:
+                        'To create an event, go to the Home screen and tap the "+" button. Fill in the event details like name, date, and budget, then tap "Create Event".',
                   ),
                   _buildFAQItem(
                     question: 'How can I track my event budget?',
-                    answer: 'Each event has a budget tracker where you can add expenses. The app automatically calculates your spending and shows remaining budget.',
+                    answer:
+                        'Each event has a budget tracker where you can add expenses. The app automatically calculates your spending and shows remaining budget.',
                   ),
                   _buildFAQItem(
                     question: 'Can I edit or delete events?',
-                    answer: 'Yes! Go to "Manage Events" from your profile page. You can edit event details or delete events you no longer need.',
+                    answer:
+                        'Yes! Go to "Manage Events" from your profile page. You can edit event details or delete events you no longer need.',
                   ),
                   _buildFAQItem(
                     question: 'How do I reset my password?',
-                    answer: 'Go to Privacy & Security in your profile settings. Enter your current password and choose a new password to update it.',
+                    answer:
+                        'Go to Privacy & Security in your profile settings. Enter your current password and choose a new password to update it.',
                   ),
                   _buildFAQItem(
                     question: 'Is my data secure?',
-                    answer: 'Yes, all your data is securely stored using Firebase encryption. We follow industry-standard security practices to protect your information.',
+                    answer:
+                        'Yes, all your data is securely stored using Firebase encryption. We follow industry-standard security practices to protect your information.',
                   ),
                   SizedBox(height: 32.h),
                 ],
@@ -153,20 +165,17 @@ class HelpSupportPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: AppTextStyles.bodyLarge,
-                      ),
+                      Text(title, style: AppTextStyles.bodyLarge),
                       SizedBox(height: 4.h),
-                      Text(
-                        subtitle,
-                        style: AppTextStyles.bodyMedium,
-                      ),
+                      Text(subtitle, style: AppTextStyles.bodyMedium),
                     ],
                   ),
                 ),
-                Icon(Icons.arrow_forward_ios,
-                    color: AppColors.textGrey, size: 16.sp),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: AppColors.textGrey,
+                  size: 16.sp,
+                ),
               ],
             ),
           ),
@@ -190,17 +199,15 @@ class HelpSupportPage extends StatelessWidget {
               color: AppColors.primaryGreen.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8.r),
             ),
-            child: Icon(Icons.help_outline, color: AppColors.primaryGreen, size: 20.sp),
-          ),
-          title: Text(
-            question,
-            style: AppTextStyles.bodyLarge,
-          ),
-          children: [
-            Text(
-              answer,
-              style: AppTextStyles.bodyMedium.copyWith(height: 1.5),
+            child: Icon(
+              Icons.help_outline,
+              color: AppColors.primaryGreen,
+              size: 20.sp,
             ),
+          ),
+          title: Text(question, style: AppTextStyles.bodyLarge),
+          children: [
+            Text(answer, style: AppTextStyles.bodyMedium.copyWith(height: 1.5)),
           ],
         ),
       ),

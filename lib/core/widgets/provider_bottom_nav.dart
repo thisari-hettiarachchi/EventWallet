@@ -26,7 +26,10 @@ class ProviderBottomNav extends StatelessWidget {
             .doc(user.uid)
             .get();
         final type = doc.data()?['providerType'] ?? 'photographer';
-        page = ServiceProviderDashboard(providerId: user.uid, providerType: type);
+        page = ServiceProviderDashboard(
+          providerId: user.uid,
+          providerType: type,
+        );
         break;
       case 1:
         page = const ServiceProviderBookingsPage();
@@ -56,7 +59,7 @@ class ProviderBottomNav extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10.r,
             offset: Offset(0, -5.h),
           ),
@@ -68,7 +71,10 @@ class ProviderBottomNav extends StatelessWidget {
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF00897B),
         unselectedItemColor: Colors.grey,
-        selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.sp),
+        selectedLabelStyle: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 12.sp,
+        ),
         unselectedLabelStyle: TextStyle(fontSize: 12.sp),
         iconSize: 24.sp,
         elevation: 0,

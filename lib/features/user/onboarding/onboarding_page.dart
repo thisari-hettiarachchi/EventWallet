@@ -50,17 +50,15 @@ class _OnboardingPageState extends State<OnboardingPage>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeIn));
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     _fadeController.forward();
     _slideController.forward();
@@ -86,7 +84,7 @@ class _OnboardingPageState extends State<OnboardingPage>
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) =>
-          const WelcomeBackPage(),
+              const WelcomeBackPage(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
@@ -101,7 +99,7 @@ class _OnboardingPageState extends State<OnboardingPage>
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-        const WelcomeBackPage(),
+            const WelcomeBackPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },
@@ -145,8 +143,8 @@ class _OnboardingPageState extends State<OnboardingPage>
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFF1565C0).withOpacity(0.3),
-                      const Color(0xFF00897B).withOpacity(0.3),
+                      const Color(0xFF1565C0).withValues(alpha: 0.3),
+                      const Color(0xFF00897B).withValues(alpha: 0.3),
                     ],
                   ),
                 ),
@@ -162,8 +160,8 @@ class _OnboardingPageState extends State<OnboardingPage>
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFF00897B).withOpacity(0.2),
-                      const Color(0xFF1565C0).withOpacity(0.2),
+                      const Color(0xFF00897B).withValues(alpha: 0.2),
+                      const Color(0xFF1565C0).withValues(alpha: 0.2),
                     ],
                   ),
                 ),
@@ -202,12 +200,13 @@ class _OnboardingPageState extends State<OnboardingPage>
 
                                 // Reduced title font size
                                 ShaderMask(
-                                  shaderCallback: (bounds) => const LinearGradient(
-                                    colors: [
-                                      Color(0xFF00897B),
-                                      Color(0xFF1565C0),
-                                    ],
-                                  ).createShader(bounds),
+                                  shaderCallback: (bounds) =>
+                                      const LinearGradient(
+                                        colors: [
+                                          Color(0xFF00897B),
+                                          Color(0xFF1565C0),
+                                        ],
+                                      ).createShader(bounds),
                                   child: Text(
                                     onboardingData[index]['title']!,
                                     textAlign: TextAlign.center,
@@ -225,7 +224,9 @@ class _OnboardingPageState extends State<OnboardingPage>
 
                                 // Reduced subtitle font size
                                 Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 20.w,
+                                  ),
                                   child: Text(
                                     onboardingData[index]['subtitle']!,
                                     textAlign: TextAlign.center,
@@ -253,7 +254,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
                       onboardingData.length,
-                          (index) => AnimatedContainer(
+                      (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         margin: EdgeInsets.symmetric(horizontal: 4.w),
                         height: 6.h,
@@ -261,11 +262,11 @@ class _OnboardingPageState extends State<OnboardingPage>
                         decoration: BoxDecoration(
                           gradient: _currentIndex == index
                               ? const LinearGradient(
-                            colors: [
-                              Color(0xFF00897B),
-                              Color(0xFF1565C0),
-                            ],
-                          )
+                                  colors: [
+                                    Color(0xFF00897B),
+                                    Color(0xFF1565C0),
+                                  ],
+                                )
                               : null,
                           color: _currentIndex == index
                               ? null
@@ -279,7 +280,10 @@ class _OnboardingPageState extends State<OnboardingPage>
 
                 // Navigation buttons
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24.w,
+                    vertical: 16.h,
+                  ),
                   child: Row(
                     children: [
                       // Back button
@@ -290,7 +294,9 @@ class _OnboardingPageState extends State<OnboardingPage>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: const Color(0xFF00897B).withOpacity(0.3),
+                              color: const Color(
+                                0xFF00897B,
+                              ).withValues(alpha: 0.3),
                               width: 1.5.w,
                             ),
                             color: Colors.white,
@@ -313,15 +319,14 @@ class _OnboardingPageState extends State<OnboardingPage>
                           height: 50.h,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [
-                                Color(0xFF00897B),
-                                Color(0xFF1565C0),
-                              ],
+                              colors: [Color(0xFF00897B), Color(0xFF1565C0)],
                             ),
                             borderRadius: BorderRadius.circular(25.r),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF00897B).withOpacity(0.2),
+                                color: const Color(
+                                  0xFF00897B,
+                                ).withValues(alpha: 0.2),
                                 blurRadius: 10.r,
                                 offset: Offset(0, 4.h),
                               ),
@@ -375,11 +380,16 @@ class _OnboardingPageState extends State<OnboardingPage>
               child: TextButton(
                 onPressed: _skip,
                 style: TextButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                  backgroundColor: Colors.white.withOpacity(0.8),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 6.h,
+                  ),
+                  backgroundColor: Colors.white.withValues(alpha: 0.8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.r),
-                    side: BorderSide(color: const Color(0xFF00897B).withOpacity(0.2)),
+                    side: BorderSide(
+                      color: const Color(0xFF00897B).withValues(alpha: 0.2),
+                    ),
                   ),
                 ),
                 child: Row(
