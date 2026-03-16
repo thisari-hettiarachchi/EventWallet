@@ -23,7 +23,6 @@ class ProfilePage extends StatelessWidget {
     final User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      // If user is not signed in, redirect to login
       Future.microtask(() {
         if (context.mounted) {
           Navigator.pushReplacement(
@@ -35,7 +34,6 @@ class ProfilePage extends StatelessWidget {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // Fetch user data from Firestore - Check both 'users' and 'service_providers'
     return FutureBuilder<DocumentSnapshot>(
       future: _getUserData(user.uid),
       builder: (context, snapshot) {
@@ -77,7 +75,7 @@ class ProfilePage extends StatelessWidget {
                       border: Border.all(color: Colors.white, width: 4.w),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
+                          color: Colors.black.withOpacity(0.2),
                           blurRadius: 10.r,
                           offset: Offset(0, 5.h),
                         ),
@@ -108,59 +106,58 @@ class ProfilePage extends StatelessWidget {
                     email,
                     style: AppTextStyles.whiteText(
                       fontSize: 15,
-                    ).copyWith(color: Colors.white.withValues(alpha: 0.9)),
+                    ).copyWith(color: Colors.white.withOpacity(0.9)),
                   ),
                   SizedBox(height: 24.h),
                   if (!isServiceProvider)
-                    Container(
-                      margin: AppSpacing.horizontalPadding,
-                      padding: EdgeInsets.all(20.r),
-                      decoration: AppDecorations.overlayButton.copyWith(
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.3),
-                          width: 1.5.w,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          // Total Events
-                          _buildStatItem(
-                            'Total Events',
-                            userData['eventsCount'] != null
-                                ? userData['eventsCount'].toString()
-                                : '0',
-                          ),
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('events')
+                          .where('userId', isEqualTo: user.uid)
+                          .snapshots(),
+                      builder: (context, eventSnapshot) {
+                        int eventsCount = 0;
+                        double totalBudget = 0;
+                        double totalSpent = 0;
 
-                          Container(
-                            width: 1.w,
-                            height: 40.h,
-                            color: Colors.white.withValues(alpha: 0.3),
-                          ),
+                        if (eventSnapshot.hasData) {
+                          eventsCount = eventSnapshot.data!.docs.length;
+                          for (var doc in eventSnapshot.data!.docs) {
+                            final data = doc.data() as Map<String, dynamic>;
+                            totalBudget += (data['budget'] ?? 0).toDouble();
+                            totalSpent += (data['spent'] ?? 0).toDouble();
+                          }
+                        }
 
-                          // Total Budget
-                          _buildStatItem(
-                            'Total Budget',
-                            userData['totalBudget'] != null
-                                ? '\$${userData['totalBudget'].toString()}'
-                                : '\$0',
+                        return Container(
+                          margin: AppSpacing.horizontalPadding,
+                          padding: EdgeInsets.all(20.r),
+                          decoration: AppDecorations.overlayButton.copyWith(
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                              width: 1.5.w,
+                            ),
                           ),
-
-                          Container(
-                            width: 1.w,
-                            height: 40.h,
-                            color: Colors.white.withValues(alpha: 0.3),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _buildStatItem('Total Events', '$eventsCount'),
+                              Container(
+                                width: 1.w,
+                                height: 40.h,
+                                color: Colors.white.withOpacity(0.3),
+                              ),
+                              _buildStatItem('Total Budget', '\$${totalBudget.toStringAsFixed(0)}'),
+                              Container(
+                                width: 1.w,
+                                height: 40.h,
+                                color: Colors.white.withOpacity(0.3),
+                              ),
+                              _buildStatItem('Amount Spent', '\$${totalSpent.toStringAsFixed(0)}'),
+                            ],
                           ),
-
-                          // Amount Spent
-                          _buildStatItem(
-                            'Amount Spent',
-                            userData['spent'] != null
-                                ? '\$${userData['spent'].toString()}'
-                                : '\$0',
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   SizedBox(height: 20.h),
                   Expanded(
@@ -180,7 +177,6 @@ class ProfilePage extends StatelessWidget {
                             subtitle: 'Update your account info',
                             color: const Color(0xFF1565C0),
                             onTap: () {
-                              // Navigate to EditProfilePage
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -368,14 +364,12 @@ class ProfilePage extends StatelessWidget {
   }
 
   Future<DocumentSnapshot> _getUserData(String uid) async {
-    // Try to get from 'users' collection first
     DocumentSnapshot userDoc = await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
         .get();
     if (userDoc.exists) return userDoc;
 
-    // If not found, try 'service_providers' collection
     return await FirebaseFirestore.instance
         .collection('service_providers')
         .doc(uid)
@@ -398,7 +392,7 @@ class ProfilePage extends StatelessWidget {
           style: AppTextStyles.whiteText(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-          ).copyWith(color: Colors.white.withValues(alpha: 0.9)),
+          ).copyWith(color: Colors.white.withOpacity(0.9)),
         ),
       ],
     );
@@ -425,7 +419,7 @@ class ProfilePage extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(10.r),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
+                    color: color.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   child: Icon(icon, color: color, size: 22.sp),
