@@ -5,6 +5,7 @@ class BookingStatuses {
   static const String accepted = 'accepted';
   static const String rejected = 'rejected';
   static const String completed = 'completed';
+  static const String inquiry = 'inquiry';
 
   static const List<String> acceptedAliases = [accepted, 'confirmed'];
   static const List<String> rejectedAliases = [rejected, 'cancelled'];
@@ -17,6 +18,8 @@ class BookingStatuses {
         return rejectedAliases;
       case completed:
         return [completed];
+      case inquiry:
+        return [inquiry];
       case pending:
       default:
         return [pending];
@@ -29,6 +32,7 @@ class BookingStatuses {
     if (acceptedAliases.contains(value)) return accepted;
     if (rejectedAliases.contains(value)) return rejected;
     if (value == completed) return completed;
+    if (value == inquiry) return inquiry;
     return pending;
   }
 
@@ -40,6 +44,8 @@ class BookingStatuses {
         return 'Rejected';
       case completed:
         return 'Completed';
+      case inquiry:
+        return 'Inquiry';
       case pending:
       default:
         return 'Pending';
@@ -154,6 +160,7 @@ Map<String, dynamic> buildBookingPayload({
   required String location,
   required String selectedPackage,
   required double amount,
+  String status = BookingStatuses.pending,
   String? clientEmail,
   String? clientPhone,
   String? providerType,
@@ -175,7 +182,7 @@ Map<String, dynamic> buildBookingPayload({
     'selectedPackage': selectedPackage,
     'serviceName': selectedPackage,
     'amount': amount,
-    'status': BookingStatuses.pending,
+    'status': status,
     'providerType': providerType,
     'providerLocation': providerLocation,
     'createdAt': FieldValue.serverTimestamp(),

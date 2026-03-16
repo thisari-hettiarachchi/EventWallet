@@ -4,6 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/provider_bottom_nav.dart';
 import '../../../services/booking_service.dart';
+import '../../../services/chat_service.dart';
+import '../../chat/booking_chat_list_page.dart';
+import '../../chat/booking_chat_thread_page.dart';
 
 class ServiceProviderBookingsPage extends StatefulWidget {
   const ServiceProviderBookingsPage({super.key});
@@ -74,6 +77,7 @@ class _ServiceProviderBookingsPageState
           .collection('bookings')
           .doc(bookingId)
           .update(updateData);
+      await ChatService().syncThreadMetadataForBooking(bookingId);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -199,6 +203,9 @@ class _ServiceProviderBookingsPageState
                 letterSpacing: -0.5.w,
               ),
             ),
+            const Spacer(),
+            if (user != null)
+              _BookingInboxButton(userId: user!.uid, isProviderView: true),
           ],
         ),
       ),
@@ -384,6 +391,12 @@ class _ServiceProviderBookingsPageState
                         ),
                       ),
                     ],
+                  ),
+                  SizedBox(height: 16.h),
+                  _BookingChatSection(
+                    bookingId: id,
+                    bookingData: data,
+                    isProviderView: true,
                   ),
                 ],
               ),
@@ -654,5 +667,235 @@ class _ServiceProviderBookingsPageState
       'Dec',
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+}
+
+class _BookingInboxButton extends StatelessWidget {
+  const _BookingInboxButton({
+    required this.userId,
+    required this.isProviderView,
+  });
+
+  final String userId;
+  final bool isProviderView;
+
+  @override
+  Widget build(BuildContext context) {
+    final chatService = ChatService();
+
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: isProviderView
+          ? chatService.watchThreadsForProvider(userId)
+          : chatService.watchThreadsForUser(userId),
+      builder: (context, snapshot) {
+        final unreadCount = (snapshot.data?.docs ?? const []).fold<int>(
+          0,
+          (total, doc) =>
+              total + bookingChatUnreadCountFrom(doc.data(), userId),
+        );
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(14.r),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+              ),
+              child: IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          BookingChatListPage(isProviderView: isProviderView),
+                    ),
+                  );
+                },
+                icon: Icon(
+                  Icons.chat_bubble_outline,
+                  color: Colors.white,
+                  size: 22.sp,
+                ),
+                tooltip: 'Messages',
+              ),
+            ),
+            if (unreadCount > 0)
+              Positioned(
+                right: -2.w,
+                top: -4.h,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF3D00),
+                    borderRadius: BorderRadius.circular(999.r),
+                    border: Border.all(color: Colors.white, width: 2.w),
+                  ),
+                  constraints: BoxConstraints(minWidth: 20.w, minHeight: 20.h),
+                  child: Text(
+                    unreadCount > 99 ? '99+' : '$unreadCount',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _BookingChatSection extends StatelessWidget {
+  const _BookingChatSection({
+    required this.bookingId,
+    required this.bookingData,
+    required this.isProviderView,
+  });
+
+  final String bookingId;
+  final Map<String, dynamic> bookingData;
+  final bool isProviderView;
+
+  @override
+  Widget build(BuildContext context) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return const SizedBox.shrink();
+
+    final chatService = ChatService();
+
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: chatService.watchThread(bookingId),
+      builder: (context, snapshot) {
+        final threadData = snapshot.data?.data();
+        final unreadCount = threadData == null
+            ? 0
+            : bookingChatUnreadCountFrom(threadData, currentUser.uid);
+        final preview = threadData == null
+            ? 'Start a booking chat with your client.'
+            : bookingChatLastMessagePreviewFrom(threadData);
+
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(14.r),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1565C0).withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: const Color(0xFF1565C0).withValues(alpha: 0.08),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8.r),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1565C0).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Icon(
+                      Icons.chat_bubble_outline,
+                      size: 18.sp,
+                      color: const Color(0xFF1565C0),
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: Text(
+                      'Booking Chat',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF1A1F36),
+                      ),
+                    ),
+                  ),
+                  if (unreadCount > 0)
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 4.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF00897B),
+                        borderRadius: BorderRadius.circular(999.r),
+                      ),
+                      child: Text(
+                        unreadCount > 99 ? '99+' : '$unreadCount new',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              SizedBox(height: 10.h),
+              Text(
+                preview,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  height: 1.45,
+                  color: const Color(0xFF4A5568),
+                  fontWeight: unreadCount > 0
+                      ? FontWeight.w700
+                      : FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: 12.h),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    await chatService.ensureThreadExistsForBooking(
+                      bookingId: bookingId,
+                      bookingData: bookingData,
+                    );
+                    if (!context.mounted) return;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BookingChatThreadPage(
+                          bookingId: bookingId,
+                          initialThreadData: {
+                            ...bookingData,
+                            if (threadData != null) ...threadData,
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.forum_outlined, size: 18.sp),
+                  label: Text(
+                    isProviderView ? 'Open Client Chat' : 'Message Provider',
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF1565C0),
+                    side: BorderSide(
+                      color: const Color(0xFF1565C0).withValues(alpha: 0.25),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 13.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

@@ -5,6 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 import '../../../services/booking_service.dart';
+import '../../../services/chat_service.dart';
+import '../../chat/booking_chat_thread_page.dart';
 
 class ProviderProfilePage extends StatelessWidget {
   final String providerId;
@@ -18,13 +20,18 @@ class ProviderProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = providerData['businessName'] ?? providerData['name'] ?? 'Unknown Provider';
-    final type = providerData['providerType'] ?? providerData['category'] ?? 'Service';
+    final name =
+        providerData['businessName'] ??
+        providerData['name'] ??
+        'Unknown Provider';
+    final type =
+        providerData['providerType'] ?? providerData['category'] ?? 'Service';
     final rating = (providerData['rating'] ?? 0.0).toDouble();
     final price = (providerData['price'] ?? 0.0).toDouble();
     final imageUrl = providerData['imageUrl'] ?? '';
     final availability = providerData['availability'] ?? 'Available';
-    final description = providerData['description'] ?? 'No description provided.';
+    final description =
+        providerData['description'] ?? 'No description provided.';
     final location = providerData['location'] ?? 'Location not specified';
     final phone = providerData['phone'] ?? 'Not provided';
     final email = providerData['email'] ?? 'Not provided';
@@ -50,10 +57,16 @@ class ProviderProfilePage extends StatelessWidget {
                   _buildQuickStats(availability, location),
                   SizedBox(height: 30.h),
 
-                  if (website.isNotEmpty || facebook.isNotEmpty || instagram.isNotEmpty) ...[
+                  if (website.isNotEmpty ||
+                      facebook.isNotEmpty ||
+                      instagram.isNotEmpty) ...[
                     Text(
                       'Social Media & Links',
-                      style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                      style: TextStyle(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textDark,
+                      ),
                     ),
                     SizedBox(height: 15.h),
                     _buildSocialLinks(website, facebook, instagram),
@@ -62,19 +75,31 @@ class ProviderProfilePage extends StatelessWidget {
 
                   Text(
                     'About',
-                    style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textDark,
+                    ),
                   ),
                   SizedBox(height: 10.h),
                   Text(
                     description,
-                    style: TextStyle(fontSize: 16.sp, color: Colors.grey.shade700, height: 1.5),
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      color: Colors.grey.shade700,
+                      height: 1.5,
+                    ),
                   ),
                   SizedBox(height: 24.h),
                   _buildServiceOptionsSection(type, price),
                   SizedBox(height: 30.h),
                   Text(
                     'Contact Information',
-                    style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textDark,
+                    ),
                   ),
                   SizedBox(height: 15.h),
                   _buildContactTile(Icons.phone, phone, 'tel:$phone'),
@@ -90,7 +115,11 @@ class ProviderProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildSliverAppBar(BuildContext context, String imageUrl, String name) {
+  Widget _buildSliverAppBar(
+    BuildContext context,
+    String imageUrl,
+    String name,
+  ) {
     return SliverAppBar(
       expandedHeight: 300.h,
       pinned: true,
@@ -111,21 +140,36 @@ class ProviderProfilePage extends StatelessWidget {
                 imageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => Container(
-                  decoration: const BoxDecoration(gradient: AppColors.headerGradient),
-                  child: Icon(Icons.broken_image, size: 100.sp, color: Colors.white54),
+                  decoration: const BoxDecoration(
+                    gradient: AppColors.headerGradient,
+                  ),
+                  child: Icon(
+                    Icons.broken_image,
+                    size: 100.sp,
+                    color: Colors.white54,
+                  ),
                 ),
               )
             : Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.headerGradient,
                 ),
-                child: Icon(Icons.business, size: 100.sp, color: Colors.white54),
+                child: Icon(
+                  Icons.business,
+                  size: 100.sp,
+                  color: Colors.white54,
+                ),
               ),
       ),
     );
   }
 
-  Widget _buildHeaderInfo(String name, String type, double rating, double price) {
+  Widget _buildHeaderInfo(
+    String name,
+    String type,
+    double rating,
+    double price,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -138,11 +182,20 @@ class ProviderProfilePage extends StatelessWidget {
                 children: [
                   Text(
                     name,
-                    style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                    style: TextStyle(
+                      fontSize: 28.sp,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textDark,
+                    ),
                   ),
                   Text(
                     type.toUpperCase(),
-                    style: TextStyle(fontSize: 14.sp, color: AppColors.primaryBlue, fontWeight: FontWeight.w700, letterSpacing: 1.w),
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: AppColors.primaryBlue,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.w,
+                    ),
                   ),
                 ],
               ),
@@ -150,7 +203,11 @@ class ProviderProfilePage extends StatelessWidget {
             if (price > 0)
               Text(
                 '\$${price.toInt()}',
-                style: TextStyle(fontSize: 26.sp, fontWeight: FontWeight.bold, color: AppColors.primaryGreen),
+                style: TextStyle(
+                  fontSize: 26.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryGreen,
+                ),
               ),
           ],
         ),
@@ -164,7 +221,10 @@ class ProviderProfilePage extends StatelessWidget {
               style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
             ),
             SizedBox(width: 10.w),
-            Text('(24 Reviews)', style: TextStyle(color: Colors.grey.shade600, fontSize: 14.sp)),
+            Text(
+              '(24 Reviews)',
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 14.sp),
+            ),
           ],
         ),
       ],
@@ -189,7 +249,11 @@ class ProviderProfilePage extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10.r, offset: Offset(0, 4.h)),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10.r,
+              offset: Offset(0, 4.h),
+            ),
           ],
         ),
         child: Column(
@@ -197,9 +261,17 @@ class ProviderProfilePage extends StatelessWidget {
           children: [
             Icon(icon, color: AppColors.primaryGreen, size: 20.sp),
             SizedBox(height: 8.h),
-            Text(label, style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600)),
+            Text(
+              label,
+              style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600),
+            ),
             SizedBox(height: 2.h),
-            Text(value, style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+            Text(
+              value,
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
         ),
       ),
@@ -251,7 +323,11 @@ class ProviderProfilePage extends StatelessWidget {
       children: [
         Text(
           'Packages',
-          style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: AppColors.textDark),
+          style: TextStyle(
+            fontSize: 20.sp,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textDark,
+          ),
         ),
         SizedBox(height: 12.h),
         StreamBuilder<QuerySnapshot>(
@@ -262,14 +338,21 @@ class ProviderProfilePage extends StatelessWidget {
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen));
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.primaryGreen),
+              );
             }
 
             final packages = snapshot.data?.docs ?? const [];
             if (packages.isEmpty) {
               return _buildPackageCard(
-                title: firstNonEmpty([providerData['businessName'], providerData['name']], fallback: type),
-                subtitle: providerData['description']?.toString().trim().isNotEmpty == true
+                title: firstNonEmpty([
+                  providerData['businessName'],
+                  providerData['name'],
+                ], fallback: type),
+                subtitle:
+                    providerData['description']?.toString().trim().isNotEmpty ==
+                        true
                     ? providerData['description']
                     : 'Standard $type package',
                 amount: fallbackPrice,
@@ -282,8 +365,12 @@ class ProviderProfilePage extends StatelessWidget {
                 return Padding(
                   padding: EdgeInsets.only(bottom: 12.h),
                   child: _buildPackageCard(
-                    title: firstNonEmpty([data['name']], fallback: 'Service Package'),
-                    subtitle: firstNonEmpty([data['description']], fallback: 'Custom package details available on booking'),
+                    title: firstNonEmpty([
+                      data['name'],
+                    ], fallback: 'Service Package'),
+                    subtitle: firstNonEmpty([
+                      data['description'],
+                    ], fallback: 'Custom package details available on booking'),
                     amount: bookingAmountFrom(data['price']),
                   ),
                 );
@@ -322,7 +409,11 @@ class ProviderProfilePage extends StatelessWidget {
               color: AppColors.primaryGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(Icons.inventory_2_outlined, color: AppColors.primaryGreen, size: 20.sp),
+            child: Icon(
+              Icons.inventory_2_outlined,
+              color: AppColors.primaryGreen,
+              size: 20.sp,
+            ),
           ),
           SizedBox(width: 12.w),
           Expanded(
@@ -331,12 +422,20 @@ class ProviderProfilePage extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700, color: AppColors.textDark),
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   subtitle,
-                  style: TextStyle(fontSize: 13.sp, color: Colors.grey.shade600, height: 1.4),
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: Colors.grey.shade600,
+                    height: 1.4,
+                  ),
                 ),
               ],
             ),
@@ -344,7 +443,11 @@ class ProviderProfilePage extends StatelessWidget {
           if (amount > 0)
             Text(
               '\$${amount.toStringAsFixed(0)}',
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w800, color: AppColors.primaryGreen),
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w800,
+                color: AppColors.primaryGreen,
+              ),
             ),
         ],
       ),
@@ -385,29 +488,73 @@ class ProviderProfilePage extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 20.r, offset: Offset(0, -5.h)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 20.r,
+            offset: Offset(0, -5.h),
+          ),
         ],
       ),
       child: SafeArea(
-        child: ElevatedButton(
-          onPressed: () => _handleBooking(context, providerName),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryGreen,
-            foregroundColor: Colors.white,
-            minimumSize: Size(double.infinity, 56.h),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-          ),
-          child: Text('Book Now', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: OutlinedButton(
+                onPressed: () => _handleMessage(context, providerName),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primaryBlue,
+                  side: BorderSide(color: AppColors.primaryBlue, width: 2.w),
+                  minimumSize: Size(double.infinity, 56.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                ),
+                child: Icon(Icons.chat_bubble_outline, size: 24.sp),
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              flex: 2,
+              child: ElevatedButton(
+                onPressed: () => _handleBooking(context, providerName),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryGreen,
+                  foregroundColor: Colors.white,
+                  minimumSize: Size(double.infinity, 56.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                ),
+                child: Text(
+                  'Book Now',
+                  style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
+  Future<void> _handleMessage(BuildContext context, String providerName) async {
+    await _initiateBookingOrInquiry(context, providerName, isInquiry: true);
+  }
+
   Future<void> _handleBooking(BuildContext context, String providerName) async {
+    await _initiateBookingOrInquiry(context, providerName, isInquiry: false);
+  }
+
+  Future<void> _initiateBookingOrInquiry(
+    BuildContext context,
+    String providerName, {
+    required bool isInquiry,
+  }) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please login to book services')),
+        const SnackBar(content: Text('Please login to continue')),
       );
       return;
     }
@@ -428,7 +575,8 @@ class ProviderProfilePage extends StatelessWidget {
 
       final userDoc = results[0] as DocumentSnapshot<Map<String, dynamic>>;
       final eventsSnapshot = results[1] as QuerySnapshot<Map<String, dynamic>>;
-      final servicesSnapshot = results[2] as QuerySnapshot<Map<String, dynamic>>;
+      final servicesSnapshot =
+          results[2] as QuerySnapshot<Map<String, dynamic>>;
 
       final clientData = userDoc.data() ?? <String, dynamic>{};
       final clientName = firstNonEmpty([
@@ -439,31 +587,37 @@ class ProviderProfilePage extends StatelessWidget {
       final clientEmail = firstNonEmpty([clientData['email'], user.email]);
       final clientPhone = firstNonEmpty([clientData['phone']]);
 
-      final eventOptions = eventsSnapshot.docs
-          .map((doc) {
-            final data = doc.data();
-            final eventDate = bookingDateFrom(data['date']);
-            if (eventDate == null) return null;
-            return _BookingEventOption(
-              id: doc.id,
-              name: firstNonEmpty([data['eventName'], data['name']], fallback: 'Untitled Event'),
-              type: firstNonEmpty([data['category']], fallback: 'Event'),
-              location: firstNonEmpty([
-                data['venue'],
-                data['location'],
-              ], fallback: 'Location not specified'),
-              date: eventDate,
-            );
-          })
-          .whereType<_BookingEventOption>()
-          .toList()
-        ..sort((a, b) => a.date.compareTo(b.date));
+      final eventOptions =
+          eventsSnapshot.docs
+              .map((doc) {
+                final data = doc.data();
+                final eventDate = bookingDateFrom(data['date']);
+                if (eventDate == null) return null;
+                return _BookingEventOption(
+                  id: doc.id,
+                  name: firstNonEmpty([
+                    data['eventName'],
+                    data['name'],
+                  ], fallback: 'Untitled Event'),
+                  type: firstNonEmpty([data['category']], fallback: 'Event'),
+                  location: firstNonEmpty([
+                    data['venue'],
+                    data['location'],
+                  ], fallback: 'Location not specified'),
+                  date: eventDate,
+                );
+              })
+              .whereType<_BookingEventOption>()
+              .toList()
+            ..sort((a, b) => a.date.compareTo(b.date));
 
       if (eventOptions.isEmpty) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Create an event first so we can attach the booking details.'),
+              content: Text(
+                'Create an event first so we can attach the inquiry details.',
+              ),
               backgroundColor: AppColors.error,
             ),
           );
@@ -471,17 +625,15 @@ class ProviderProfilePage extends StatelessWidget {
         return;
       }
 
-      final packageOptions = servicesSnapshot.docs
-          .map((doc) {
-            final data = doc.data();
-            return _BookingPackageOption(
-              id: doc.id,
-              name: firstNonEmpty([data['name']], fallback: 'Service Package'),
-              amount: bookingAmountFrom(data['price']),
-              description: firstNonEmpty([data['description']]),
-            );
-          })
-          .toList();
+      final packageOptions = servicesSnapshot.docs.map((doc) {
+        final data = doc.data();
+        return _BookingPackageOption(
+          id: doc.id,
+          name: firstNonEmpty([data['name']], fallback: 'Service Package'),
+          amount: bookingAmountFrom(data['price']),
+          description: firstNonEmpty([data['description']]),
+        );
+      }).toList();
 
       if (packageOptions.isEmpty) {
         packageOptions.add(
@@ -507,62 +659,92 @@ class ProviderProfilePage extends StatelessWidget {
         clientName: clientName,
         eventOptions: eventOptions,
         packageOptions: packageOptions,
+        isInquiry: isInquiry,
       );
 
       if (selection == null) return;
 
       final providerSummary = {
         'businessName': providerName,
-        'providerType': firstNonEmpty([providerData['providerType'], providerData['category']]),
+        'providerType': firstNonEmpty([
+          providerData['providerType'],
+          providerData['category'],
+        ]),
         'location': firstNonEmpty([providerData['location']]),
         'price': bookingAmountFrom(providerData['price']),
       };
 
-      await FirebaseFirestore.instance.collection('bookings').add(
-            buildBookingPayload(
-              userId: user.uid,
-              providerId: providerId,
-              providerName: providerName,
-              clientName: clientName,
-              clientEmail: clientEmail.isEmpty ? null : clientEmail,
-              clientPhone: clientPhone.isEmpty ? null : clientPhone,
-              eventId: selection.event.id,
-              eventName: selection.event.name,
-              eventType: selection.event.type,
-              eventDate: selection.event.date,
-              location: selection.event.location,
-              selectedPackage: selection.package.name,
-              amount: selection.package.amount,
-              providerType: providerSummary['providerType']?.toString(),
-              providerLocation: providerSummary['location']?.toString(),
-              providerData: providerSummary,
+      final bookingRef = FirebaseFirestore.instance
+          .collection('bookings')
+          .doc();
+      final bookingPayload = buildBookingPayload(
+        userId: user.uid,
+        providerId: providerId,
+        providerName: providerName,
+        clientName: clientName,
+        clientEmail: clientEmail.isEmpty ? null : clientEmail,
+        clientPhone: clientPhone.isEmpty ? null : clientPhone,
+        eventId: selection.event.id,
+        eventName: selection.event.name,
+        eventType: selection.event.type,
+        eventDate: selection.event.date,
+        location: selection.event.location,
+        selectedPackage: selection.package.name,
+        amount: selection.package.amount,
+        status: isInquiry ? BookingStatuses.inquiry : BookingStatuses.pending,
+        providerType: providerSummary['providerType']?.toString(),
+        providerLocation: providerSummary['location']?.toString(),
+        providerData: providerSummary,
+      );
+
+      await bookingRef.set(bookingPayload);
+      await ChatService().ensureThreadExistsForBooking(
+        bookingId: bookingRef.id,
+        bookingData: bookingPayload,
+      );
+
+      if (isInquiry) {
+        if (context.mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BookingChatThreadPage(
+                bookingId: bookingRef.id,
+                initialThreadData: bookingPayload,
+              ),
             ),
           );
+        }
+      } else {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('notifications')
+            .add({
+              'title': 'Booking Requested',
+              'message':
+                  'Your booking request for ${selection.package.name} at $providerName for ${selection.event.name} has been sent.',
+              'timestamp': FieldValue.serverTimestamp(),
+              'isRead': false,
+              'type': 'service',
+            });
 
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('notifications')
-          .add({
-        'title': 'Booking Requested',
-        'message': 'Your booking request for ${selection.package.name} at $providerName for ${selection.event.name} has been sent.',
-        'timestamp': FieldValue.serverTimestamp(),
-        'isRead': false,
-        'type': 'service',
-      });
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Booking request sent successfully!'),
-            backgroundColor: AppColors.success,
-          ),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Booking request sent successfully!'),
+              backgroundColor: AppColors.success,
+            ),
+          );
+        }
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     }
@@ -574,6 +756,7 @@ class ProviderProfilePage extends StatelessWidget {
     required String clientName,
     required List<_BookingEventOption> eventOptions,
     required List<_BookingPackageOption> packageOptions,
+    bool isInquiry = false,
   }) {
     return showModalBottomSheet<_BookingSelection>(
       context: context,
@@ -605,13 +788,23 @@ class ProviderProfilePage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Book $providerName',
-                          style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w800, color: AppColors.textDark),
+                          isInquiry ? 'Inquire with $providerName' : 'Book $providerName',
+                          style: TextStyle(
+                            fontSize: 22.sp,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textDark,
+                          ),
                         ),
                         SizedBox(height: 8.h),
                         Text(
-                          'Choose the event and package so both you and the provider see the same booking details.',
-                          style: TextStyle(fontSize: 13.sp, color: Colors.grey.shade600, height: 1.4),
+                          isInquiry 
+                            ? 'Start a conversation about your event and requirements.' 
+                            : 'Choose the event and package so both you and the provider see the same booking details.',
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: Colors.grey.shade600,
+                            height: 1.4,
+                          ),
                         ),
                         SizedBox(height: 20.h),
                         _buildSheetLabel('Client'),
@@ -635,13 +828,23 @@ class ProviderProfilePage extends StatelessWidget {
                           onChanged: (value) {
                             if (value == null) return;
                             setModalState(() {
-                              selectedEvent = eventOptions.firstWhere((event) => event.id == value);
+                              selectedEvent = eventOptions.firstWhere(
+                                (event) => event.id == value,
+                              );
                             });
                           },
                         ),
                         SizedBox(height: 12.h),
-                        _buildBookingSummaryTile(Icons.location_on_outlined, 'Location', selectedEvent.location),
-                        _buildBookingSummaryTile(Icons.event_outlined, 'Event Type', selectedEvent.type),
+                        _buildBookingSummaryTile(
+                          Icons.location_on_outlined,
+                          'Location',
+                          selectedEvent.location,
+                        ),
+                        _buildBookingSummaryTile(
+                          Icons.event_outlined,
+                          'Event Type',
+                          selectedEvent.type,
+                        ),
                         SizedBox(height: 16.h),
                         _buildSheetLabel('Package'),
                         DropdownButtonFormField<String>(
@@ -663,18 +866,24 @@ class ProviderProfilePage extends StatelessWidget {
                           onChanged: (value) {
                             if (value == null) return;
                             setModalState(() {
-                              selectedPackage = packageOptions.firstWhere((option) => option.id == value);
+                              selectedPackage = packageOptions.firstWhere(
+                                (option) => option.id == value,
+                              );
                             });
                           },
                         ),
                         if (selectedPackage.description.isNotEmpty) ...[
                           SizedBox(height: 12.h),
-                          _buildBookingSummaryTile(Icons.notes_outlined, 'Package Details', selectedPackage.description),
+                          _buildBookingSummaryTile(
+                            Icons.notes_outlined,
+                            'Package Details',
+                            selectedPackage.description,
+                          ),
                         ],
                         SizedBox(height: 12.h),
                         _buildBookingSummaryTile(
                           Icons.payments_outlined,
-                          'Amount',
+                          'Estimated Amount',
                           selectedPackage.amount > 0
                               ? '\$${selectedPackage.amount.toStringAsFixed(2)}'
                               : 'To be confirmed',
@@ -689,7 +898,9 @@ class ProviderProfilePage extends StatelessWidget {
                                   foregroundColor: Colors.grey.shade700,
                                   padding: EdgeInsets.symmetric(vertical: 14.h),
                                   side: BorderSide(color: Colors.grey.shade300),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14.r),
+                                  ),
                                 ),
                                 child: const Text('Cancel'),
                               ),
@@ -699,15 +910,20 @@ class ProviderProfilePage extends StatelessWidget {
                               child: ElevatedButton(
                                 onPressed: () => Navigator.pop(
                                   context,
-                                  _BookingSelection(event: selectedEvent, package: selectedPackage),
+                                  _BookingSelection(
+                                    event: selectedEvent,
+                                    package: selectedPackage,
+                                  ),
                                 ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primaryGreen,
                                   foregroundColor: Colors.white,
                                   padding: EdgeInsets.symmetric(vertical: 14.h),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14.r),
+                                  ),
                                 ),
-                                child: const Text('Send Request'),
+                                child: Text(isInquiry ? 'Start Chat' : 'Send Request'),
                               ),
                             ),
                           ],
@@ -729,7 +945,11 @@ class ProviderProfilePage extends StatelessWidget {
       padding: EdgeInsets.only(bottom: 8.h),
       child: Text(
         text,
-        style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w700, color: AppColors.textDark),
+        style: TextStyle(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w700,
+          color: AppColors.textDark,
+        ),
       ),
     );
   }
@@ -741,11 +961,17 @@ class ProviderProfilePage extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.primaryBlue.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: AppColors.primaryBlue.withValues(alpha: 0.15)),
+        border: Border.all(
+          color: AppColors.primaryBlue.withValues(alpha: 0.15),
+        ),
       ),
       child: Text(
         text,
-        style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: AppColors.textDark),
+        style: TextStyle(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textDark,
+        ),
       ),
     );
   }
@@ -771,12 +997,20 @@ class ProviderProfilePage extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade600,
+                  ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
                   value,
-                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: AppColors.textDark),
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textDark,
+                  ),
                 ),
               ],
             ),
@@ -807,7 +1041,20 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   String _formatDate(DateTime date) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 }
@@ -846,8 +1093,5 @@ class _BookingSelection {
   final _BookingEventOption event;
   final _BookingPackageOption package;
 
-  const _BookingSelection({
-    required this.event,
-    required this.package,
-  });
+  const _BookingSelection({required this.event, required this.package});
 }
