@@ -322,9 +322,6 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     }
 
     Query query = FirebaseFirestore.instance.collection('service_providers');
-    if (_selectedCategory != 'All') {
-      query = query.where('category', isEqualTo: _selectedCategory);
-    }
     return _buildStreamList(query);
   }
 
@@ -347,7 +344,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         final docs = snapshot.data!.docs.where((doc) {
           final data = doc.data() as Map<String, dynamic>;
           final name = (data['businessName'] ?? '').toString().toLowerCase();
-          return name.contains(_searchQuery);
+          return name.contains(_searchQuery) && _matchesSelectedCategory(data);
         }).toList();
 
         if (docs.isEmpty) return _buildEmptyState();
@@ -395,7 +392,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   Widget _buildProviderCard(
       Map<String, dynamic> data, String id, bool isSaved) {
     final name = data['businessName'] ?? 'Service Provider';
-    final type = data['category'] ?? 'Service';
+    final type = _resolveProviderCategory(data);
     final rating = (data['rating'] ?? 0.0).toDouble();
     final imageUrl = data['imageUrl'] ?? '';
 
@@ -590,6 +587,40 @@ class _DiscoveryPageState extends State<DiscoveryPage>
       color: Colors.grey[100],
       child: Icon(Icons.image_outlined, size: 60.sp, color: Colors.grey[300]),
     );
+  }
+
+  bool _matchesSelectedCategory(Map<String, dynamic> data) {
+    if (_selectedCategory == 'All') return true;
+    return _resolveProviderCategory(data).toLowerCase() ==
+        _selectedCategory.toLowerCase();
+  }
+
+  String _resolveProviderCategory(Map<String, dynamic> data) {
+    final raw = (data['category'] ?? data['providerType'] ?? data['type'] ?? '')
+        .toString()
+        .trim();
+    if (raw.isEmpty) return 'Service';
+
+    switch (raw.toLowerCase()) {
+      case 'photographer':
+      case 'photography':
+        return 'Photography';
+      case 'venue':
+        return 'Venue';
+      case 'music':
+      case 'musician':
+        return 'Music';
+      case 'catering':
+      case 'caterer':
+        return 'Catering';
+      case 'decoration':
+      case 'decor':
+        return 'Decoration';
+      case 'transport':
+        return 'Transport';
+      default:
+        return raw[0].toUpperCase() + raw.substring(1);
+    }
   }
 
   Widget _buildEmptyState() {

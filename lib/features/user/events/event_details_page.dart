@@ -426,12 +426,16 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                   ),
                                 ),
                                 SizedBox(width: 8.w),
-                                Text(
-                                  status,
-                                  style: TextStyle(
-                                    color: color,
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.bold,
+                                Flexible(
+                                  child: Text(
+                                    status,
+                                    style: TextStyle(
+                                      color: color,
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
@@ -895,6 +899,8 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                             fontWeight: FontWeight.bold,
                             color: AppColors.textDark,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           packageName,
@@ -902,10 +908,13 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                             fontSize: 13.sp,
                             color: AppColors.textGrey,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
+                  SizedBox(width: 10.w),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -973,12 +982,16 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                   child: Icon(icon, color: color, size: 20.sp),
                 ),
                 SizedBox(width: 12.w),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textDark,
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textDark,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],

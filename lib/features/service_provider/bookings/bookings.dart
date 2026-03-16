@@ -48,6 +48,7 @@ class _ServiceProviderBookingsPageState
     String status, {
     String? statusReason,
     String? cancelledBy,
+    Map<String, dynamic>? bookingData,
   }) async {
     final normalizedStatus = BookingStatuses.normalize(status);
 
@@ -73,10 +74,67 @@ class _ServiceProviderBookingsPageState
     }
 
     try {
-      await FirebaseFirestore.instance
-          .collection('bookings')
-          .doc(bookingId)
-          .update(updateData);
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final bookingRef =
+            FirebaseFirestore.instance.collection('bookings').doc(bookingId);
+        final bookingSnap = await transaction.get(bookingRef);
+
+        if (!bookingSnap.exists) return;
+
+        final data = bookingSnap.data() as Map<String, dynamic>;
+        final oldStatus = BookingStatuses.normalize(data['status']);
+        final eventId = data['eventId']?.toString();
+        final amount = bookingAmountFrom(data['amount']);
+
+        // Update booking status
+        transaction.update(bookingRef, updateData);
+
+        // Update event budget if status changed to/from 'accepted'
+        if (eventId != null && eventId.isNotEmpty && oldStatus != normalizedStatus) {
+          final eventRef =
+              FirebaseFirestore.instance.collection('events').doc(eventId);
+          final eventSnap = await transaction.get(eventRef);
+
+          if (eventSnap.exists) {
+            double currentSpent =
+                (eventSnap.data()?['spent'] ?? 0).toDouble();
+
+            if (normalizedStatus == BookingStatuses.accepted) {
+              // Add to budget
+              transaction.update(eventRef, {'spent': currentSpent + amount});
+
+              // Add to expenses collection
+              final expenseRef =
+                  FirebaseFirestore.instance.collection('expenses').doc();
+              transaction.set(expenseRef, {
+                'userId': data['userId'],
+                'title': '${data['providerName']} - ${bookingPackageNameFrom(data)}',
+                'amount': amount,
+                'category': data['providerType'] ?? 'Service',
+                'eventId': eventId,
+                'bookingId': bookingId,
+                'timestamp': FieldValue.serverTimestamp(),
+              });
+            } else if (oldStatus == BookingStatuses.accepted) {
+              // Remove from budget if it was previously accepted
+              transaction.update(eventRef, {
+                'spent': (currentSpent - amount).clamp(0.0, double.infinity),
+              });
+
+              // Find and remove the corresponding expense
+              final expensesQuery = await FirebaseFirestore.instance
+                  .collection('expenses')
+                  .where('bookingId', isEqualTo: bookingId)
+                  .get();
+
+              for (var doc in expensesQuery.docs) {
+                transaction.delete(doc.reference);
+              }
+            }
+          }
+        }
+      });
+
       await ChatService().syncThreadMetadataForBooking(bookingId);
 
       if (mounted) {

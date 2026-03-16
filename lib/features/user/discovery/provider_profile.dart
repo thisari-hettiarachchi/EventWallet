@@ -54,6 +54,10 @@ class ProviderProfilePage extends StatelessWidget {
         final String phone = data['phone'] ?? '';
         final String email = data['email'] ?? '';
         final String website = data['website'] ?? '';
+        final String displayCategory = _resolveProviderCategory(
+          data,
+          fallback: category,
+        );
 
         return Scaffold(
           backgroundColor: const Color(0xFFF8FAFC),
@@ -76,7 +80,7 @@ class ProviderProfilePage extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        category.toUpperCase(),
+                        displayCategory.toUpperCase(),
                         style: TextStyle(
                           fontSize: 16.sp,
                           color: const Color(0xFF1E5BB1),
@@ -151,7 +155,7 @@ class ProviderProfilePage extends StatelessWidget {
                       SizedBox(height: 30.h),
                       _buildSectionTitle('Packages'),
                       SizedBox(height: 15.h),
-                      _buildPackagesList(name, data),
+                      _buildPackagesList(displayCategory, data),
                       SizedBox(height: 30.h),
                       _buildSectionTitle('Contact Information'),
                       SizedBox(height: 15.h),
@@ -303,96 +307,114 @@ class ProviderProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildPackagesList(String providerName, Map<String, dynamic> providerData) {
-    final rawServices = providerData['services'];
-    final List<Map<String, dynamic>> packages = [];
+  Widget _buildPackagesList(
+    String displayCategory,
+    Map<String, dynamic> providerData,
+  ) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('service_providers')
+          .doc(providerId)
+          .collection('services')
+          .snapshots(),
+      builder: (context, snapshot) {
+        final List<Map<String, dynamic>> packages = [];
 
-    if (rawServices is List) {
-      for (var item in rawServices) {
-        if (item is Map) packages.add(Map<String, dynamic>.from(item));
-      }
-    }
+        if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+          for (var doc in snapshot.data!.docs) {
+            packages.add(doc.data() as Map<String, dynamic>);
+          }
+        } else {
+          final rawServices = providerData['services'];
+          if (rawServices is List) {
+            for (var item in rawServices) {
+              if (item is Map) packages.add(Map<String, dynamic>.from(item));
+            }
+          }
+        }
 
-    if (packages.isEmpty) {
-      packages.add({
-        'name': '$category Package',
-        'price': providerData['price'] ?? 0.0,
-        'description': 'Standard package details available on booking',
-      });
-    }
+        if (packages.isEmpty) {
+          packages.add({
+            'name': '$displayCategory Package',
+            'price': providerData['price'] ?? 0.0,
+            'description': 'Standard package details available on booking',
+          });
+        }
 
-    return Column(
-      children: packages.map((pkg) {
-        final double price = (pkg['price'] ?? pkg['amount'] ?? 0.0).toDouble();
-        return Container(
-          margin: EdgeInsets.only(bottom: 15.h),
-          padding: EdgeInsets.all(20.r),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(25.r),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 15,
-                offset: const Offset(0, 8),
+        return Column(
+          children: packages.map((pkg) {
+            final double price = (pkg['price'] ?? pkg['amount'] ?? 0.0).toDouble();
+            return Container(
+              margin: EdgeInsets.only(bottom: 15.h),
+              padding: EdgeInsets.all(20.r),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(25.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: EdgeInsets.all(12.r),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF008069).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Icon(Icons.inventory_2_outlined,
-                    color: const Color(0xFF008069), size: 24.sp),
-              ),
-              SizedBox(width: 15.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(12.r),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF008069).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Icon(Icons.inventory_2_outlined,
+                        color: const Color(0xFF008069), size: 24.sp),
+                  ),
+                  SizedBox(width: 15.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Text(
-                            pkg['name'] ?? 'Package',
-                            style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF1A1C1E),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                pkg['name'] ?? 'Package',
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFF1A1C1E),
+                                ),
+                              ),
                             ),
-                          ),
+                            Text(
+                              '\$${price.toStringAsFixed(0)}',
+                              style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w900,
+                                color: const Color(0xFF008069),
+                              ),
+                            ),
+                          ],
                         ),
+                        SizedBox(height: 4.h),
                         Text(
-                          '\$${price.toStringAsFixed(0)}',
+                          pkg['description'] ?? 'No description',
                           style: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.w900,
-                            color: const Color(0xFF008069),
+                            fontSize: 13.sp,
+                            color: Colors.grey.shade500,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      pkg['description'] ?? 'No description',
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.grey.shade500,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 
@@ -637,7 +659,7 @@ class ProviderProfilePage extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => _handleMessage(context, providerName),
+            onTap: () => _handleMessage(context, providerName, providerData),
             child: Container(
               padding: EdgeInsets.all(16.r),
               decoration: BoxDecoration(
@@ -678,15 +700,31 @@ class ProviderProfilePage extends StatelessWidget {
     );
   }
 
-  void _handleMessage(BuildContext context, String providerName) {
+  void _handleMessage(
+    BuildContext context,
+    String providerName,
+    Map<String, dynamic> providerData,
+  ) {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
+
+    final inquiryData = {
+      'userId': user.uid,
+      'providerId': providerId,
+      'clientName': user.displayName ?? user.email?.split('@').first ?? 'Client',
+      'providerName': providerName,
+      'eventName': 'Service Inquiry',
+      'status': BookingStatuses.inquiry,
+      'location': providerData['location'] ?? 'Not specified',
+    };
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            BookingChatThreadPage(bookingId: 'inquiry_${user.uid}_$providerId'),
+        builder: (context) => BookingChatThreadPage(
+          bookingId: 'inquiry_${user.uid}_$providerId',
+          initialThreadData: inquiryData,
+        ),
       ),
     );
   }
@@ -716,7 +754,17 @@ class ProviderProfilePage extends StatelessWidget {
       return;
     }
 
-    final packageOptions = _buildPackageOptions(providerName, providerData);
+    final effectiveCategory = _resolveProviderCategory(
+      providerData,
+      fallback: category,
+    );
+    final packageOptions = await _buildPackageOptions(
+      providerName,
+      providerData,
+      effectiveCategory,
+    );
+    if (!context.mounted) return;
+
     final selection = await showModalBottomSheet<BookingSelection>(
       context: context,
       isScrollControlled: true,
@@ -749,13 +797,13 @@ class ProviderProfilePage extends StatelessWidget {
       selectedPackage: selection.package.name,
       amount: selection.package.amount,
       status: BookingStatuses.pending,
-      providerType: category,
+      providerType: effectiveCategory,
       providerLocation:
           providerData['location']?.toString() ?? selection.event.location,
       providerData: {
         'businessName': providerData['businessName'] ?? providerName,
         'imageUrl': providerData['imageUrl'] ?? '',
-        'category': category,
+        'category': effectiveCategory,
       },
     );
 
@@ -819,29 +867,47 @@ class ProviderProfilePage extends StatelessWidget {
     );
   }
 
-  List<BookingPackageOption> _buildPackageOptions(
+  Future<List<BookingPackageOption>> _buildPackageOptions(
     String providerName,
     Map<String, dynamic> providerData,
-  ) {
+    String displayCategory,
+  ) async {
     final options = <BookingPackageOption>[];
-    final rawServices = providerData['services'];
 
-    if (rawServices is List) {
-      for (var i = 0; i < rawServices.length; i++) {
-        final item = rawServices[i];
-        if (item is! Map) continue;
-        final name = (item['name'] ?? item['title'] ?? 'Package ${i + 1}')
-            .toString();
-        final amount = bookingAmountFrom(item['price'] ?? item['amount']);
-        final description = (item['description'] ?? '').toString();
+    final servicesSnapshot = await FirebaseFirestore.instance
+        .collection('service_providers')
+        .doc(providerId)
+        .collection('services')
+        .get();
+
+    if (servicesSnapshot.docs.isNotEmpty) {
+      for (var doc in servicesSnapshot.docs) {
+        final data = doc.data();
         options.add(
           BookingPackageOption(
-            id: 'pkg_$i',
-            name: name,
-            amount: amount,
-            description: description,
+            id: doc.id,
+            name: (data['name'] ?? 'Package').toString(),
+            amount: bookingAmountFrom(data['price'] ?? data['amount']),
+            description: (data['description'] ?? '').toString(),
           ),
         );
+      }
+    } else {
+      final rawServices = providerData['services'];
+      if (rawServices is List) {
+        for (var i = 0; i < rawServices.length; i++) {
+          final item = rawServices[i];
+          if (item is! Map) continue;
+          options.add(
+            BookingPackageOption(
+              id: 'pkg_$i',
+              name: (item['name'] ?? item['title'] ?? 'Package ${i + 1}')
+                  .toString(),
+              amount: bookingAmountFrom(item['price'] ?? item['amount']),
+              description: (item['description'] ?? '').toString(),
+            ),
+          );
+        }
       }
     }
 
@@ -849,7 +915,7 @@ class ProviderProfilePage extends StatelessWidget {
       options.add(
         BookingPackageOption(
           id: 'default',
-          name: '$category Package',
+          name: '$displayCategory Package',
           amount: bookingAmountFrom(providerData['price']),
           description: 'Custom package details available on booking',
         ),
@@ -857,5 +923,37 @@ class ProviderProfilePage extends StatelessWidget {
     }
 
     return options;
+  }
+
+  String _resolveProviderCategory(
+    Map<String, dynamic> data, {
+    required String fallback,
+  }) {
+    final raw = (data['category'] ?? data['providerType'] ?? data['type'] ?? '')
+        .toString()
+        .trim();
+    final source = raw.isEmpty ? fallback : raw;
+
+    switch (source.toLowerCase()) {
+      case 'photographer':
+      case 'photography':
+        return 'Photography';
+      case 'venue':
+        return 'Venue';
+      case 'music':
+      case 'musician':
+        return 'Music';
+      case 'catering':
+      case 'caterer':
+        return 'Catering';
+      case 'decoration':
+      case 'decor':
+        return 'Decoration';
+      case 'transport':
+        return 'Transport';
+      default:
+        if (source.isEmpty) return 'Service';
+        return source[0].toUpperCase() + source.substring(1);
+    }
   }
 }
