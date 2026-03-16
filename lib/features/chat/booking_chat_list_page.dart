@@ -127,6 +127,7 @@ class _BookingChatListPageState extends State<BookingChatListPage> {
                                     threadId: doc.id,
                                     data: doc.data(),
                                     currentUserId: user.uid,
+                                    isProviderView: widget.isProviderView,
                                   );
                                 },
                               ),
@@ -256,11 +257,13 @@ class _BookingChatThreadCard extends StatelessWidget {
     required this.threadId,
     required this.data,
     required this.currentUserId,
+    required this.isProviderView,
   });
 
   final String threadId;
   final Map<String, dynamic> data;
   final String currentUserId;
+  final bool isProviderView;
 
   @override
   Widget build(BuildContext context) {
@@ -335,7 +338,10 @@ class _BookingChatThreadCard extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      _ThreadStatusBadge(status: status),
+                      _ThreadStatusBadge(
+                        status: status,
+                        userFacing: !isProviderView,
+                      ),
                       SizedBox(height: 8.h),
                       Text(
                         _formatDateTime(activityDate),
@@ -458,9 +464,10 @@ class _BookingChatThreadCard extends StatelessWidget {
 }
 
 class _ThreadStatusBadge extends StatelessWidget {
-  const _ThreadStatusBadge({required this.status});
+  const _ThreadStatusBadge({required this.status, this.userFacing = false});
 
   final String status;
+  final bool userFacing;
 
   @override
   Widget build(BuildContext context) {
@@ -480,7 +487,10 @@ class _ThreadStatusBadge extends StatelessWidget {
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(
-        BookingStatuses.label(normalized).toUpperCase(),
+        (userFacing && normalized == BookingStatuses.accepted
+                ? 'Booked'
+                : BookingStatuses.label(normalized))
+            .toUpperCase(),
         style: TextStyle(
           color: color,
           fontSize: 10.sp,

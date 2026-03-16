@@ -6,7 +6,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
 import '../../../services/booking_service.dart';
 import '../../../services/chat_service.dart';
+import '../../../services/review_service.dart';
 import '../../chat/booking_chat_thread_page.dart';
+import '../bookings/review_dialog.dart';
+import 'all_provider_reviews_page.dart';
 
 class ProviderProfilePage extends StatelessWidget {
   final String providerId;
@@ -20,98 +23,145 @@ class ProviderProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name =
-        providerData['businessName'] ??
-        providerData['name'] ??
-        'Unknown Provider';
-    final type =
-        providerData['providerType'] ?? providerData['category'] ?? 'Service';
-    final rating = (providerData['rating'] ?? 0.0).toDouble();
-    final price = (providerData['price'] ?? 0.0).toDouble();
-    final imageUrl = providerData['imageUrl'] ?? '';
-    final availability = providerData['availability'] ?? 'Available';
-    final description =
-        providerData['description'] ?? 'No description provided.';
-    final location = providerData['location'] ?? 'Location not specified';
-    final phone = providerData['phone'] ?? 'Not provided';
-    final email = providerData['email'] ?? 'Not provided';
+    final user = FirebaseAuth.instance.currentUser;
 
-    // Social Links
-    final website = providerData['website'] ?? '';
-    final facebook = providerData['facebook'] ?? '';
-    final instagram = providerData['instagram'] ?? '';
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('service_providers')
+          .doc(providerId)
+          .snapshots(),
+      builder: (context, snapshot) {
+        final data = snapshot.data?.data() as Map<String, dynamic>? ?? providerData;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          _buildSliverAppBar(context, imageUrl, name),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(20.r),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeaderInfo(name, type, rating, price),
-                  SizedBox(height: 25.h),
-                  _buildQuickStats(availability, location),
-                  SizedBox(height: 30.h),
+        final name = data['businessName'] ?? data['name'] ?? 'Unknown Provider';
+        final type = data['providerType'] ?? data['category'] ?? 'Service';
+        final rating = (data['rating'] ?? 0.0).toDouble();
+        final reviewCount = (data['reviewCount'] ?? 0).toInt();
+        final price = (data['price'] ?? 0.0).toDouble();
+        final imageUrl = data['imageUrl'] ?? '';
+        final availability = data['availability'] ?? 'Available';
+        final description = data['description'] ?? 'No description provided.';
+        final location = data['location'] ?? 'Location not specified';
+        final phone = data['phone'] ?? 'Not provided';
+        final email = data['email'] ?? 'Not provided';
 
-                  if (website.isNotEmpty ||
-                      facebook.isNotEmpty ||
-                      instagram.isNotEmpty) ...[
-                    Text(
-                      'Social Media & Links',
-                      style: TextStyle(
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textDark,
+        // Social Links
+        final website = data['website'] ?? '';
+        final facebook = data['facebook'] ?? '';
+        final instagram = data['instagram'] ?? '';
+
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          body: CustomScrollView(
+            slivers: [
+              _buildSliverAppBar(context, imageUrl, name),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.all(20.r),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeaderInfo(name, type, rating, reviewCount, price),
+                      SizedBox(height: 25.h),
+                      _buildQuickStats(availability, location),
+                      SizedBox(height: 30.h),
+
+                      if (website.isNotEmpty ||
+                          facebook.isNotEmpty ||
+                          instagram.isNotEmpty) ...[
+                        Text(
+                          'Social Media & Links',
+                          style: TextStyle(
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                        SizedBox(height: 15.h),
+                        _buildSocialLinks(website, facebook, instagram),
+                        SizedBox(height: 30.h),
+                      ],
+
+                      Text(
+                        'About',
+                        style: TextStyle(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textDark,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 15.h),
-                    _buildSocialLinks(website, facebook, instagram),
-                    SizedBox(height: 30.h),
-                  ],
+                      SizedBox(height: 10.h),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: Colors.grey.shade700,
+                          height: 1.5,
+                        ),
+                      ),
+                      SizedBox(height: 24.h),
+                      _buildServiceOptionsSection(type, price),
+                      SizedBox(height: 30.h),
 
-                  Text(
-                    'About',
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
-                    ),
+                      _buildReviewsSection(context, name),
+                      SizedBox(height: 30.h),
+
+                      Text(
+                        'Contact Information',
+                        style: TextStyle(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                      SizedBox(height: 15.h),
+                      _buildContactTile(Icons.phone, phone, 'tel:$phone'),
+                      _buildContactTile(Icons.email, email, 'mailto:$email'),
+                      SizedBox(height: 100.h),
+                    ],
                   ),
-                  SizedBox(height: 10.h),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.grey.shade700,
-                      height: 1.5,
-                    ),
-                  ),
-                  SizedBox(height: 24.h),
-                  _buildServiceOptionsSection(type, price),
-                  SizedBox(height: 30.h),
-                  Text(
-                    'Contact Information',
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                  SizedBox(height: 15.h),
-                  _buildContactTile(Icons.phone, phone, 'tel:$phone'),
-                  _buildContactTile(Icons.email, email, 'mailto:$email'),
-                  SizedBox(height: 100.h),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-      bottomSheet: _buildBottomAction(context, name),
+          bottomSheet: user != null
+              ? StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('bookings')
+                      .where('userId', isEqualTo: user.uid)
+                      .where('providerId', isEqualTo: providerId)
+                      .snapshots(),
+                  builder: (context, bookingSnapshot) {
+                    final bookings = bookingSnapshot.data?.docs ?? [];
+                    String buttonText = 'Book Now';
+                    bool isActionable = true;
+
+                    if (bookings.isNotEmpty) {
+                      final pending = bookings.where((b) {
+                        final status = b['status']?.toString() ?? '';
+                        return BookingStatuses.normalize(status) == BookingStatuses.pending;
+                      }).toList();
+                      
+                      final accepted = bookings.where((b) {
+                        final status = b['status']?.toString() ?? '';
+                        return BookingStatuses.normalize(status) == BookingStatuses.accepted;
+                      }).toList();
+                      
+                      if (accepted.isNotEmpty) {
+                        buttonText = 'Booked';
+                        isActionable = false;
+                      } else if (pending.isNotEmpty) {
+                        buttonText = 'Request Sent';
+                        isActionable = false;
+                      }
+                    }
+
+                    return _buildBottomAction(context, name, buttonText, isActionable);
+                  },
+                )
+              : _buildBottomAction(context, name, 'Book Now', true),
+        );
+      }
     );
   }
 
@@ -168,6 +218,7 @@ class ProviderProfilePage extends StatelessWidget {
     String name,
     String type,
     double rating,
+    int reviewCount,
     double price,
   ) {
     return Column(
@@ -222,7 +273,7 @@ class ProviderProfilePage extends StatelessWidget {
             ),
             SizedBox(width: 10.w),
             Text(
-              '(24 Reviews)',
+              '($reviewCount Reviews)',
               style: TextStyle(color: Colors.grey.shade600, fontSize: 14.sp),
             ),
           ],
@@ -454,6 +505,221 @@ class ProviderProfilePage extends StatelessWidget {
     );
   }
 
+  Widget _buildReviewsSection(BuildContext context, String providerName) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Reviews',
+              style: TextStyle(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textDark,
+              ),
+            ),
+            TextButton.icon(
+              onPressed: () => _handleManualReview(context, providerName),
+              icon: Icon(Icons.add_comment_outlined, size: 18.sp, color: AppColors.primaryGreen),
+              label: Text(
+                'Add Review',
+                style: TextStyle(
+                  color: AppColors.primaryGreen,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14.sp,
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 12.h),
+        StreamBuilder<QuerySnapshot>(
+          // Limit to 2 reviews for initial display
+          stream: FirebaseFirestore.instance
+              .collection('service_providers')
+              .doc(providerId)
+              .collection('reviews')
+              .orderBy('createdAt', descending: true)
+              .limit(2)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final reviews = snapshot.data?.docs ?? [];
+            if (reviews.isEmpty) {
+              return Text(
+                'No reviews yet. Be the first to review!',
+                style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+              );
+            }
+
+            return Column(
+              children: [
+                ...reviews.map((doc) {
+                  final review = doc.data() as Map<String, dynamic>;
+                  return _buildReviewTile(review);
+                }),
+                SizedBox(height: 8.h),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AllProviderReviewsPage(
+                          providerId: providerId,
+                          providerName: providerName,
+                        ),
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.primaryGreen),
+                      foregroundColor: AppColors.primaryGreen,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    child: const Text('View All Reviews'),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Future<void> _handleManualReview(BuildContext context, String providerName) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please login to leave a review')),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final bookings = await FirebaseFirestore.instance
+          .collection('bookings')
+          .where('userId', isEqualTo: user.uid)
+          .where('providerId', isEqualTo: providerId)
+          .get();
+
+      if (!context.mounted) return;
+      Navigator.pop(context);
+
+      final completedBookings = bookings.docs.where((doc) {
+        final data = doc.data();
+        return BookingStatuses.normalize(data['status']) == BookingStatuses.completed;
+      }).toList();
+
+      if (completedBookings.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You can only review services you have booked and completed.')),
+        );
+        return;
+      }
+
+      final unreviewed = completedBookings.where((doc) {
+        final data = doc.data();
+        return data['isReviewed'] != true;
+      }).toList();
+
+      if (unreviewed.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You have already reviewed your bookings for this provider.')),
+        );
+        return;
+      }
+
+      showDialog(
+        context: context,
+        builder: (context) => ReviewDialog(
+          bookingId: unreviewed.first.id,
+          providerId: providerId,
+          providerName: providerName,
+        ),
+      );
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error checking bookings: $e')),
+        );
+      }
+    }
+  }
+
+  Widget _buildReviewTile(Map<String, dynamic> review) {
+    final userName = review['userName'] ?? 'Anonymous';
+    final rating = (review['rating'] ?? 0.0).toDouble();
+    final comment = review['comment'] ?? '';
+    final createdAt = (review['createdAt'] as Timestamp?)?.toDate();
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(12.r),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                userName,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+              ),
+              if (createdAt != null)
+                Text(
+                  '${createdAt.day}/${createdAt.month}/${createdAt.year}',
+                  style: TextStyle(color: Colors.grey, fontSize: 12.sp),
+                ),
+            ],
+          ),
+          SizedBox(height: 4.h),
+          Row(
+            children: List.generate(5, (index) {
+              return Icon(
+                index < rating ? Icons.star : Icons.star_border,
+                color: Colors.amber,
+                size: 16.sp,
+              );
+            }),
+          ),
+          if (comment.isNotEmpty) ...[
+            SizedBox(height: 8.h),
+            Text(
+              comment,
+              style: TextStyle(fontSize: 14.sp, color: Colors.grey.shade800),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _buildContactTile(IconData icon, String value, String url) {
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
@@ -482,7 +748,7 @@ class ProviderProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomAction(BuildContext context, String providerName) {
+  Widget _buildBottomAction(BuildContext context, String providerName, String buttonText, bool isActionable) {
     return Container(
       padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
@@ -517,17 +783,19 @@ class ProviderProfilePage extends StatelessWidget {
             Expanded(
               flex: 2,
               child: ElevatedButton(
-                onPressed: () => _handleBooking(context, providerName),
+                onPressed: isActionable ? () => _handleBooking(context, providerName) : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
+                  backgroundColor: isActionable ? AppColors.primaryGreen : Colors.grey,
                   foregroundColor: Colors.white,
                   minimumSize: Size(double.infinity, 56.h),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16.r),
                   ),
+                  disabledBackgroundColor: Colors.grey.shade400,
+                  disabledForegroundColor: Colors.white,
                 ),
                 child: Text(
-                  'Book Now',
+                  buttonText,
                   style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -538,12 +806,259 @@ class ProviderProfilePage extends StatelessWidget {
     );
   }
 
-  Future<void> _handleMessage(BuildContext context, String providerName) async {
-    await _initiateBookingOrInquiry(context, providerName, isInquiry: true);
+  Future<void> _handleBooking(BuildContext context, String providerName) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please login to continue')),
+      );
+      return;
+    }
+
+    try {
+      final results = await Future.wait([
+        FirebaseFirestore.instance.collection('users').doc(user.uid).get(),
+        FirebaseFirestore.instance
+            .collection('events')
+            .where('userId', isEqualTo: user.uid)
+            .get(),
+        FirebaseFirestore.instance
+            .collection('service_providers')
+            .doc(providerId)
+            .collection('services')
+            .get(),
+      ]);
+
+      final userDoc = results[0] as DocumentSnapshot<Map<String, dynamic>>;
+      final eventsSnapshot = results[1] as QuerySnapshot<Map<String, dynamic>>;
+      final servicesSnapshot =
+          results[2] as QuerySnapshot<Map<String, dynamic>>;
+
+      final clientData = userDoc.data() ?? <String, dynamic>{};
+      final clientName = firstNonEmpty([
+        clientData['name'],
+        user.displayName,
+        user.email?.split('@').first,
+      ], fallback: 'Client');
+      final clientEmail = firstNonEmpty([clientData['email'], user.email]);
+      final clientPhone = firstNonEmpty([clientData['phone']]);
+
+      final eventOptions =
+          eventsSnapshot.docs
+              .map((doc) {
+                final data = doc.data();
+                final eventDate = bookingDateFrom(data['date']);
+                if (eventDate == null) return null;
+                return _BookingEventOption(
+                  id: doc.id,
+                  name: firstNonEmpty([
+                    data['eventName'],
+                    data['name'],
+                  ], fallback: 'Untitled Event'),
+                  type: firstNonEmpty([data['category']], fallback: 'Event'),
+                  location: firstNonEmpty([
+                    data['venue'],
+                    data['location'],
+                  ], fallback: 'Location not specified'),
+                  date: eventDate,
+                );
+              })
+              .whereType<_BookingEventOption>()
+              .toList()
+            ..sort((a, b) => a.date.compareTo(b.date));
+
+      if (eventOptions.isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Create an event first so we can attach the booking details.'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        return;
+      }
+
+      final packageOptions = servicesSnapshot.docs.map((doc) {
+        final data = doc.data();
+        return _BookingPackageOption(
+          id: doc.id,
+          name: firstNonEmpty([data['name']], fallback: 'Service Package'),
+          amount: bookingAmountFrom(data['price']),
+          description: firstNonEmpty([data['description']]),
+        );
+      }).toList();
+
+      if (packageOptions.isEmpty) {
+        packageOptions.add(
+          _BookingPackageOption(
+            id: 'default',
+            name: firstNonEmpty([
+              providerData['businessName'],
+              providerData['name'],
+              providerData['providerType'],
+              providerData['category'],
+            ], fallback: 'Standard Package'),
+            amount: bookingAmountFrom(providerData['price']),
+            description: firstNonEmpty([providerData['description']]),
+          ),
+        );
+      }
+
+      if (!context.mounted) return;
+
+      final selection = await _showBookingBottomSheet(
+        context,
+        providerName: providerName,
+        clientName: clientName,
+        eventOptions: eventOptions,
+        packageOptions: packageOptions,
+      );
+
+      if (selection == null) return;
+
+      final providerSummary = {
+        'businessName': providerName,
+        'providerType': firstNonEmpty([
+          providerData['providerType'],
+          providerData['category'],
+        ]),
+        'location': firstNonEmpty([providerData['location']]),
+        'price': bookingAmountFrom(providerData['price']),
+      };
+
+      final bookingRef = FirebaseFirestore.instance
+          .collection('bookings')
+          .doc();
+      final bookingPayload = buildBookingPayload(
+        userId: user.uid,
+        providerId: providerId,
+        providerName: providerName,
+        clientName: clientName,
+        clientEmail: clientEmail.isEmpty ? null : clientEmail,
+        clientPhone: clientPhone.isEmpty ? null : clientPhone,
+        eventId: selection.event.id,
+        eventName: selection.event.name,
+        eventType: selection.event.type,
+        eventDate: selection.event.date,
+        location: selection.event.location,
+        selectedPackage: selection.package.name,
+        amount: selection.package.amount,
+        status: BookingStatuses.pending,
+        providerType: providerSummary['providerType']?.toString(),
+        providerLocation: providerSummary['location']?.toString(),
+        providerData: providerSummary,
+      );
+
+      final batch = FirebaseFirestore.instance.batch();
+      batch.set(bookingRef, bookingPayload);
+      
+      // Notify Provider
+      final notificationRef = FirebaseFirestore.instance
+          .collection('service_providers')
+          .doc(providerId)
+          .collection('notifications')
+          .doc();
+      
+      batch.set(notificationRef, {
+        'title': 'New Booking Request',
+        'message': '$clientName has requested a booking for ${selection.event.name}.',
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'type': 'booking',
+        'relatedId': bookingRef.id,
+      });
+
+      await batch.commit();
+
+      await ChatService().ensureThreadExistsForBooking(
+        bookingId: bookingRef.id,
+        bookingData: bookingPayload,
+      );
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('notifications')
+          .add({
+            'title': 'Booking Requested',
+            'message':
+                'Your booking request for ${selection.package.name} at $providerName for ${selection.event.name} has been sent.',
+            'timestamp': FieldValue.serverTimestamp(),
+            'isRead': false,
+            'type': 'service',
+          });
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Booking request sent successfully!'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
-  Future<void> _handleBooking(BuildContext context, String providerName) async {
-    await _initiateBookingOrInquiry(context, providerName, isInquiry: false);
+  Future<void> _handleMessage(BuildContext context, String providerName) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please login to message the provider')),
+      );
+      return;
+    }
+
+    try {
+      // Find existing active bookings to reuse thread, or just initiate an inquiry
+      final bookingSnapshot = await FirebaseFirestore.instance
+          .collection('bookings')
+          .where('userId', isEqualTo: user.uid)
+          .where('providerId', isEqualTo: providerId)
+          .limit(1)
+          .get();
+
+      if (!context.mounted) return;
+
+      if (bookingSnapshot.docs.isNotEmpty) {
+        final bookingId = bookingSnapshot.docs.first.id;
+        final bookingData = bookingSnapshot.docs.first.data();
+        
+        await ChatService().ensureThreadExistsForBooking(
+          bookingId: bookingId,
+          bookingData: bookingData,
+        );
+
+        if (!context.mounted) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BookingChatThreadPage(
+              bookingId: bookingId,
+              initialThreadData: bookingData,
+            ),
+          ),
+        );
+      } else {
+        // No booking exists yet, initiate a standard inquiry
+        await _initiateBookingOrInquiry(context, providerName, isInquiry: true);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
+    }
   }
 
   Future<void> _initiateBookingOrInquiry(
@@ -615,9 +1130,7 @@ class ProviderProfilePage extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text(
-                'Create an event first so we can attach the inquiry details.',
-              ),
+              content: Text('Create an event first so we can attach the inquiry details.'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -698,6 +1211,21 @@ class ProviderProfilePage extends StatelessWidget {
       );
 
       await bookingRef.set(bookingPayload);
+      
+      // Notify Provider of inquiry
+      await FirebaseFirestore.instance
+          .collection('service_providers')
+          .doc(providerId)
+          .collection('notifications')
+          .add({
+            'title': isInquiry ? 'New Inquiry' : 'New Booking Request',
+            'message': '$clientName is interested in your services for ${selection.event.name}.',
+            'timestamp': FieldValue.serverTimestamp(),
+            'isRead': false,
+            'type': 'booking',
+            'relatedId': bookingRef.id,
+          });
+
       await ChatService().ensureThreadExistsForBooking(
         bookingId: bookingRef.id,
         bookingData: bookingPayload,
@@ -784,11 +1312,11 @@ class ProviderProfilePage extends StatelessWidget {
                   ),
                   child: SingleChildScrollView(
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisSize: List<Widget>.empty().length < 1 ? MainAxisSize.min : MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isInquiry ? 'Inquire with $providerName' : 'Book $providerName',
+                          isInquiry ? 'Inquire with $providerName' : 'Send Request to $providerName',
                           style: TextStyle(
                             fontSize: 22.sp,
                             fontWeight: FontWeight.w800,
@@ -797,9 +1325,7 @@ class ProviderProfilePage extends StatelessWidget {
                         ),
                         SizedBox(height: 8.h),
                         Text(
-                          isInquiry 
-                            ? 'Start a conversation about your event and requirements.' 
-                            : 'Choose the event and package so both you and the provider see the same booking details.',
+                          'Choose the event and package so both you and the provider see the same booking details.',
                           style: TextStyle(
                             fontSize: 13.sp,
                             color: Colors.grey.shade600,
@@ -1042,18 +1568,7 @@ class ProviderProfilePage extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }

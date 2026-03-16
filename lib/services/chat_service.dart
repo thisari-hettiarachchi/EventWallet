@@ -127,7 +127,6 @@ class ChatService {
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> watchMessages(String bookingId) {
-    // Ordering by createdAt helps maintain message sequence
     return messagesRef(bookingId).orderBy('createdAt', descending: true).snapshots();
   }
 
@@ -140,9 +139,7 @@ class ChatService {
           bookingData ??
           (await _firestore.collection('bookings').doc(bookingId).get()).data();
 
-      if (resolvedBooking == null) {
-        return;
-      }
+      if (resolvedBooking == null) return;
 
       final metadata = buildBookingChatThreadMetadata(
         bookingId: bookingId,
@@ -170,17 +167,10 @@ class ChatService {
         }
 
         final existingData = snapshot.data() ?? <String, dynamic>{};
-        final existingUnread = existingData['unreadCounts'];
         final unreadCounts = <String, dynamic>{
           userId: bookingChatUnreadCountFrom(existingData, userId),
           providerId: bookingChatUnreadCountFrom(existingData, providerId),
         };
-
-        if (existingUnread is Map) {
-          for (final entry in existingUnread.entries) {
-            unreadCounts.putIfAbsent(entry.key.toString(), () => entry.value);
-          }
-        }
 
         transaction.set(threadRef(bookingId), {
           ...metadata,
@@ -262,11 +252,21 @@ class ChatService {
       });
       await batch.commit();
     } catch (e) {
-      print('ChatService: sendMessage error (retrying with set): $e');
-      // If update fails, fallback to set merge
+      print('ChatService: sendMessage fallback triggered: $e');
+      
+      // Fallback: If update fails (doc might still be missing), use set with merge.
+      // We MUST resolve metadata to ensure userId/providerId are present for security rules.
+      final resolvedBooking = bookingData ?? 
+          (await _firestore.collection('bookings').doc(bookingId).get()).data();
+          
+      final metadata = resolvedBooking != null 
+          ? buildBookingChatThreadMetadata(bookingId: bookingId, bookingData: resolvedBooking)
+          : <String, dynamic>{};
+
       final batch = _firestore.batch();
       batch.set(messageRef, messagePayload);
       batch.set(threadRef(bookingId), {
+        if (metadata.isNotEmpty) ...metadata,
         'lastMessage': trimmed,
         'lastMessageAt': FieldValue.serverTimestamp(),
         'lastMessageSenderId': senderId,
@@ -287,7 +287,7 @@ class ChatService {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      // If update fails, document might not exist, but we don't want to crash
+      // Doc might not exist yet
     }
   }
 }

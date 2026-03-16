@@ -6,6 +6,8 @@ import '../../../core/constants/colors.dart';
 import '../services/my_services.dart';
 import '../bookings/bookings.dart';
 import '../../../services/booking_service.dart';
+import 'all_reviews_page.dart';
+import 'notifications_page.dart';
 
 class ServiceProviderDashboard extends StatefulWidget {
   final String providerId;
@@ -37,6 +39,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
 
   List<DocumentSnapshot> _recentBookings = [];
   List<DocumentSnapshot> _upcomingEvents = [];
+  List<DocumentSnapshot> _recentReviewsList = [];
   Map<String, dynamic>? _providerData;
 
   @override
@@ -53,16 +56,23 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     );
     _controller.forward();
 
-    _fetchProviderData();
-    _fetchBookingStats();
-    _fetchRecentBookings();
-    _fetchUpcomingEvents();
+    _fetchAllData();
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchAllData() async {
+    await Future.wait([
+      _fetchProviderData(),
+      _fetchBookingStats(),
+      _fetchRecentBookings(),
+      _fetchUpcomingEvents(),
+      _fetchRecentReviews(),
+    ]);
   }
 
   Future<void> _fetchProviderData() async {
@@ -196,6 +206,24 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     }
   }
 
+  Future<void> _fetchRecentReviews() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('service_providers')
+          .doc(widget.providerId)
+          .collection('reviews')
+          .orderBy('createdAt', descending: true)
+          .limit(3)
+          .get();
+
+      setState(() {
+        _recentReviewsList = snapshot.docs;
+      });
+    } catch (e) {
+      debugPrint('Error fetching reviews: $e');
+    }
+  }
+
   String _getProviderTitle() {
     switch (widget.providerType.toLowerCase()) {
       case 'photographer':
@@ -246,6 +274,15 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     );
   }
 
+  void _viewAllReviews() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AllReviewsPage(providerId: widget.providerId),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -266,12 +303,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                     ),
                   ),
                   child: RefreshIndicator(
-                    onRefresh: () async {
-                      await _fetchProviderData();
-                      await _fetchBookingStats();
-                      await _fetchRecentBookings();
-                      await _fetchUpcomingEvents();
-                    },
+                    onRefresh: _fetchAllData,
                     child: ListView(
                       padding: EdgeInsets.symmetric(
                         horizontal: 20.w,
@@ -287,6 +319,8 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                         _buildRecentBookings(),
                         SizedBox(height: 28.h),
                         _buildUpcomingEvents(),
+                        SizedBox(height: 28.h),
+                        _buildRecentReviews(),
                         SizedBox(height: 28.h),
                         _buildPerformanceMetrics(),
                         SizedBox(height: 100.h),
@@ -398,42 +432,105 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                     ],
                   ),
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.settings_outlined,
-                    color: Colors.white,
-                    size: 28.sp,
-                  ),
-                  onPressed: () {},
-                ),
+                _buildNotificationIcon(),
               ],
             ),
             SizedBox(height: 16.h),
-            Row(
-              children: [
-                Icon(Icons.star, color: Colors.amber, size: 20.sp),
-                SizedBox(width: 6.w),
-                Text(
-                  _averageRating.toStringAsFixed(1),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w700,
+            GestureDetector(
+              onTap: _viewAllReviews,
+              child: Row(
+                children: [
+                  Icon(Icons.star, color: Colors.amber, size: 20.sp),
+                  SizedBox(width: 6.w),
+                  Text(
+                    _averageRating.toStringAsFixed(1),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                SizedBox(width: 4.w),
-                Text(
-                  '($_totalReviews reviews)',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: 14.sp,
+                  SizedBox(width: 4.w),
+                  Text(
+                    '($_totalReviews reviews)',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 14.sp,
+                    ),
                   ),
-                ),
-              ],
+                  SizedBox(width: 4.w),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white70,
+                    size: 12.sp,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildNotificationIcon() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('service_providers')
+          .doc(widget.providerId)
+          .collection('notifications')
+          .where('isRead', isEqualTo: false)
+          .snapshots(),
+      builder: (context, snapshot) {
+        final unreadCount = snapshot.data?.docs.length ?? 0;
+
+        return Stack(
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.notifications_none_rounded,
+                color: Colors.white,
+                size: 28.sp,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ServiceProviderNotificationsPage(
+                      providerId: widget.providerId,
+                    ),
+                  ),
+                );
+              },
+            ),
+            if (unreadCount > 0)
+              Positioned(
+                right: 8.w,
+                top: 8.h,
+                child: Container(
+                  padding: EdgeInsets.all(2.r),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  constraints: BoxConstraints(
+                    minWidth: 16.w,
+                    minHeight: 16.w,
+                  ),
+                  child: Text(
+                    unreadCount > 9 ? '9+' : '$unreadCount',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -675,12 +772,10 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
             SizedBox(width: 12.w),
             Expanded(
               child: _buildActionButton(
-                'Analytics',
-                Icons.analytics,
+                'Reviews',
+                Icons.rate_review,
                 const Color(0xFF26A69A),
-                () {
-                  // Navigate to analytics
-                },
+                _viewAllReviews,
               ),
             ),
           ],
@@ -750,7 +845,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
               ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: _navigateToBookings,
               child: Text(
                 'View All',
                 style: TextStyle(
@@ -989,6 +1084,124 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
             );
           }),
       ],
+    );
+  }
+
+  // ================= RECENT REVIEWS =================
+  Widget _buildRecentReviews() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Recent Reviews',
+              style: TextStyle(
+                fontSize: 24.sp,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textDark,
+              ),
+            ),
+            if (_recentReviewsList.isNotEmpty)
+              TextButton(
+                onPressed: _viewAllReviews,
+                child: Text(
+                  'View All',
+                  style: TextStyle(
+                    color: AppColors.primaryGreen,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+          ],
+        ),
+        SizedBox(height: 16.h),
+        if (_recentReviewsList.isEmpty)
+          Container(
+            padding: EdgeInsets.all(24.r),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16.r),
+              boxShadow: [AppColors.cardShadow()],
+            ),
+            child: const Center(
+              child: Text(
+                'No reviews yet',
+                style: TextStyle(color: Colors.grey, fontSize: 15),
+              ),
+            ),
+          )
+        else
+          ..._recentReviewsList.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return _buildReviewCard(data);
+          }),
+      ],
+    );
+  }
+
+  Widget _buildReviewCard(Map<String, dynamic> data) {
+    final rating = _doubleFrom(data['rating']);
+    final userName = data['userName'] ?? 'Anonymous';
+    final comment = data['comment'] ?? '';
+    final createdAt = bookingDateFrom(data['createdAt']);
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(16.r),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [AppColors.cardShadow()],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                userName,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
+              ),
+              if (createdAt != null)
+                Text(
+                  '${createdAt.day}/${createdAt.month}/${createdAt.year}',
+                  style: TextStyle(color: Colors.grey, fontSize: 12.sp),
+                ),
+            ],
+          ),
+          SizedBox(height: 6.h),
+          Row(
+            children: List.generate(5, (index) {
+              return Icon(
+                index < rating ? Icons.star_rounded : Icons.star_border_rounded,
+                color: Colors.amber,
+                size: 18.sp,
+              );
+            }),
+          ),
+          if (comment.isNotEmpty) ...[
+            SizedBox(height: 10.h),
+            Text(
+              comment,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.grey.shade800,
+                height: 1.4,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ],
+      ),
     );
   }
 

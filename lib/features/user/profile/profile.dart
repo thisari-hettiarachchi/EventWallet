@@ -211,7 +211,7 @@ class ProfilePage extends StatelessWidget {
                               icon: Icons.receipt_long_outlined,
                               title: 'My Booking Requests',
                               subtitle:
-                                  'Track pending, accepted, rejected, and completed bookings',
+                                  'Track pending requests, booked services, rejected, and completed bookings',
                               color: AppColors.primaryGreen,
                               onTap: () {
                                 Navigator.push(

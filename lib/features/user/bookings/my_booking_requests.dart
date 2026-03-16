@@ -65,7 +65,7 @@ class UserBookingStatusPage extends StatelessWidget {
                           ),
                           tabs: const [
                             Tab(text: 'Pending'),
-                            Tab(text: 'Accepted'),
+                            Tab(text: 'Booked'),
                             Tab(text: 'Rejected'),
                             Tab(text: 'Completed'),
                           ],
@@ -84,9 +84,9 @@ class UserBookingStatusPage extends StatelessWidget {
                               _BookingTab(
                                 userId: user.uid,
                                 status: BookingStatuses.accepted,
-                                emptyTitle: 'No accepted bookings',
+                                emptyTitle: 'No booked services yet',
                                 emptySubtitle:
-                                    'Accepted or confirmed bookings will appear here.',
+                                    'Requests accepted by providers will appear here as booked.',
                                 newestFirst: false,
                               ),
                               _BookingTab(
@@ -654,7 +654,7 @@ class _BookingCard extends StatelessWidget {
 
     switch (status) {
       case BookingStatuses.accepted:
-        return 'Provider confirmed this booking';
+        return 'Provider accepted your request. You are booked.';
       case BookingStatuses.rejected:
         if (bookingWasCancelled(data)) {
           if (cancelledBy == 'user') {
@@ -920,7 +920,7 @@ class _StatusBadge extends StatelessWidget {
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(
-        bookingStatusLabelFrom(data).toUpperCase(),
+        bookingStatusLabelFrom(data, userFacing: true).toUpperCase(),
         style: TextStyle(
           color: color,
           fontSize: 11.sp,

@@ -137,9 +137,16 @@ bool bookingWasCancelled(Map<String, dynamic> data) {
   return false;
 }
 
-String bookingStatusLabelFrom(Map<String, dynamic> data) {
+String bookingStatusLabelFrom(
+  Map<String, dynamic> data, {
+  bool userFacing = false,
+}) {
   if (bookingWasCancelled(data)) return 'Cancelled';
-  return BookingStatuses.label(data['status']);
+  final normalizedStatus = BookingStatuses.normalize(data['status']);
+  if (userFacing && normalizedStatus == BookingStatuses.accepted) {
+    return 'Booked';
+  }
+  return BookingStatuses.label(normalizedStatus);
 }
 
 bool bookingCanBeCancelledByUser(Map<String, dynamic> data) {
