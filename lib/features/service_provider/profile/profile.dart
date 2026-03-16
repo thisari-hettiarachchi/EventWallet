@@ -7,6 +7,7 @@ import '../../../services/auth_service.dart';
 import '../../user/auth/login.dart';
 import '../services/my_services.dart';
 import 'edit_business_profile.dart';
+import 'earnings_analytics.dart';
 import '../../user/info/privacy.dart';
 import '../../user/info/help.dart';
 import '../../../core/constants/colors.dart';
@@ -167,7 +168,10 @@ class ServiceProviderProfilePage extends StatelessWidget {
                             subtitle: 'View your detailed revenue reports',
                             color: AppColors.primaryGreen,
                             onTap: () {
-                              // Coming soon
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const EarningsAnalyticsPage()),
+                              );
                             },
                           ),
                           SizedBox(height: 24.h),
