@@ -73,7 +73,9 @@ Map<String, dynamic> buildBookingChatThreadMetadata({
     'eventDate': bookingData['eventDate'] ?? bookingData['date'],
     'location': bookingLocationFrom(bookingData),
     'selectedPackage': bookingPackageNameFrom(bookingData),
-    'bookingStatus': BookingStatuses.normalize(bookingData['status']),
+    'bookingStatus': BookingStatuses.normalize(
+      bookingData['status'] ?? bookingData['bookingStatus'],
+    ),
   };
 }
 
@@ -257,8 +259,6 @@ class ChatService {
     } catch (e) {
       debugPrint('ChatService: sendMessage fallback triggered: $e');
 
-      // Fallback: If update fails (doc might still be missing), use set with merge.
-      // We MUST resolve metadata to ensure userId/providerId are present for security rules.
       final resolvedBooking =
           bookingData ??
           (await _firestore.collection('bookings').doc(bookingId).get()).data();
@@ -279,6 +279,10 @@ class ChatService {
         'lastMessageSenderId': senderId,
         'lastMessageSenderName': senderName,
         'updatedAt': FieldValue.serverTimestamp(),
+        'unreadCounts': {
+          recipientId: FieldValue.increment(1),
+          senderId: 0,
+        },
       }, SetOptions(merge: true));
       await batch.commit();
     }

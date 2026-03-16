@@ -37,6 +37,8 @@ class _BookingChatListPageState extends State<BookingChatListPage> {
         currentUserId: user.uid,
         isProviderView: widget.isProviderView,
       );
+    } catch (e) {
+      debugPrint('Error ensuring threads: $e');
     } finally {
       if (mounted) {
         setState(() => _isBackfilling = false);
@@ -83,10 +85,21 @@ class _BookingChatListPageState extends State<BookingChatListPage> {
                       }
 
                       if (snapshot.hasError) {
+                        String title = 'Could not load messages';
+                        String subtitle = 'Please try again in a moment.';
+
+                        if (snapshot.error is FirebaseException &&
+                            (snapshot.error as FirebaseException).code ==
+                                'permission-denied') {
+                          title = 'Error loading messages';
+                          subtitle =
+                          'The caller does not have permission to execute the specific operation.';
+                        }
+
                         return _buildInfoState(
                           icon: Icons.error_outline,
-                          title: 'Could not load messages',
-                          subtitle: 'Please try again in a moment.',
+                          title: title,
+                          subtitle: subtitle,
                         );
                       }
 
