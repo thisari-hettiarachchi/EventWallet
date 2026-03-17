@@ -54,6 +54,8 @@ class ServiceProviderProfilePage extends StatelessWidget {
         final String businessName =
             providerData['businessName'] ?? 'Business Name';
         final String email = providerData['email'] ?? 'No email';
+        final String profileImageUrl = (providerData['imageUrl'] ?? '')
+            .toString();
 
         final initials = businessName.isNotEmpty
             ? businessName.trim().split(' ').map((e) => e[0]).take(2).join()
@@ -87,14 +89,19 @@ class ServiceProviderProfilePage extends StatelessWidget {
                     ),
                     child: CircleAvatar(
                       backgroundColor: Colors.white,
-                      child: Text(
-                        initials,
-                        style: TextStyle(
-                          fontSize: 36.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryGreen,
-                        ),
-                      ),
+                      backgroundImage: profileImageUrl.isNotEmpty
+                          ? NetworkImage(profileImageUrl)
+                          : null,
+                      child: profileImageUrl.isEmpty
+                          ? Text(
+                              initials,
+                              style: TextStyle(
+                                fontSize: 36.sp,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryGreen,
+                              ),
+                            )
+                          : null,
                     ),
                   ),
                   SizedBox(height: 16.h),

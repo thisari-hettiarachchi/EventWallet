@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
+import '../../../services/profile_image_storage_service.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -16,6 +20,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _picker = ImagePicker();
+  final _profileImageStorageService = ProfileImageStorageService();
+
+  String _profileImageUrl = '';
+  File? _imageFile;
   bool _isLoading = false;
 
   @override
@@ -36,8 +45,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _nameController.text = data['name'] ?? '';
         _emailController.text = data['email'] ?? '';
         _phoneController.text = data['phone'] ?? '';
+        _profileImageUrl = data['imageUrl'] ?? '';
       }
     }
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile == null) return;
+
+    setState(() {
+      _imageFile = File(pickedFile.path);
+    });
   }
 
   Future<void> _saveProfile() async {
@@ -48,12 +67,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
+        String imageUrl = _profileImageUrl;
+
+        if (_imageFile != null) {
+          final pickedImage = XFile(_imageFile!.path);
+          imageUrl = await _profileImageStorageService.uploadProfileImage(
+            uid: user.uid,
+            role: 'users',
+            image: pickedImage,
+          );
+        }
+
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
             .update({
               'name': _nameController.text.trim(),
               'phone': _phoneController.text.trim(),
+              'imageUrl': imageUrl,
             });
 
         if (mounted) {
@@ -129,45 +160,68 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         Center(
                           child: Stack(
                             children: [
-                              Container(
-                                width: 120.w,
-                                height: 120.w,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: AppColors.primaryGradient,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.primaryBlue.withValues(
-                                        alpha: 0.3,
+                              GestureDetector(
+                                onTap: _pickImage,
+                                child: Container(
+                                  width: 120.w,
+                                  height: 120.w,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: AppColors.primaryGradient,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.primaryBlue.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                        blurRadius: 20.r,
+                                        offset: Offset(0, 10.h),
                                       ),
-                                      blurRadius: 20.r,
-                                      offset: Offset(0, 10.h),
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  Icons.person,
-                                  size: 60.sp,
-                                  color: Colors.white,
+                                    ],
+                                    image: _imageFile != null
+                                        ? DecorationImage(
+                                            image: FileImage(_imageFile!),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : (_profileImageUrl.isNotEmpty
+                                              ? DecorationImage(
+                                                  image: NetworkImage(
+                                                    _profileImageUrl,
+                                                  ),
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : null),
+                                  ),
+                                  child:
+                                      _imageFile == null &&
+                                          _profileImageUrl.isEmpty
+                                      ? Icon(
+                                          Icons.person,
+                                          size: 60.sp,
+                                          color: Colors.white,
+                                        )
+                                      : null,
                                 ),
                               ),
                               Positioned(
                                 bottom: 0,
                                 right: 0,
-                                child: Container(
-                                  padding: EdgeInsets.all(8.r),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryBlue,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 3.w,
+                                child: GestureDetector(
+                                  onTap: _pickImage,
+                                  child: Container(
+                                    padding: EdgeInsets.all(8.r),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primaryBlue,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 3.w,
+                                      ),
                                     ),
-                                  ),
-                                  child: Icon(
-                                    Icons.camera_alt,
-                                    size: 20.sp,
-                                    color: Colors.white,
+                                    child: Icon(
+                                      Icons.camera_alt,
+                                      size: 20.sp,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
