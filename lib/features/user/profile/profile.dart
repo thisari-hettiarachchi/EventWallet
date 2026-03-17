@@ -1,5 +1,4 @@
 import 'package:eventwallet/features/user/info/help.dart';
-import 'package:eventwallet/features/user/events/manage_event.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -191,41 +190,23 @@ class ProfilePage extends StatelessWidget {
                               );
                             },
                           ),
-                          if (!isServiceProvider) ...[
-                            SizedBox(height: 12.h),
-                            _buildSettingsCard(
-                              icon: Icons.event_note_outlined,
-                              title: 'Manage Events',
-                              subtitle: 'View, edit, or delete your events',
-                              color: Colors.orange.shade800,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ManageEventsPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                            SizedBox(height: 12.h),
-                            _buildSettingsCard(
-                              icon: Icons.receipt_long_outlined,
-                              title: 'My Booking Requests',
-                              subtitle:
-                                  'Track pending requests, booked services, rejected, and completed bookings',
-                              color: AppColors.primaryGreen,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const UserBookingStatusPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
+                          SizedBox(height: 12.h),
+                          _buildSettingsCard(
+                            icon: Icons.receipt_long_outlined,
+                            title: 'My Booking Requests',
+                            subtitle:
+                                'Track pending requests, booked services, rejected, and completed bookings',
+                            color: AppColors.primaryGreen,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const UserBookingStatusPage(),
+                                ),
+                              );
+                            },
+                          ),
                           SizedBox(height: 12.h),
                           _buildSettingsCard(
                             icon: Icons.lock_outline,
