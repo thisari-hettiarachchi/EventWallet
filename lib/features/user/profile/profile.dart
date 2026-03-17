@@ -14,9 +14,14 @@ import '../info/privacy.dart';
 import '../info/about.dart';
 import '../info/service_provider.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final User? user = FirebaseAuth.instance.currentUser;
@@ -33,8 +38,8 @@ class ProfilePage extends StatelessWidget {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return FutureBuilder<DocumentSnapshot>(
-      future: _getUserData(user.uid),
+    return StreamBuilder<DocumentSnapshot>(
+      stream: _getUserDataStream(user.uid),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -356,17 +361,15 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Future<DocumentSnapshot> _getUserData(String uid) async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+  Stream<DocumentSnapshot> _getUserDataStream(String uid) {
+    // Return stream from users collection, or fallback to service_providers
+    // Note: Since users and providers are in different collections, 
+    // a production app might use a central 'profiles' collection or
+    // check which one the user belongs to first.
+    return FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
-        .get();
-    if (userDoc.exists) return userDoc;
-
-    return await FirebaseFirestore.instance
-        .collection('service_providers')
-        .doc(uid)
-        .get();
+        .snapshots();
   }
 
   Widget _buildStatItem(String label, String value) {

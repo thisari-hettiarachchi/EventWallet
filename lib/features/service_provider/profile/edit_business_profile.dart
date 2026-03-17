@@ -93,6 +93,44 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
     }
   }
 
+  Future<void> _deleteImage() async {
+    if (_profileImageUrl.isEmpty && _imageFile == null) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        if (_profileImageUrl.isNotEmpty) {
+          await _profileImageStorageService.deleteProfileImage(_profileImageUrl);
+        }
+
+        await FirebaseFirestore.instance
+            .collection('service_providers')
+            .doc(user.uid)
+            .update({'imageUrl': ''});
+
+        setState(() {
+          _profileImageUrl = '';
+          _imageFile = null;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Business image removed')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error removing image: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -104,6 +142,10 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
         String imageUrl = _profileImageUrl;
 
         if (_imageFile != null) {
+          if (_profileImageUrl.isNotEmpty) {
+            await _profileImageStorageService.deleteProfileImage(_profileImageUrl);
+          }
+
           final pickedImage = XFile(_imageFile!.path);
           imageUrl = await _profileImageStorageService.uploadProfileImage(
             uid: user.uid,
@@ -198,77 +240,87 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Center(
-                          child: Stack(
+                          child: Column(
                             children: [
-                              GestureDetector(
-                                onTap: _pickImage,
-                                child: Container(
-                                  width: 120.w,
-                                  height: 120.w,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.grey[200],
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 4.w,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(
-                                          alpha: 0.1,
+                              Stack(
+                                children: [
+                                  GestureDetector(
+                                    onTap: _pickImage,
+                                    child: Container(
+                                      width: 120.w,
+                                      height: 120.w,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.grey[200],
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 4.w,
                                         ),
-                                        blurRadius: 10.r,
-                                        offset: Offset(0, 5.h),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(
+                                              alpha: 0.1,
+                                            ),
+                                            blurRadius: 10.r,
+                                            offset: Offset(0, 5.h),
+                                          ),
+                                        ],
+                                        image: _imageFile != null
+                                            ? DecorationImage(
+                                                image: FileImage(_imageFile!),
+                                                fit: BoxFit.cover,
+                                              )
+                                            : (_profileImageUrl.isNotEmpty
+                                                  ? DecorationImage(
+                                                      image: NetworkImage(
+                                                        _profileImageUrl,
+                                                      ),
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : null),
                                       ),
-                                    ],
-                                    image: _imageFile != null
-                                        ? DecorationImage(
-                                            image: FileImage(_imageFile!),
-                                            fit: BoxFit.cover,
-                                          )
-                                        : (_profileImageUrl.isNotEmpty
-                                              ? DecorationImage(
-                                                  image: NetworkImage(
-                                                    _profileImageUrl,
-                                                  ),
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : null),
-                                  ),
-                                  child:
-                                      _imageFile == null &&
-                                          _profileImageUrl.isEmpty
-                                      ? Icon(
-                                          Icons.business,
-                                          size: 60.sp,
-                                          color: AppColors.primaryGreen,
-                                        )
-                                      : null,
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: GestureDetector(
-                                  onTap: _pickImage,
-                                  child: Container(
-                                    padding: EdgeInsets.all(8.r),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primaryBlue,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 3.w,
-                                      ),
-                                    ),
-                                    child: Icon(
-                                      Icons.camera_alt,
-                                      size: 20.sp,
-                                      color: Colors.white,
+                                      child:
+                                          _imageFile == null &&
+                                              _profileImageUrl.isEmpty
+                                          ? Icon(
+                                              Icons.business,
+                                              size: 60.sp,
+                                              color: AppColors.primaryGreen,
+                                            )
+                                          : null,
                                     ),
                                   ),
-                                ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: GestureDetector(
+                                      onTap: _pickImage,
+                                      child: Container(
+                                        padding: EdgeInsets.all(8.r),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primaryBlue,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 3.w,
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Icons.camera_alt,
+                                          size: 20.sp,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
+                              if (_profileImageUrl.isNotEmpty || _imageFile != null)
+                                TextButton.icon(
+                                  onPressed: _isLoading ? null : _deleteImage,
+                                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                  label: const Text('Remove Photo', style: TextStyle(color: Colors.red)),
+                                ),
                             ],
                           ),
                         ),

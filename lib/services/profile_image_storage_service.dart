@@ -64,6 +64,32 @@ class ProfileImageStorageService {
     throw Exception('Supabase upload failed for an unknown reason.');
   }
 
+  Future<void> deleteProfileImage(String imageUrl) async {
+    if (imageUrl.isEmpty) return;
+
+    try {
+      final uri = Uri.parse(imageUrl);
+      final pathSegments = uri.pathSegments;
+      
+      // Supabase public URL structure: /storage/v1/object/public/bucket-name/file-path
+      // We need the bucket-name and the file-path (everything after bucket-name)
+      
+      final publicIndex = pathSegments.indexOf('public');
+      if (publicIndex == -1 || pathSegments.length <= publicIndex + 2) {
+        return;
+      }
+
+      final bucket = pathSegments[publicIndex + 1];
+      final filePath = pathSegments.sublist(publicIndex + 2).join('/');
+
+      await _client.storage.from(bucket).remove([filePath]);
+    } catch (e) {
+      // If deletion fails, we don't want to block the rest of the flow, 
+      // but you might want to log it.
+      print('Error deleting image: $e');
+    }
+  }
+
   String _safeExtension(String path) {
     final lastDot = path.lastIndexOf('.');
     if (lastDot == -1 || lastDot == path.length - 1) {
