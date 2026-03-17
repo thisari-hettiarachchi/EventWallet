@@ -48,7 +48,6 @@ class _ServiceProviderBookingsPageState
     String status, {
     String? statusReason,
     String? cancelledBy,
-    Map<String, dynamic>? bookingData,
   }) async {
     final normalizedStatus = BookingStatuses.normalize(status);
 
@@ -73,6 +72,8 @@ class _ServiceProviderBookingsPageState
       updateData['cancelledAt'] = FieldValue.delete();
     }
 
+    var shouldCleanupLegacyExpense = false;
+
     try {
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final bookingRef =
@@ -86,54 +87,82 @@ class _ServiceProviderBookingsPageState
         final eventId = data['eventId']?.toString();
         final amount = bookingAmountFrom(data['amount']);
 
+        // Fetch event data BEFORE any updates to satisfy transaction requirements
+        DocumentSnapshot? eventSnap;
+        if (eventId != null && eventId.isNotEmpty) {
+          eventSnap = await transaction.get(
+            FirebaseFirestore.instance.collection('events').doc(eventId),
+          );
+        }
+
         // Update booking status
         transaction.update(bookingRef, updateData);
 
-        // Update event budget if status changed to/from 'accepted'
-        if (eventId != null && eventId.isNotEmpty && oldStatus != normalizedStatus) {
-          final eventRef =
-              FirebaseFirestore.instance.collection('events').doc(eventId);
-          final eventSnap = await transaction.get(eventRef);
+        // Update event budget if status changed
+        if (eventSnap != null && eventSnap.exists && oldStatus != normalizedStatus) {
+          final eventData = eventSnap.data() as Map<String, dynamic>?;
+          final spentValue = eventData?['spent'];
+          final currentSpent = spentValue is num
+              ? spentValue.toDouble()
+              : double.tryParse(spentValue?.toString() ?? '') ?? 0.0;
 
-          if (eventSnap.exists) {
-            double currentSpent =
-                (eventSnap.data()?['spent'] ?? 0).toDouble();
+          // Define which statuses count towards the budget
+          final bool wasActive = oldStatus == BookingStatuses.accepted || 
+                               oldStatus == BookingStatuses.completed;
+          final bool isNowActive = normalizedStatus == BookingStatuses.accepted || 
+                                 normalizedStatus == BookingStatuses.completed;
 
-            if (normalizedStatus == BookingStatuses.accepted) {
-              // Add to budget
-              transaction.update(eventRef, {'spent': currentSpent + amount});
+          if (isNowActive && !wasActive) {
+            // Add to budget
+            transaction.update(eventSnap.reference, {'spent': currentSpent + amount});
 
-              // Add to expenses collection
-              final expenseRef =
-                  FirebaseFirestore.instance.collection('expenses').doc();
-              transaction.set(expenseRef, {
-                'userId': data['userId'],
-                'title': '${data['providerName']} - ${bookingPackageNameFrom(data)}',
-                'amount': amount,
-                'category': data['providerType'] ?? 'Service',
-                'eventId': eventId,
-                'bookingId': bookingId,
-                'timestamp': FieldValue.serverTimestamp(),
-              });
-            } else if (oldStatus == BookingStatuses.accepted) {
-              // Remove from budget if it was previously accepted
-              transaction.update(eventRef, {
-                'spent': (currentSpent - amount).clamp(0.0, double.infinity),
-              });
+            // Keep one canonical expense doc per booking
+            final expenseRef = FirebaseFirestore.instance
+                .collection('expenses')
+                .doc(bookingId);
+            transaction.set(expenseRef, {
+              'userId': data['userId'],
+              'title': '${data['providerName']} - ${bookingPackageNameFrom(data)}',
+              'amount': amount,
+              'category': data['providerType'] ?? 'Service',
+              'eventId': eventId,
+              'bookingId': bookingId,
+              'timestamp': FieldValue.serverTimestamp(),
+            });
+          } else if (!isNowActive && wasActive) {
+            // Remove from budget
+            transaction.update(eventSnap.reference, {
+              'spent': (currentSpent - amount).clamp(0.0, double.infinity),
+            });
 
-              // Find and remove the corresponding expense
-              final expensesQuery = await FirebaseFirestore.instance
-                  .collection('expenses')
-                  .where('bookingId', isEqualTo: bookingId)
-                  .get();
-
-              for (var doc in expensesQuery.docs) {
-                transaction.delete(doc.reference);
-              }
-            }
+            // Remove canonical expense doc
+            final expenseRef = FirebaseFirestore.instance
+                .collection('expenses')
+                .doc(bookingId);
+            transaction.delete(expenseRef);
+            shouldCleanupLegacyExpense = true;
           }
         }
       });
+
+      if (shouldCleanupLegacyExpense) {
+        final legacyExpenses = await FirebaseFirestore.instance
+            .collection('expenses')
+            .where('bookingId', isEqualTo: bookingId)
+            .get();
+
+        final cleanupBatch = FirebaseFirestore.instance.batch();
+        var deleteCount = 0;
+        for (final doc in legacyExpenses.docs) {
+          if (doc.id != bookingId) {
+            cleanupBatch.delete(doc.reference);
+            deleteCount++;
+          }
+        }
+        if (deleteCount > 0) {
+          await cleanupBatch.commit();
+        }
+      }
 
       await ChatService().syncThreadMetadataForBooking(bookingId);
 

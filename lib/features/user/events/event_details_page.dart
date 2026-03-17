@@ -148,6 +148,93 @@ class _EventDetailsPageState extends State<EventDetailsPage>
     }
   }
 
+  Future<void> _cancelBooking(String bookingId, Map<String, dynamic> data) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        title: Text('Cancel Booking', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp)),
+        content: Text(
+          'Are you sure you want to cancel this service booking? This will remove the expense from your budget.',
+          style: TextStyle(fontSize: 14.sp),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Keep it', style: TextStyle(color: Colors.grey.shade600)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+            ),
+            child: const Text('Yes, Cancel', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      // Find expenses related to this booking first
+      final expensesQuery = await FirebaseFirestore.instance
+          .collection('expenses')
+          .where('bookingId', isEqualTo: bookingId)
+          .get();
+
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final bookingRef = FirebaseFirestore.instance.collection('bookings').doc(bookingId);
+        final bookingSnap = await transaction.get(bookingRef);
+
+        if (!bookingSnap.exists) return;
+
+        final bData = bookingSnap.data() as Map<String, dynamic>;
+        final oldStatus = BookingStatuses.normalize(bData['status']);
+        final amount = bookingAmountFrom(bData['amount']);
+
+        // Update status to rejected (cancelled)
+        transaction.update(bookingRef, {
+          'status': BookingStatuses.rejected,
+          'statusReason': 'cancelled_by_user',
+          'cancelledBy': 'user',
+          'cancelledAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+
+        // If it was accepted, revert budget and remove expense
+        if (oldStatus == BookingStatuses.accepted) {
+          final eventRef = FirebaseFirestore.instance.collection('events').doc(widget.eventId);
+          final eventSnap = await transaction.get(eventRef);
+
+          if (eventSnap.exists) {
+            double currentSpent = (eventSnap.data()?['spent'] ?? 0).toDouble();
+            transaction.update(eventRef, {
+              'spent': (currentSpent - amount).clamp(0.0, double.infinity),
+            });
+          }
+
+          for (var doc in expensesQuery.docs) {
+            transaction.delete(doc.reference);
+          }
+        }
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Booking cancelled successfully'), backgroundColor: AppColors.success),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to cancel: $e'), backgroundColor: AppColors.error),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<DocumentSnapshot>(
@@ -860,6 +947,10 @@ class _EventDetailsPageState extends State<EventDetailsPage>
             final isAccepted =
                 BookingStatuses.normalize(status) == BookingStatuses.accepted;
 
+            // Check if booking is within 2 days for removal
+            final createdAt = bookingDateFrom(data['createdAt']) ?? DateTime.now();
+            final canRemove = DateTime.now().difference(createdAt).inHours <= 48;
+
             return Container(
               margin: EdgeInsets.only(bottom: 15.h),
               padding: EdgeInsets.all(15.r),
@@ -918,21 +1009,40 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(
-                        '\$${amount.toStringAsFixed(0)}',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryGreen,
-                        ),
-                      ),
-                      Text(
-                        isAccepted ? 'Confirmed' : 'Pending',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w600,
-                          color: isAccepted ? AppColors.primaryGreen : Colors.orange,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                '\$${amount.toStringAsFixed(0)}',
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryGreen,
+                                ),
+                              ),
+                              Text(
+                                isAccepted ? 'Confirmed' : 'Pending',
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: isAccepted ? AppColors.primaryGreen : Colors.orange,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (canRemove) ...[
+                            SizedBox(width: 15.w),
+                            IconButton(
+                              onPressed: () => _cancelBooking(doc.id, data),
+                              icon: Icon(Icons.delete_outline, color: Colors.red.shade400, size: 24.sp),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
+                        ],
                       ),
                     ],
                   ),

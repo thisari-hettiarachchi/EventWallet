@@ -5,6 +5,17 @@ import 'booking_service.dart';
 
 const String bookingChatsCollection = 'booking_chats';
 
+Map<String, String>? parseInquiryBookingId(String bookingId) {
+  if (!bookingId.startsWith('inquiry_')) return null;
+  final raw = bookingId.substring('inquiry_'.length);
+  final separatorIndex = raw.lastIndexOf('_');
+  if (separatorIndex <= 0 || separatorIndex >= raw.length - 1) return null;
+  return {
+    'userId': raw.substring(0, separatorIndex),
+    'providerId': raw.substring(separatorIndex + 1),
+  };
+}
+
 DateTime? bookingChatDateFrom(dynamic value) {
   if (value is Timestamp) return value.toDate();
   if (value is DateTime) return value;
@@ -39,6 +50,13 @@ String bookingChatLastMessagePreviewFrom(Map<String, dynamic> data) {
   final lastMessage = data['lastMessage']?.toString().trim() ?? '';
   if (lastMessage.isNotEmpty) return lastMessage;
   return 'No messages yet. Start the conversation.';
+}
+
+bool bookingChatHasMessagesFrom(Map<String, dynamic> data) {
+  final hasMessages = data['hasMessages'];
+  if (hasMessages is bool) return hasMessages;
+  final lastMessage = data['lastMessage']?.toString().trim() ?? '';
+  return lastMessage.isNotEmpty;
 }
 
 String bookingChatCounterpartNameFrom(
@@ -114,15 +132,31 @@ class ChatService {
       threadRef(bookingId).collection('messages');
 
   Stream<QuerySnapshot<Map<String, dynamic>>> watchThreadsForUser(
-    String userId,
-  ) {
-    return _threads.where('userId', isEqualTo: userId).snapshots();
+    String userId, {
+    bool messagedOnly = false,
+  }) {
+    Query<Map<String, dynamic>> query = _threads.where(
+      'userId',
+      isEqualTo: userId,
+    );
+    if (messagedOnly) {
+      query = query.where('hasMessages', isEqualTo: true);
+    }
+    return query.snapshots();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> watchThreadsForProvider(
-    String providerId,
-  ) {
-    return _threads.where('providerId', isEqualTo: providerId).snapshots();
+    String providerId, {
+    bool messagedOnly = false,
+  }) {
+    Query<Map<String, dynamic>> query = _threads.where(
+      'providerId',
+      isEqualTo: providerId,
+    );
+    if (messagedOnly) {
+      query = query.where('hasMessages', isEqualTo: true);
+    }
+    return query.snapshots();
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> watchThread(String bookingId) {
@@ -135,23 +169,71 @@ class ChatService {
     ).orderBy('createdAt', descending: true).snapshots();
   }
 
+  bool _looksLikeThreadMetadata(Map<String, dynamic>? data) {
+    if (data == null) return false;
+    final userId = data['userId']?.toString().trim() ?? '';
+    final providerId = data['providerId']?.toString().trim() ?? '';
+    return userId.isNotEmpty && providerId.isNotEmpty;
+  }
+
+  Future<Map<String, dynamic>?> _resolveThreadMetadata(
+    String bookingId, {
+    Map<String, dynamic>? bookingData,
+  }) async {
+    if (_looksLikeThreadMetadata(bookingData)) {
+      return buildBookingChatThreadMetadata(
+        bookingId: bookingId,
+        bookingData: bookingData!,
+      );
+    }
+
+    Map<String, dynamic>? resolvedBooking = bookingData;
+    if (!_looksLikeThreadMetadata(resolvedBooking)) {
+      final bookingSnapshot = await _firestore
+          .collection('bookings')
+          .doc(bookingId)
+          .get();
+      resolvedBooking = bookingSnapshot.data();
+    }
+
+    if (_looksLikeThreadMetadata(resolvedBooking)) {
+      return buildBookingChatThreadMetadata(
+        bookingId: bookingId,
+        bookingData: resolvedBooking!,
+      );
+    }
+
+    final inquiryData = parseInquiryBookingId(bookingId);
+    if (inquiryData == null) return null;
+
+    return {
+      'bookingId': bookingId,
+      'userId': inquiryData['userId']!,
+      'providerId': inquiryData['providerId']!,
+      'clientName': bookingData?['clientName']?.toString() ?? '',
+      'providerName': bookingData?['providerName']?.toString() ?? '',
+      'eventName': bookingData?['eventName']?.toString() ?? 'Inquiry',
+      'eventType': bookingData?['eventType']?.toString() ?? 'Inquiry',
+      'eventDate': bookingData?['eventDate'],
+      'location': bookingData?['location']?.toString() ?? '',
+      'selectedPackage': bookingData?['selectedPackage']?.toString() ?? '',
+      'bookingStatus': BookingStatuses.inquiry,
+    };
+  }
+
   Future<void> ensureThreadExistsForBooking({
     required String bookingId,
     Map<String, dynamic>? bookingData,
   }) async {
     try {
-      final resolvedBooking =
-          bookingData ??
-          (await _firestore.collection('bookings').doc(bookingId).get()).data();
-
-      if (resolvedBooking == null) return;
-
-      final metadata = buildBookingChatThreadMetadata(
-        bookingId: bookingId,
-        bookingData: resolvedBooking,
+      final metadata = await _resolveThreadMetadata(
+        bookingId,
+        bookingData: bookingData,
       );
-      final userId = metadata['userId']?.toString() ?? '';
-      final providerId = metadata['providerId']?.toString() ?? '';
+      if (metadata == null) return;
+
+      final userId = metadata['userId']?.toString().trim() ?? '';
+      final providerId = metadata['providerId']?.toString().trim() ?? '';
 
       if (userId.isEmpty || providerId.isEmpty) return;
 
@@ -161,6 +243,7 @@ class ChatService {
         if (!snapshot.exists) {
           transaction.set(threadRef(bookingId), {
             ...metadata,
+            'hasMessages': false,
             'lastMessage': '',
             'lastMessageSenderId': '',
             'lastMessageSenderName': '',
@@ -179,6 +262,7 @@ class ChatService {
 
         transaction.set(threadRef(bookingId), {
           ...metadata,
+          'hasMessages': bookingChatHasMessagesFrom(existingData),
           'unreadCounts': unreadCounts,
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
@@ -247,6 +331,7 @@ class ChatService {
       final batch = _firestore.batch();
       batch.set(messageRef, messagePayload);
       batch.update(threadRef(bookingId), {
+        'hasMessages': true,
         'lastMessage': trimmed,
         'lastMessageAt': FieldValue.serverTimestamp(),
         'lastMessageSenderId': senderId,
@@ -259,30 +344,21 @@ class ChatService {
     } catch (e) {
       debugPrint('ChatService: sendMessage fallback triggered: $e');
 
-      final resolvedBooking =
-          bookingData ??
-          (await _firestore.collection('bookings').doc(bookingId).get()).data();
-
-      final metadata = resolvedBooking != null
-          ? buildBookingChatThreadMetadata(
-              bookingId: bookingId,
-              bookingData: resolvedBooking,
-            )
-          : <String, dynamic>{};
+      final metadata =
+          await _resolveThreadMetadata(bookingId, bookingData: bookingData) ??
+          <String, dynamic>{};
 
       final batch = _firestore.batch();
       batch.set(messageRef, messagePayload);
       batch.set(threadRef(bookingId), {
-        if (metadata.isNotEmpty) ...metadata,
+        ...metadata,
+        'hasMessages': true,
         'lastMessage': trimmed,
         'lastMessageAt': FieldValue.serverTimestamp(),
         'lastMessageSenderId': senderId,
         'lastMessageSenderName': senderName,
         'updatedAt': FieldValue.serverTimestamp(),
-        'unreadCounts': {
-          recipientId: FieldValue.increment(1),
-          senderId: 0,
-        },
+        'unreadCounts': {recipientId: FieldValue.increment(1), senderId: 0},
       }, SetOptions(merge: true));
       await batch.commit();
     }

@@ -39,7 +39,7 @@ class UserBookingStatusPage extends StatelessWidget {
           child: SafeArea(
             child: Column(
               children: [
-                _buildHeader(context),
+                _buildHeader(context, user.uid),
                 SizedBox(height: 20.h),
                 Expanded(
                   child: Container(
@@ -120,8 +120,7 @@ class UserBookingStatusPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+  Widget _buildHeader(BuildContext context, String userId) {
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 0),
       child: Row(
@@ -166,91 +165,9 @@ class UserBookingStatusPage extends StatelessWidget {
               ],
             ),
           ),
-          if (user != null)
-            _BookingInboxButton(userId: user.uid, isProviderView: false),
+          _BookingInboxButton(userId: userId, isProviderView: false),
         ],
       ),
-    );
-  }
-}
-
-class _BookingInboxButton extends StatelessWidget {
-  const _BookingInboxButton({
-    required this.userId,
-    required this.isProviderView,
-  });
-
-  final String userId;
-  final bool isProviderView;
-
-  @override
-  Widget build(BuildContext context) {
-    final chatService = ChatService();
-
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: isProviderView
-          ? chatService.watchThreadsForProvider(userId)
-          : chatService.watchThreadsForUser(userId),
-      builder: (context, snapshot) {
-        final unreadCount = (snapshot.data?.docs ?? const []).fold<int>(
-          0,
-          (total, doc) =>
-              total + bookingChatUnreadCountFrom(doc.data(), userId),
-        );
-
-        return Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(14.r),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-              ),
-              child: IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          BookingChatListPage(isProviderView: isProviderView),
-                    ),
-                  );
-                },
-                icon: Icon(
-                  Icons.chat_bubble_outline,
-                  color: Colors.white,
-                  size: 22.sp,
-                ),
-                tooltip: 'Messages',
-              ),
-            ),
-            if (unreadCount > 0)
-              Positioned(
-                right: -2.w,
-                top: -4.h,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFF3D00),
-                    borderRadius: BorderRadius.circular(999.r),
-                    border: Border.all(color: Colors.white, width: 2.w),
-                  ),
-                  constraints: BoxConstraints(minWidth: 20.w, minHeight: 20.h),
-                  child: Text(
-                    unreadCount > 99 ? '99+' : '$unreadCount',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
     );
   }
 }
@@ -608,6 +525,7 @@ class _BookingCard extends StatelessWidget {
             'cancelledAt': FieldValue.serverTimestamp(),
             'updatedAt': FieldValue.serverTimestamp(),
           });
+
       await ChatService().syncThreadMetadataForBooking(bookingId);
 
       if (!context.mounted) return;
@@ -690,6 +608,87 @@ class _BookingCard extends StatelessWidget {
       'Dec',
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+}
+
+class _BookingInboxButton extends StatelessWidget {
+  const _BookingInboxButton({
+    required this.userId,
+    required this.isProviderView,
+  });
+
+  final String userId;
+  final bool isProviderView;
+
+  @override
+  Widget build(BuildContext context) {
+    final chatService = ChatService();
+
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: isProviderView
+          ? chatService.watchThreadsForProvider(userId)
+          : chatService.watchThreadsForUser(userId),
+      builder: (context, snapshot) {
+        final unreadCount = (snapshot.data?.docs ?? const []).fold<int>(
+          0,
+          (total, doc) =>
+              total + bookingChatUnreadCountFrom(doc.data(), userId),
+        );
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(14.r),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+              ),
+              child: IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          BookingChatListPage(isProviderView: isProviderView),
+                    ),
+                  );
+                },
+                icon: Icon(
+                  Icons.chat_bubble_outline,
+                  color: Colors.white,
+                  size: 22.sp,
+                ),
+                tooltip: 'Messages',
+              ),
+            ),
+            if (unreadCount > 0)
+              Positioned(
+                right: -2.w,
+                top: -4.h,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF3D00),
+                    borderRadius: BorderRadius.circular(999.r),
+                    border: Border.all(color: Colors.white, width: 2.w),
+                  ),
+                  constraints: BoxConstraints(minWidth: 20.w, minHeight: 20.h),
+                  child: Text(
+                    unreadCount > 99 ? '99+' : '$unreadCount',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
   }
 }
 

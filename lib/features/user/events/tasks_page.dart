@@ -14,6 +14,13 @@ class TasksPage extends StatefulWidget {
 
 class _TasksPageState extends State<TasksPage> {
   final _taskController = TextEditingController();
+  bool _isAdding = false;
+
+  @override
+  void dispose() {
+    _taskController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +49,13 @@ class _TasksPageState extends State<TasksPage> {
                         .orderBy('createdAt', descending: true)
                         .snapshots(),
                     builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Error: ${snapshot.error}',
+                              style: TextStyle(color: Colors.red, fontSize: 14.sp)),
+                        );
+                      }
+
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }
@@ -109,7 +123,7 @@ class _TasksPageState extends State<TasksPage> {
           Icon(
             Icons.task_alt,
             size: 80.sp,
-            color: Colors.grey.withValues(alpha: 0.4),
+            color: Colors.grey.withOpacity(0.4),
           ),
           SizedBox(height: 16.h),
           Text(
@@ -149,9 +163,7 @@ class _TasksPageState extends State<TasksPage> {
             fontSize: 16.sp,
             fontWeight: FontWeight.w600,
             color: AppColors.textDark,
-            decoration: isDone
-                ? TextDecoration.lineThrough
-                : TextDecoration.none,
+            decoration: isDone ? TextDecoration.lineThrough : TextDecoration.none,
           ),
         ),
         leading: Transform.scale(
@@ -159,6 +171,7 @@ class _TasksPageState extends State<TasksPage> {
           child: Checkbox(
             value: isDone,
             onChanged: (value) {
+              if (value == null) return;
               FirebaseFirestore.instance
                   .collection('events')
                   .doc(widget.eventId)
@@ -185,50 +198,82 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   void _showAddTaskDialog() {
+    _taskController.clear();
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(
-            'Add a new task',
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-          ),
-          content: TextField(
-            controller: _taskController,
-            autofocus: true,
-            style: TextStyle(fontSize: 16.sp),
-            decoration: InputDecoration(
-              hintText: 'Task title',
-              hintStyle: TextStyle(fontSize: 14.sp),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (_taskController.text.isNotEmpty) {
-                  FirebaseFirestore.instance
-                      .collection('events')
-                      .doc(widget.eventId)
-                      .collection('tasks')
-                      .add({
-                        'title': _taskController.text,
-                        'isDone': false,
-                        'createdAt': FieldValue.serverTimestamp(),
-                      });
-                  _taskController.clear();
-                  Navigator.pop(context);
-                }
-              },
-              child: Text(
-                'Add',
-                style: TextStyle(fontSize: 14.sp, color: Colors.white),
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text(
+                'Add a new task',
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
               ),
-            ),
-          ],
+              content: TextField(
+                controller: _taskController,
+                autofocus: true,
+                style: TextStyle(fontSize: 16.sp),
+                decoration: InputDecoration(
+                  hintText: 'Task title',
+                  hintStyle: TextStyle(fontSize: 14.sp),
+                  errorText: _taskController.text.isEmpty && _isAdding ? 'Task cannot be empty' : null,
+                ),
+                onChanged: (_) => setDialogState(() {}),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    _taskController.clear();
+                    Navigator.pop(context);
+                  },
+                  child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
+                ),
+                ElevatedButton(
+                  onPressed: _isAdding
+                      ? null
+                      : () async {
+                          if (_taskController.text.trim().isNotEmpty) {
+                            setDialogState(() => _isAdding = true);
+                            try {
+                              await FirebaseFirestore.instance
+                                  .collection('events')
+                                  .doc(widget.eventId)
+                                  .collection('tasks')
+                                  .add({
+                                'title': _taskController.text.trim(),
+                                'isDone': false,
+                                'createdAt': FieldValue.serverTimestamp(),
+                              });
+                              _taskController.clear();
+                              if (mounted) Navigator.pop(context);
+                            } catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Failed to add task: $e')),
+                                );
+                              }
+                            } finally {
+                              if (mounted) setDialogState(() => _isAdding = false);
+                            }
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryBlue,
+                  ),
+                  child: _isAdding
+                      ? SizedBox(
+                          height: 18.sp,
+                          width: 18.sp,
+                          child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : Text(
+                          'Add',
+                          style: TextStyle(fontSize: 14.sp, color: Colors.white),
+                        ),
+                ),
+              ],
+            );
+          },
         );
       },
     );

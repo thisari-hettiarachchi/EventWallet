@@ -64,6 +64,28 @@ void main() {
       );
     });
 
+    test(
+      'resolves message visibility from hasMessages and legacy lastMessage',
+      () {
+        expect(
+          bookingChatHasMessagesFrom({'hasMessages': true, 'lastMessage': ''}),
+          isTrue,
+        );
+        expect(
+          bookingChatHasMessagesFrom({
+            'hasMessages': false,
+            'lastMessage': 'Hi',
+          }),
+          isFalse,
+        );
+        expect(
+          bookingChatHasMessagesFrom({'lastMessage': '  hello there  '}),
+          isTrue,
+        );
+        expect(bookingChatHasMessagesFrom({}), isFalse);
+      },
+    );
+
     test('picks the latest available timestamp for thread sorting', () {
       final createdAt = Timestamp.fromDate(DateTime(2026, 1, 1, 8));
       final updatedAt = Timestamp.fromDate(DateTime(2026, 1, 2, 8));

@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/colors.dart';
 import '../../../services/booking_service.dart';
+import '../../../services/chat_service.dart';
 import '../../chat/booking_chat_thread_page.dart';
 import 'event_selection_bottom_sheet.dart';
 
@@ -308,9 +309,9 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   Widget _buildPackagesList(
-    String displayCategory,
-    Map<String, dynamic> providerData,
-  ) {
+      String displayCategory,
+      Map<String, dynamic> providerData,
+      ) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('service_providers')
@@ -639,11 +640,11 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   Widget _buildBottomAction(
-    BuildContext context,
-    String providerName,
-    String buttonText,
-    Map<String, dynamic> providerData,
-  ) {
+      BuildContext context,
+      String providerName,
+      String buttonText,
+      Map<String, dynamic> providerData,
+      ) {
     return Container(
       padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 20.h),
       decoration: BoxDecoration(
@@ -659,7 +660,7 @@ class ProviderProfilePage extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => _handleMessage(context, providerName, providerData),
+            onTap: () => _handleMessage(context),
             child: Container(
               padding: EdgeInsets.all(16.r),
               decoration: BoxDecoration(
@@ -700,40 +701,113 @@ class ProviderProfilePage extends StatelessWidget {
     );
   }
 
-  void _handleMessage(
-    BuildContext context,
-    String providerName,
-    Map<String, dynamic> providerData,
-  ) {
+  Future<void> _handleMessage(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final inquiryData = {
-      'userId': user.uid,
-      'providerId': providerId,
-      'clientName': user.displayName ?? user.email?.split('@').first ?? 'Client',
-      'providerName': providerName,
-      'eventName': 'Service Inquiry',
-      'status': BookingStatuses.inquiry,
-      'location': providerData['location'] ?? 'Not specified',
-    };
+    final messageTarget = await _resolveMessageTargetForProvider(
+      userId: user.uid,
+      providerId: providerId,
+    );
+
+    if (!context.mounted) return;
+
+    if (messageTarget == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Send a booking request first to start messaging.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    final bookingId = messageTarget.bookingId;
+    final bookingData = messageTarget.initialThreadData;
+
+    try {
+      await ChatService().ensureThreadExistsForBooking(
+        bookingId: bookingId,
+        bookingData: bookingData,
+      );
+    } catch (_) {}
+
+    if (!context.mounted) return;
 
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => BookingChatThreadPage(
-          bookingId: 'inquiry_${user.uid}_$providerId',
-          initialThreadData: inquiryData,
+          bookingId: bookingId,
+          initialThreadData: bookingData,
         ),
       ),
     );
   }
 
+  Future<_MessageTarget?> _resolveMessageTargetForProvider({
+    required String userId,
+    required String providerId,
+  }) async {
+    final threadSnapshot = await FirebaseFirestore.instance
+        .collection(bookingChatsCollection)
+        .where('userId', isEqualTo: userId)
+        .where('providerId', isEqualTo: providerId)
+        .where('hasMessages', isEqualTo: true)
+        .get();
+
+    final activeThreads = threadSnapshot.docs.toList()
+      ..sort(
+        (a, b) => bookingChatSortDateFrom(
+          b.data(),
+        ).compareTo(bookingChatSortDateFrom(a.data())),
+      );
+
+    if (activeThreads.isNotEmpty) {
+      final thread = activeThreads.first;
+      return _MessageTarget(
+        bookingId: thread.id,
+        initialThreadData: thread.data(),
+      );
+    }
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('bookings')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    final matching = snapshot.docs.where((doc) {
+      final data = doc.data();
+      return data['providerId']?.toString() == providerId;
+    }).toList();
+
+    if (matching.isEmpty) return null;
+
+    matching.sort((a, b) {
+      final aDate = _bookingActivityDate(a.data());
+      final bDate = _bookingActivityDate(b.data());
+      return bDate.compareTo(aDate);
+    });
+
+    final booking = matching.first;
+    return _MessageTarget(
+      bookingId: booking.id,
+      initialThreadData: booking.data(),
+    );
+  }
+
+  DateTime _bookingActivityDate(Map<String, dynamic> data) {
+    return bookingDateFrom(data['updatedAt']) ??
+        bookingDateFrom(data['createdAt']) ??
+        bookingEventDateFromMap(data) ??
+        DateTime.fromMillisecondsSinceEpoch(0);
+  }
+
   Future<void> _handleBooking(
-    BuildContext context,
-    String providerName,
-    Map<String, dynamic> providerData,
-  ) async {
+      BuildContext context,
+      String providerName,
+      Map<String, dynamic> providerData,
+      ) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -781,7 +855,7 @@ class ProviderProfilePage extends StatelessWidget {
     if (!context.mounted || selection == null) return;
 
     final selectedEventId =
-        (isEventSaving && eventId != null) ? eventId! : selection.event.id;
+    (isEventSaving && eventId != null) ? eventId! : selection.event.id;
 
     final payload = buildBookingPayload(
       userId: user.uid,
@@ -799,7 +873,7 @@ class ProviderProfilePage extends StatelessWidget {
       status: BookingStatuses.pending,
       providerType: effectiveCategory,
       providerLocation:
-          providerData['location']?.toString() ?? selection.event.location,
+      providerData['location']?.toString() ?? selection.event.location,
       providerData: {
         'businessName': providerData['businessName'] ?? providerName,
         'imageUrl': providerData['imageUrl'] ?? '',
@@ -851,9 +925,9 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   BookingEventOption _toBookingEventOption(
-    String id,
-    Map<String, dynamic> data,
-  ) {
+      String id,
+      Map<String, dynamic> data,
+      ) {
     final rawDate = data['date'] ?? data['eventDate'] ?? data['createdAt'];
     final eventDate = bookingDateFrom(rawDate) ?? DateTime.now();
 
@@ -868,10 +942,10 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   Future<List<BookingPackageOption>> _buildPackageOptions(
-    String providerName,
-    Map<String, dynamic> providerData,
-    String displayCategory,
-  ) async {
+      String providerName,
+      Map<String, dynamic> providerData,
+      String displayCategory,
+      ) async {
     final options = <BookingPackageOption>[];
 
     final servicesSnapshot = await FirebaseFirestore.instance
@@ -926,9 +1000,9 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   String _resolveProviderCategory(
-    Map<String, dynamic> data, {
-    required String fallback,
-  }) {
+      Map<String, dynamic> data, {
+        required String fallback,
+      }) {
     final raw = (data['category'] ?? data['providerType'] ?? data['type'] ?? '')
         .toString()
         .trim();
@@ -956,4 +1030,14 @@ class ProviderProfilePage extends StatelessWidget {
         return source[0].toUpperCase() + source.substring(1);
     }
   }
+}
+
+class _MessageTarget {
+  const _MessageTarget({
+    required this.bookingId,
+    required this.initialThreadData,
+  });
+
+  final String bookingId;
+  final Map<String, dynamic> initialThreadData;
 }
