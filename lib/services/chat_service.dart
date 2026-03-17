@@ -42,9 +42,9 @@ String bookingChatLastMessagePreviewFrom(Map<String, dynamic> data) {
 }
 
 String bookingChatCounterpartNameFrom(
-  Map<String, dynamic> data,
-  String currentUserId,
-) {
+    Map<String, dynamic> data,
+    String currentUserId,
+    ) {
   if (data['userId'] == currentUserId) {
     return firstNonEmpty([data['providerName']], fallback: 'Service Provider');
   }
@@ -52,9 +52,9 @@ String bookingChatCounterpartNameFrom(
 }
 
 String bookingChatCounterpartLabelFrom(
-  Map<String, dynamic> data,
-  String currentUserId,
-) {
+    Map<String, dynamic> data,
+    String currentUserId,
+    ) {
   return data['userId'] == currentUserId ? 'Provider' : 'Client';
 }
 
@@ -100,7 +100,7 @@ Map<String, dynamic> buildBookingChatMessagePayload({
 
 class ChatService {
   ChatService({FirebaseFirestore? firestore})
-    : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -114,14 +114,14 @@ class ChatService {
       threadRef(bookingId).collection('messages');
 
   Stream<QuerySnapshot<Map<String, dynamic>>> watchThreadsForUser(
-    String userId,
-  ) {
+      String userId,
+      ) {
     return _threads.where('userId', isEqualTo: userId).snapshots();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> watchThreadsForProvider(
-    String providerId,
-  ) {
+      String providerId,
+      ) {
     return _threads.where('providerId', isEqualTo: providerId).snapshots();
   }
 
@@ -142,7 +142,7 @@ class ChatService {
     try {
       final resolvedBooking =
           bookingData ??
-          (await _firestore.collection('bookings').doc(bookingId).get()).data();
+              (await _firestore.collection('bookings').doc(bookingId).get()).data();
 
       if (resolvedBooking == null) return;
 
@@ -200,9 +200,9 @@ class ChatService {
       final bookingSnapshot = await _firestore
           .collection('bookings')
           .where(
-            isProviderView ? 'providerId' : 'userId',
-            isEqualTo: currentUserId,
-          )
+        isProviderView ? 'providerId' : 'userId',
+        isEqualTo: currentUserId,
+      )
           .get();
 
       for (final doc in bookingSnapshot.docs) {
@@ -261,13 +261,13 @@ class ChatService {
 
       final resolvedBooking =
           bookingData ??
-          (await _firestore.collection('bookings').doc(bookingId).get()).data();
+              (await _firestore.collection('bookings').doc(bookingId).get()).data();
 
       final metadata = resolvedBooking != null
           ? buildBookingChatThreadMetadata(
-              bookingId: bookingId,
-              bookingData: resolvedBooking,
-            )
+        bookingId: bookingId,
+        bookingData: resolvedBooking,
+      )
           : <String, dynamic>{};
 
       final batch = _firestore.batch();

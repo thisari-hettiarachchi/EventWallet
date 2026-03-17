@@ -111,7 +111,7 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
       String errorMessage = 'Unable to send message: $e';
       if (e is FirebaseException && e.code == 'permission-denied') {
         errorMessage =
-            'Unable to send message: The caller does not have permission to execute the specified operation.';
+        'Unable to send message: The caller does not have permission to execute the specified operation.';
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -150,193 +150,179 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
         child: SafeArea(
           child: user == null
               ? Center(
-                  child: Text(
-                    'Please login to use chat.',
-                    style: TextStyle(fontSize: 16.sp, color: Colors.white),
-                  ),
-                )
+            child: Text(
+              'Please login to use chat.',
+              style: TextStyle(fontSize: 16.sp, color: Colors.white),
+            ),
+          )
               : StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                  stream: _chatService.watchThread(widget.bookingId),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      String errorMessage = 'Error loading thread: ${snapshot.error}';
-                      if (snapshot.error is FirebaseException &&
-                          (snapshot.error as FirebaseException).code ==
-                              'permission-denied') {
-                        errorMessage =
-                            'Error loading messages: The caller does not have permission to execute the specified operation.';
-                      }
-                      return _buildErrorState(errorMessage);
-                    }
+            stream: _chatService.watchThread(widget.bookingId),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                String errorMessage = 'Error loading thread: ${snapshot.error}';
+                if (snapshot.error is FirebaseException &&
+                    (snapshot.error as FirebaseException).code ==
+                        'permission-denied') {
+                  errorMessage =
+                  'Error loading messages: The caller does not have permission to execute the specified operation.';
+                }
+                return _buildErrorState(errorMessage);
+              }
 
-                    if (snapshot.connectionState == ConnectionState.waiting &&
-                        !snapshot.hasData &&
-                        widget.initialThreadData == null) {
-                      return const Center(
-                        child: CircularProgressIndicator(color: Colors.white),
-                      );
-                    }
+              if (snapshot.connectionState == ConnectionState.waiting &&
+                  !snapshot.hasData &&
+                  widget.initialThreadData == null) {
+                return const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                );
+              }
 
-                    final threadData =
-                        snapshot.data?.data() ?? widget.initialThreadData;
-                    if (threadData == null) {
-                      return _buildMissingThreadState(context);
-                    }
+              final threadData =
+                  snapshot.data?.data() ?? widget.initialThreadData;
+              if (threadData == null) {
+                return _buildMissingThreadState(context);
+              }
 
-                    return Column(
-                      children: [
-                        _buildHeader(context, user.uid, threadData),
-                        SizedBox(height: 16.h),
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.background,
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(35.r),
+              return Column(
+                children: [
+                  _buildHeader(context, user.uid, threadData),
+                  SizedBox(height: 16.h),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(35.r),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          _buildBookingSummary(threadData),
+                          Expanded(
+                            child: StreamBuilder<
+                                QuerySnapshot<Map<String, dynamic>>>(
+                              stream: _chatService.watchMessages(
+                                widget.bookingId,
                               ),
-                            ),
-                            child: Column(
-                              children: [
-                                _buildBookingSummary(threadData),
-                                Expanded(
-                                  child: StreamBuilder<
-                                      QuerySnapshot<Map<String, dynamic>>>(
-                                    stream: _chatService.watchMessages(
-                                      widget.bookingId,
-                                    ),
-                                    builder: (context, messageSnapshot) {
-                                      if (messageSnapshot.hasError) {
-                                        String errorMessage =
-                                            'Error loading messages: ${messageSnapshot.error}';
-                                        if (messageSnapshot.error
-                                            is FirebaseException &&
-                                            (messageSnapshot.error
-                                                        as FirebaseException)
-                                                    .code ==
-                                                'permission-denied') {
-                                          errorMessage =
-                                              'Error loading messages: The caller does not have permission to execute the specified operation.';
-                                        }
-                                        return Center(
-                                          child: Padding(
-                                            padding: EdgeInsets.all(20.r),
-                                            child: Text(
-                                              errorMessage,
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                color: AppColors.error,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      }
-
-                                      if (messageSnapshot.connectionState ==
-                                              ConnectionState.waiting &&
-                                          !messageSnapshot.hasData) {
-                                        return const Center(
-                                          child: CircularProgressIndicator(
-                                            color: AppColors.primaryGreen,
-                                          ),
-                                        );
-                                      }
-
-                                      final messages = messageSnapshot
-                                              .data?.docs
-                                              .toList() ??
-                                          <QueryDocumentSnapshot<
-                                              Map<String, dynamic>>>[];
-
-                                      // Sort client-side: newest at bottom (ascending time)
-                                      messages.sort((a, b) {
-                                        final aData = a.data();
-                                        final bData = b.data();
-
-                                        final aDate = bookingChatDateFrom(
-                                                aData['createdAt']) ??
-                                            DateTime.now();
-                                        final bDate = bookingChatDateFrom(
-                                                bData['createdAt']) ??
-                                            DateTime.now();
-                                        return aDate.compareTo(bDate);
-                                      });
-
-                                      if (messages.isNotEmpty) {
-                                        final lastMessage =
-                                            messages.last.data();
-                                        if (lastMessage['senderId'] !=
-                                            user.uid) {
-                                          WidgetsBinding.instance
-                                              .addPostFrameCallback((_) {
-                                            _chatService.markThreadRead(
-                                              bookingId: widget.bookingId,
-                                              currentUserId: user.uid,
-                                            );
-                                          });
-                                        }
-                                        _scrollToBottom();
-                                      }
-
-                                      if (messages.isEmpty) {
-                                        return _buildEmptyMessages();
-                                      }
-
-                                      return ListView.builder(
-                                        controller: _scrollController,
-                                        padding: EdgeInsets.fromLTRB(
-                                          18.w,
-                                          12.h,
-                                          18.w,
-                                          18.h,
+                              builder: (context, messageSnapshot) {
+                                if (messageSnapshot.hasError) {
+                                  String errorMessage =
+                                      'Error loading messages: ${messageSnapshot.error}';
+                                  if (messageSnapshot.error
+                                  is FirebaseException &&
+                                      (messageSnapshot.error
+                                      as FirebaseException)
+                                          .code ==
+                                          'permission-denied') {
+                                    errorMessage =
+                                    'Error loading messages: The caller does not have permission to execute the specified operation.';
+                                  }
+                                  return Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(20.r),
+                                      child: Text(
+                                        errorMessage,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: AppColors.error,
                                         ),
-                                        itemCount: messages.length,
-                                        itemBuilder: (context, index) {
-                                          final data = messages[index].data();
-                                          final isMe =
-                                              data['senderId'] == user.uid;
-                                          return _MessageBubble(
-                                            isMe: isMe,
-                                            senderName: data['senderName']
-                                                    ?.toString() ??
-                                                'Unknown',
-                                            message:
-                                                data['text']?.toString() ?? '',
-                                            timestamp: bookingChatDateFrom(
-                                              data['createdAt'],
-                                            ),
-                                          );
-                                        },
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                if (messageSnapshot.connectionState ==
+                                    ConnectionState.waiting &&
+                                    !messageSnapshot.hasData) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      color: AppColors.primaryGreen,
+                                    ),
+                                  );
+                                }
+
+                                final messages = messageSnapshot
+                                    .data?.docs ??
+                                    <QueryDocumentSnapshot<
+                                        Map<String, dynamic>>>[];
+
+                                if (messages.isNotEmpty) {
+                                  final lastMessage =
+                                  messages.first.data();
+                                  if (lastMessage['senderId'] !=
+                                      user.uid) {
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      _chatService.markThreadRead(
+                                        bookingId: widget.bookingId,
+                                        currentUserId: user.uid,
                                       );
-                                    },
+                                    });
+                                  }
+                                  _scrollToBottom();
+                                }
+
+                                if (messages.isEmpty) {
+                                  return _buildEmptyMessages();
+                                }
+
+                                return ListView.builder(
+                                  controller: _scrollController,
+                                  reverse: true,
+                                  padding: EdgeInsets.fromLTRB(
+                                    18.w,
+                                    12.h,
+                                    18.w,
+                                    18.h,
                                   ),
-                                ),
-                                _buildComposer(threadData),
-                              ],
+                                  itemCount: messages.length,
+                                  itemBuilder: (context, index) {
+                                    final data = messages[index].data();
+                                    final isMe =
+                                        data['senderId'] == user.uid;
+                                    return _MessageBubble(
+                                      isMe: isMe,
+                                      senderName: data['senderName']
+                                          ?.toString() ??
+                                          'Unknown',
+                                      message:
+                                      data['text']?.toString() ?? '',
+                                      timestamp: bookingChatDateFrom(
+                                        data['createdAt'],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                          _buildComposer(threadData),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
   }
 
   Widget _buildHeader(
-    BuildContext context,
-    String currentUserId,
-    Map<String, dynamic> threadData,
-  ) {
+      BuildContext context,
+      String currentUserId,
+      Map<String, dynamic> threadData,
+      ) {
     final counterpartName = bookingChatCounterpartNameFrom(
       threadData,
       currentUserId,
     );
     final eventName =
-        threadData['eventName']?.toString().trim().isNotEmpty == true
-            ? threadData['eventName'].toString().trim()
-            : 'Booking Chat';
+    threadData['eventName']?.toString().trim().isNotEmpty == true
+        ? threadData['eventName'].toString().trim()
+        : 'Booking Chat';
 
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 0),
@@ -406,14 +392,14 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
             icon: Icons.inventory_2_outlined,
             label: 'Package',
             value:
-                threadData['selectedPackage']?.toString() ?? 'Custom Package',
+            threadData['selectedPackage']?.toString() ?? 'Custom Package',
             color: AppColors.primaryGreen,
           ),
           _SummaryTile(
             icon: Icons.location_on_outlined,
             label: 'Location',
             value:
-                threadData['location']?.toString() ?? 'Location not specified',
+            threadData['location']?.toString() ?? 'Location not specified',
             color: Colors.orange,
           ),
           _SummaryTile(
@@ -511,15 +497,15 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
                 ),
                 child: _isSending
                     ? SizedBox(
-                        width: 18.w,
-                        height: 18.w,
-                        child: const CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        ),
-                      )
+                  width: 18.w,
+                  height: 18.w,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Colors.white,
+                    ),
+                  ),
+                )
                     : Icon(Icons.send_rounded, size: 22.sp),
               ),
             ),
@@ -766,8 +752,8 @@ class _MessageBubble extends StatelessWidget {
     final hour = value.hour == 0
         ? 12
         : value.hour > 12
-            ? value.hour - 12
-            : value.hour;
+        ? value.hour - 12
+        : value.hour;
     final minute = value.minute.toString().padLeft(2, '0');
     final suffix = value.hour >= 12 ? 'PM' : 'AM';
     return '$hour:$minute $suffix';

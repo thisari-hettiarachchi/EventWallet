@@ -103,9 +103,19 @@ class _BookingChatListPageState extends State<BookingChatListPage> {
                         );
                       }
 
-                      final threads =
+                      var threads =
                           snapshot.data?.docs.toList() ??
                               <QueryDocumentSnapshot<Map<String, dynamic>>>[];
+
+                      // If in provider view, only show threads that have at least one message
+                      if (widget.isProviderView) {
+                        threads = threads.where((doc) {
+                          final lastMsg =
+                              doc.data()['lastMessage']?.toString() ?? '';
+                          return lastMsg.trim().isNotEmpty;
+                        }).toList();
+                      }
+
                       threads.sort(
                             (a, b) => bookingChatSortDateFrom(
                           b.data(),

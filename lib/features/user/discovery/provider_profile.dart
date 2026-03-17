@@ -308,9 +308,9 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   Widget _buildPackagesList(
-    String displayCategory,
-    Map<String, dynamic> providerData,
-  ) {
+      String displayCategory,
+      Map<String, dynamic> providerData,
+      ) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('service_providers')
@@ -639,11 +639,11 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   Widget _buildBottomAction(
-    BuildContext context,
-    String providerName,
-    String buttonText,
-    Map<String, dynamic> providerData,
-  ) {
+      BuildContext context,
+      String providerName,
+      String buttonText,
+      Map<String, dynamic> providerData,
+      ) {
     return Container(
       padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 20.h),
       decoration: BoxDecoration(
@@ -701,10 +701,10 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   void _handleMessage(
-    BuildContext context,
-    String providerName,
-    Map<String, dynamic> providerData,
-  ) {
+      BuildContext context,
+      String providerName,
+      Map<String, dynamic> providerData,
+      ) {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
@@ -730,10 +730,10 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   Future<void> _handleBooking(
-    BuildContext context,
-    String providerName,
-    Map<String, dynamic> providerData,
-  ) async {
+      BuildContext context,
+      String providerName,
+      Map<String, dynamic> providerData,
+      ) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -781,7 +781,7 @@ class ProviderProfilePage extends StatelessWidget {
     if (!context.mounted || selection == null) return;
 
     final selectedEventId =
-        (isEventSaving && eventId != null) ? eventId! : selection.event.id;
+    (isEventSaving && eventId != null) ? eventId! : selection.event.id;
 
     final payload = buildBookingPayload(
       userId: user.uid,
@@ -799,7 +799,7 @@ class ProviderProfilePage extends StatelessWidget {
       status: BookingStatuses.pending,
       providerType: effectiveCategory,
       providerLocation:
-          providerData['location']?.toString() ?? selection.event.location,
+      providerData['location']?.toString() ?? selection.event.location,
       providerData: {
         'businessName': providerData['businessName'] ?? providerName,
         'imageUrl': providerData['imageUrl'] ?? '',
@@ -851,9 +851,9 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   BookingEventOption _toBookingEventOption(
-    String id,
-    Map<String, dynamic> data,
-  ) {
+      String id,
+      Map<String, dynamic> data,
+      ) {
     final rawDate = data['date'] ?? data['eventDate'] ?? data['createdAt'];
     final eventDate = bookingDateFrom(rawDate) ?? DateTime.now();
 
@@ -868,10 +868,10 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   Future<List<BookingPackageOption>> _buildPackageOptions(
-    String providerName,
-    Map<String, dynamic> providerData,
-    String displayCategory,
-  ) async {
+      String providerName,
+      Map<String, dynamic> providerData,
+      String displayCategory,
+      ) async {
     final options = <BookingPackageOption>[];
 
     final servicesSnapshot = await FirebaseFirestore.instance
@@ -926,9 +926,9 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   String _resolveProviderCategory(
-    Map<String, dynamic> data, {
-    required String fallback,
-  }) {
+      Map<String, dynamic> data, {
+        required String fallback,
+      }) {
     final raw = (data['category'] ?? data['providerType'] ?? data['type'] ?? '')
         .toString()
         .trim();
