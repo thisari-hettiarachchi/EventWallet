@@ -14,6 +14,7 @@ class GuestListPage extends StatefulWidget {
 class _GuestListPageState extends State<GuestListPage> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  bool _isSaving = false;
 
   @override
   void dispose() {
@@ -49,7 +50,14 @@ class _GuestListPageState extends State<GuestListPage> {
                         .orderBy('name')
                         .snapshots(),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Error loading guests: ${snapshot.error}',
+                              style: TextStyle(color: Colors.red, fontSize: 14.sp)),
+                        );
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }
 
@@ -184,7 +192,7 @@ class _GuestListPageState extends State<GuestListPage> {
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         leading: CircleAvatar(
-          backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.1),
+          backgroundColor: AppColors.primaryGreen.withOpacity(0.1),
           radius: 20.r,
           child: Text(
             (data['name'] ?? 'G').isNotEmpty
@@ -261,7 +269,7 @@ class _GuestListPageState extends State<GuestListPage> {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
             decoration: BoxDecoration(
-              color: _getStatusColor(data['status']).withValues(alpha: 0.1),
+              color: _getStatusColor(data['status']).withOpacity(0.1),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Text(
@@ -297,7 +305,7 @@ class _GuestListPageState extends State<GuestListPage> {
           Icon(
             Icons.people_outline,
             size: 80.sp,
-            color: Colors.grey.withValues(alpha: 0.3),
+            color: Colors.grey.withOpacity(0.3),
           ),
           SizedBox(height: 16.h),
           Text(
@@ -331,14 +339,22 @@ class _GuestListPageState extends State<GuestListPage> {
             child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
           ),
           TextButton(
-            onPressed: () {
-              FirebaseFirestore.instance
-                  .collection('events')
-                  .doc(widget.eventId)
-                  .collection('guests')
-                  .doc(guestId)
-                  .delete();
-              Navigator.pop(context);
+            onPressed: () async {
+              try {
+                await FirebaseFirestore.instance
+                    .collection('events')
+                    .doc(widget.eventId)
+                    .collection('guests')
+                    .doc(guestId)
+                    .delete();
+                if (mounted) Navigator.pop(context);
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to remove guest: $e')),
+                  );
+                }
+              }
             },
             child: Text(
               'Remove',
@@ -364,8 +380,9 @@ class _GuestListPageState extends State<GuestListPage> {
 
     showDialog(
       context: context,
+      barrierDismissible: !_isSaving,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
+        builder: (context, setDialogState) => AlertDialog(
           title: Text(
             isEditing ? 'Edit Guest' : 'Add Guest',
             style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
@@ -382,8 +399,10 @@ class _GuestListPageState extends State<GuestListPage> {
                     labelStyle: TextStyle(fontSize: 14.sp),
                     hintText: 'Enter guest name',
                     hintStyle: TextStyle(fontSize: 14.sp),
+                    errorText: _nameController.text.isEmpty && _isSaving ? 'Name is required' : null,
                   ),
                   textCapitalization: TextCapitalization.words,
+                  onChanged: (_) => setDialogState(() {}),
                 ),
                 SizedBox(height: 16.h),
                 TextField(
@@ -399,7 +418,7 @@ class _GuestListPageState extends State<GuestListPage> {
                 ),
                 SizedBox(height: 16.h),
                 DropdownButtonFormField<String>(
-                  initialValue: selectedStatus,
+                  value: selectedStatus,
                   decoration: InputDecoration(
                     labelText: 'Status',
                     labelStyle: TextStyle(fontSize: 14.sp),
@@ -413,7 +432,7 @@ class _GuestListPageState extends State<GuestListPage> {
                     );
                   }).toList(),
                   onChanged: (newValue) {
-                    setState(() {
+                    setDialogState(() {
                       selectedStatus = newValue!;
                     });
                   },
@@ -423,44 +442,64 @@ class _GuestListPageState extends State<GuestListPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: _isSaving ? null : () => Navigator.pop(context),
               child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
             ),
             ElevatedButton(
-              onPressed: () {
-                if (_nameController.text.isNotEmpty) {
+              onPressed: _isSaving
+                  ? null
+                  : () async {
+                if (_nameController.text.trim().isNotEmpty) {
+                  setDialogState(() => _isSaving = true);
                   final Map<String, dynamic> guestData = {
                     'name': _nameController.text.trim(),
                     'email': _emailController.text.trim(),
                     'status': selectedStatus,
+                    'updatedAt': FieldValue.serverTimestamp(),
                   };
 
-                  if (isEditing) {
-                    FirebaseFirestore.instance
-                        .collection('events')
-                        .doc(widget.eventId)
-                        .collection('guests')
-                        .doc(guestId)
-                        .update(guestData);
-                  } else {
-                    guestData['createdAt'] = FieldValue.serverTimestamp();
-                    FirebaseFirestore.instance
-                        .collection('events')
-                        .doc(widget.eventId)
-                        .collection('guests')
-                        .add(guestData);
+                  try {
+                    if (isEditing) {
+                      await FirebaseFirestore.instance
+                          .collection('events')
+                          .doc(widget.eventId)
+                          .collection('guests')
+                          .doc(guestId)
+                          .update(guestData);
+                    } else {
+                      guestData['createdAt'] = FieldValue.serverTimestamp();
+                      await FirebaseFirestore.instance
+                          .collection('events')
+                          .doc(widget.eventId)
+                          .collection('guests')
+                          .add(guestData);
+                    }
+                    if (mounted) Navigator.pop(context);
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to save guest: $e')),
+                      );
+                    }
+                  } finally {
+                    if (mounted) setDialogState(() => _isSaving = false);
                   }
-                  Navigator.pop(context);
                 }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
               ),
-              child: Text(
-                isEditing ? 'Update' : 'Add',
-                style: TextStyle(color: Colors.white, fontSize: 14.sp),
-              ),
+              child: _isSaving
+                  ? SizedBox(
+                      height: 18.sp,
+                      width: 18.sp,
+                      child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    )
+                  : Text(
+                      isEditing ? 'Update' : 'Add',
+                      style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                    ),
             ),
           ],
         ),
