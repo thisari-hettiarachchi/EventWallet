@@ -13,9 +13,14 @@ import '../../user/info/help.dart';
 import '../../../core/constants/colors.dart';
 import '../../../services/booking_service.dart';
 
-class ServiceProviderProfilePage extends StatelessWidget {
+class ServiceProviderProfilePage extends StatefulWidget {
   const ServiceProviderProfilePage({super.key});
 
+  @override
+  State<ServiceProviderProfilePage> createState() => _ServiceProviderProfilePageState();
+}
+
+class _ServiceProviderProfilePageState extends State<ServiceProviderProfilePage> {
   @override
   Widget build(BuildContext context) {
     final User? user = FirebaseAuth.instance.currentUser;
@@ -32,11 +37,11 @@ class ServiceProviderProfilePage extends StatelessWidget {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseFirestore.instance
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance
           .collection('service_providers')
           .doc(user.uid)
-          .get(),
+          .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(

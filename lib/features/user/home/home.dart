@@ -497,25 +497,55 @@ class _HomePageState extends State<HomePage>
             physics: const BouncingScrollPhysics(),
             children: [
               _promoCard(
-                'Hire Best Photographers',
-                'Up to 30% off',
-                Icons.camera_alt_rounded,
-                [AppColors.primaryBlue, AppColors.primaryGreen],
-                imagePath: 'assets/images/hire.jpg',
-              ),
-              _promoCard(
                 'Luxury Hotels',
                 'Special event rates',
                 Icons.hotel_rounded,
                 [AppColors.primaryGreen, const Color(0xFF26A69A)],
                 imagePath: 'assets/images/hire2.jpg',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const DiscoveryPage(
+                        initialCategory: 'Venue',
+                      ),
+                    ),
+                  ).then((_) => _refreshData());
+                },
               ),
               _promoCard(
-                'Outdoor Locations',
-                'Book now',
-                Icons.park_rounded,
+                'Top Music Bands',
+                'Best live performances',
+                Icons.music_note_rounded,
                 [const Color(0xFF26A69A), AppColors.primaryGreen],
                 imagePath: 'assets/images/hire3.jpg',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const DiscoveryPage(
+                        initialCategory: 'Music',
+                      ),
+                    ),
+                  ).then((_) => _refreshData());
+                },
+              ),
+              _promoCard(
+                'Hire Best Photographers',
+                'Up to 30% off',
+                Icons.camera_alt_rounded,
+                [AppColors.primaryBlue, AppColors.primaryGreen],
+                imagePath: 'assets/images/hire.jpg',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const DiscoveryPage(
+                        initialCategory: 'Photography',
+                      ),
+                    ),
+                  ).then((_) => _refreshData());
+                },
               ),
             ],
           ),
@@ -530,84 +560,88 @@ class _HomePageState extends State<HomePage>
     IconData icon,
     List<Color> colors, {
     String? imagePath,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      width: 315.w,
-      margin: EdgeInsets.only(right: 16.w),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24.r),
-        boxShadow: [
-          BoxShadow(
-            color: colors[0].withValues(alpha: 0.2),
-            blurRadius: 16.r,
-            offset: Offset(0, 8.h),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24.r),
-        child: imagePath != null
-            ? Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 315.w,
+        margin: EdgeInsets.only(right: 16.w),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24.r),
+          boxShadow: [
+            BoxShadow(
+              color: colors[0].withValues(alpha: 0.2),
+              blurRadius: 16.r,
+              offset: Offset(0, 8.h),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24.r),
+          child: imagePath != null
+              ? Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: colors),
+                    ),
+                    child: Center(
+                      child: Icon(icon, color: Colors.white, size: 40.sp),
+                    ),
+                  ),
+                )
+              : Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(colors: colors),
                   ),
-                  child: Center(
-                    child: Icon(icon, color: Colors.white, size: 40.sp),
-                  ),
-                ),
-              )
-            : Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: colors),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(24.r),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(14.r),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16.r),
+                  child: Padding(
+                    padding: EdgeInsets.all(24.r),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(14.r),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16.r),
+                          ),
+                          child: Icon(icon, color: colors[1], size: 32.sp),
                         ),
-                        child: Icon(icon, color: colors[1], size: 32.sp),
-                      ),
-                      const Spacer(),
-                      Text(
-                        title,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 6.h),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 6.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.25),
-                          borderRadius: BorderRadius.circular(8.r),
-                        ),
-                        child: Text(
-                          subtitle,
+                        const Spacer(),
+                        Text(
+                          title,
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 6.h),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12.w,
+                            vertical: 6.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.25),
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          child: Text(
+                            subtitle,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+        ),
       ),
     );
   }

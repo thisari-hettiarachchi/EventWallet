@@ -46,6 +46,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _emailController.text = data['email'] ?? '';
         _phoneController.text = data['phone'] ?? '';
         _profileImageUrl = data['imageUrl'] ?? '';
+        if (mounted) setState(() {});
       }
     }
   }
@@ -59,6 +60,46 @@ class _EditProfilePageState extends State<EditProfilePage> {
     });
   }
 
+  Future<void> _deleteImage() async {
+    if (_profileImageUrl.isEmpty && _imageFile == null) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // If there was an old image on Supabase, delete it
+        if (_profileImageUrl.isNotEmpty) {
+          await _profileImageStorageService.deleteProfileImage(_profileImageUrl);
+        }
+
+        // Update Firestore
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .update({'imageUrl': ''});
+
+        setState(() {
+          _profileImageUrl = '';
+          _imageFile = null;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Profile image removed')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error removing image: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -70,6 +111,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         String imageUrl = _profileImageUrl;
 
         if (_imageFile != null) {
+          // Delete old image if it exists before uploading new one
+          if (_profileImageUrl.isNotEmpty) {
+            await _profileImageStorageService.deleteProfileImage(_profileImageUrl);
+          }
+
           final pickedImage = XFile(_imageFile!.path);
           imageUrl = await _profileImageStorageService.uploadProfileImage(
             uid: user.uid,
@@ -158,73 +204,83 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Center(
-                          child: Stack(
+                          child: Column(
                             children: [
-                              GestureDetector(
-                                onTap: _pickImage,
-                                child: Container(
-                                  width: 120.w,
-                                  height: 120.w,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: AppColors.primaryGradient,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.primaryBlue.withValues(
-                                          alpha: 0.3,
+                              Stack(
+                                children: [
+                                  GestureDetector(
+                                    onTap: _pickImage,
+                                    child: Container(
+                                      width: 120.w,
+                                      height: 120.w,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: AppColors.primaryGradient,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppColors.primaryBlue.withValues(
+                                              alpha: 0.3,
+                                            ),
+                                            blurRadius: 20.r,
+                                            offset: Offset(0, 10.h),
+                                          ),
+                                        ],
+                                        image: _imageFile != null
+                                            ? DecorationImage(
+                                                image: FileImage(_imageFile!),
+                                                fit: BoxFit.cover,
+                                              )
+                                            : (_profileImageUrl.isNotEmpty
+                                                  ? DecorationImage(
+                                                      image: NetworkImage(
+                                                        _profileImageUrl,
+                                                      ),
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : null),
+                                      ),
+                                      child:
+                                          _imageFile == null &&
+                                              _profileImageUrl.isEmpty
+                                          ? Icon(
+                                              Icons.person,
+                                              size: 60.sp,
+                                              color: Colors.white,
+                                            )
+                                          : null,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: GestureDetector(
+                                      onTap: _pickImage,
+                                      child: Container(
+                                        padding: EdgeInsets.all(8.r),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primaryBlue,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 3.w,
+                                          ),
                                         ),
-                                        blurRadius: 20.r,
-                                        offset: Offset(0, 10.h),
-                                      ),
-                                    ],
-                                    image: _imageFile != null
-                                        ? DecorationImage(
-                                            image: FileImage(_imageFile!),
-                                            fit: BoxFit.cover,
-                                          )
-                                        : (_profileImageUrl.isNotEmpty
-                                              ? DecorationImage(
-                                                  image: NetworkImage(
-                                                    _profileImageUrl,
-                                                  ),
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : null),
-                                  ),
-                                  child:
-                                      _imageFile == null &&
-                                          _profileImageUrl.isEmpty
-                                      ? Icon(
-                                          Icons.person,
-                                          size: 60.sp,
+                                        child: Icon(
+                                          Icons.camera_alt,
+                                          size: 20.sp,
                                           color: Colors.white,
-                                        )
-                                      : null,
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: GestureDetector(
-                                  onTap: _pickImage,
-                                  child: Container(
-                                    padding: EdgeInsets.all(8.r),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primaryBlue,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 3.w,
+                                        ),
                                       ),
                                     ),
-                                    child: Icon(
-                                      Icons.camera_alt,
-                                      size: 20.sp,
-                                      color: Colors.white,
-                                    ),
                                   ),
-                                ),
+                                ],
                               ),
+                              if (_profileImageUrl.isNotEmpty || _imageFile != null)
+                                TextButton.icon(
+                                  onPressed: _isLoading ? null : _deleteImage,
+                                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                  label: const Text('Remove Photo', style: TextStyle(color: Colors.red)),
+                                ),
                             ],
                           ),
                         ),
