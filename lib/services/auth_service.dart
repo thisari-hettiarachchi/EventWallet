@@ -21,6 +21,7 @@ class AuthService {
         'uid': user.uid,
         'name': name,
         'email': email,
+        'imageUrl': '',
         'createdAt': FieldValue.serverTimestamp(),
       });
     }

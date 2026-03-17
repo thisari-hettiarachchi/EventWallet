@@ -214,13 +214,25 @@ class ProviderProfilePage extends StatelessWidget {
               end: Alignment.bottomRight,
             ),
           ),
-          child: Center(
-            child: Icon(
-              Icons.business_outlined,
-              size: 80.sp,
-              color: Colors.white.withValues(alpha: 0.5),
-            ),
-          ),
+          child: imageUrl.isNotEmpty
+              ? Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Center(
+                    child: Icon(
+                      Icons.business_outlined,
+                      size: 80.sp,
+                      color: Colors.white.withValues(alpha: 0.5),
+                    ),
+                  ),
+                )
+              : Center(
+                  child: Icon(
+                    Icons.business_outlined,
+                    size: 80.sp,
+                    color: Colors.white.withValues(alpha: 0.5),
+                  ),
+                ),
         ),
         SafeArea(
           child: Padding(

@@ -2,10 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
+import '../../../services/profile_image_storage_service.dart';
 
 class EditBusinessProfilePage extends StatefulWidget {
   const EditBusinessProfilePage({super.key});
@@ -29,6 +29,7 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
   String _profileImageUrl = '';
   File? _imageFile;
   final _picker = ImagePicker();
+  final _profileImageStorageService = ProfileImageStorageService();
 
   String _selectedProviderType = 'Photography';
   bool _isLoading = false;
@@ -92,23 +93,6 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
     }
   }
 
-  Future<String?> _uploadImage(String uid) async {
-    if (_imageFile == null) return _profileImageUrl;
-
-    try {
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('provider_profiles')
-          .child('$uid.jpg');
-
-      await ref.putFile(_imageFile!);
-      return await ref.getDownloadURL();
-    } catch (e) {
-      debugPrint('Error uploading image: $e');
-      return null;
-    }
-  }
-
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -117,7 +101,16 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        String? imageUrl = await _uploadImage(user.uid);
+        String imageUrl = _profileImageUrl;
+
+        if (_imageFile != null) {
+          final pickedImage = XFile(_imageFile!.path);
+          imageUrl = await _profileImageStorageService.uploadProfileImage(
+            uid: user.uid,
+            role: 'service_providers',
+            image: pickedImage,
+          );
+        }
 
         await FirebaseFirestore.instance
             .collection('service_providers')
@@ -130,7 +123,7 @@ class _EditBusinessProfilePageState extends State<EditBusinessProfilePage> {
               'website': _websiteController.text.trim(),
               'facebook': _facebookController.text.trim(),
               'instagram': _instagramController.text.trim(),
-              'imageUrl': imageUrl ?? _profileImageUrl,
+              'imageUrl': imageUrl,
               'providerType': _selectedProviderType.toLowerCase(),
             });
 

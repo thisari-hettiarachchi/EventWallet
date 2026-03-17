@@ -54,6 +54,7 @@ class ProfilePage extends StatelessWidget {
             ? userData['businessName'] ?? 'Service Provider'
             : userData['name'] ?? 'User';
         final email = userData['email'] ?? 'No email';
+        final profileImageUrl = (userData['imageUrl'] ?? '').toString();
         final initials = displayName.isNotEmpty
             ? displayName.trim().split(' ').map((e) => e[0]).take(2).join()
             : 'U';
@@ -82,14 +83,19 @@ class ProfilePage extends StatelessWidget {
                     ),
                     child: CircleAvatar(
                       backgroundColor: Colors.white,
-                      child: Text(
-                        initials,
-                        style: TextStyle(
-                          fontSize: 36.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryGreen,
-                        ),
-                      ),
+                      backgroundImage: profileImageUrl.isNotEmpty
+                          ? NetworkImage(profileImageUrl)
+                          : null,
+                      child: profileImageUrl.isEmpty
+                          ? Text(
+                              initials,
+                              style: TextStyle(
+                                fontSize: 36.sp,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryGreen,
+                              ),
+                            )
+                          : null,
                     ),
                   ),
                   SizedBox(height: 16.h),

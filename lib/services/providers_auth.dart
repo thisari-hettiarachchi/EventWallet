@@ -27,6 +27,7 @@ class ServiceProviderAuthService {
         'businessName': businessName,
         'email': email,
         'providerType': providerType,
+        'imageUrl': '',
         'role': 'service_provider',
         'createdAt': FieldValue.serverTimestamp(),
       });
