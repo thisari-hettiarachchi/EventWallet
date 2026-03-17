@@ -70,93 +70,90 @@ class _BookingChatListPageState extends State<BookingChatListPage> {
                   child: user == null
                       ? _buildLoginPrompt()
                       : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                    stream: widget.isProviderView
-                        ? _chatService.watchThreadsForProvider(user.uid)
-                        : _chatService.watchThreadsForUser(user.uid),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting &&
-                          !snapshot.hasData) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.primaryGreen,
-                          ),
-                        );
-                      }
+                          stream: widget.isProviderView
+                              ? _chatService.watchThreadsForProvider(
+                                  user.uid,
+                                  messagedOnly: true,
+                                )
+                              : _chatService.watchThreadsForUser(
+                                  user.uid,
+                                  messagedOnly: true,
+                                ),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                    ConnectionState.waiting &&
+                                !snapshot.hasData) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColors.primaryGreen,
+                                ),
+                              );
+                            }
 
-                      if (snapshot.hasError) {
-                        String title = 'Could not load messages';
-                        String subtitle = 'Please try again in a moment.';
+                            if (snapshot.hasError) {
+                              String title = 'Could not load messages';
+                              String subtitle = 'Please try again in a moment.';
 
-                        if (snapshot.error is FirebaseException &&
-                            (snapshot.error as FirebaseException).code ==
-                                'permission-denied') {
-                          title = 'Error loading messages';
-                          subtitle =
-                          'The caller does not have permission to execute the specific operation.';
-                        }
+                              if (snapshot.error is FirebaseException &&
+                                  (snapshot.error as FirebaseException).code ==
+                                      'permission-denied') {
+                                title = 'Error loading messages';
+                                subtitle =
+                                    'The caller does not have permission to execute the specific operation.';
+                              }
 
-                        return _buildInfoState(
-                          icon: Icons.error_outline,
-                          title: title,
-                          subtitle: subtitle,
-                        );
-                      }
+                              return _buildInfoState(
+                                icon: Icons.error_outline,
+                                title: title,
+                                subtitle: subtitle,
+                              );
+                            }
 
-                      var threads =
-                          snapshot.data?.docs.toList() ??
-                              <QueryDocumentSnapshot<Map<String, dynamic>>>[];
+                            var threads =
+                                snapshot.data?.docs.toList() ??
+                                <QueryDocumentSnapshot<Map<String, dynamic>>>[];
 
-                      // If in provider view, only show threads that have at least one message
-                      if (widget.isProviderView) {
-                        threads = threads.where((doc) {
-                          final lastMsg =
-                              doc.data()['lastMessage']?.toString() ?? '';
-                          return lastMsg.trim().isNotEmpty;
-                        }).toList();
-                      }
+                            threads.sort(
+                              (a, b) => bookingChatSortDateFrom(
+                                b.data(),
+                              ).compareTo(bookingChatSortDateFrom(a.data())),
+                            );
 
-                      threads.sort(
-                            (a, b) => bookingChatSortDateFrom(
-                          b.data(),
-                        ).compareTo(bookingChatSortDateFrom(a.data())),
-                      );
+                            if (threads.isEmpty) {
+                              return _buildInfoState(
+                                icon: Icons.chat_bubble_outline,
+                                title: 'No booking chats yet',
+                                subtitle: widget.isProviderView
+                                    ? 'Booking conversations with clients will appear here.'
+                                    : 'Your conversations with providers will appear here.',
+                              );
+                            }
 
-                      if (threads.isEmpty) {
-                        return _buildInfoState(
-                          icon: Icons.chat_bubble_outline,
-                          title: 'No booking chats yet',
-                          subtitle: widget.isProviderView
-                              ? 'Booking conversations with clients will appear here.'
-                              : 'Your conversations with providers will appear here.',
-                        );
-                      }
-
-                      return RefreshIndicator(
-                        color: AppColors.primaryGreen,
-                        onRefresh: _ensureThreadsExist,
-                        child: ListView.builder(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          padding: EdgeInsets.fromLTRB(
-                            20.w,
-                            18.h,
-                            20.w,
-                            32.h,
-                          ),
-                          itemCount: threads.length,
-                          itemBuilder: (context, index) {
-                            final doc = threads[index];
-                            return _BookingChatThreadCard(
-                              threadId: doc.id,
-                              data: doc.data(),
-                              currentUserId: user.uid,
-                              isProviderView: widget.isProviderView,
+                            return RefreshIndicator(
+                              color: AppColors.primaryGreen,
+                              onRefresh: _ensureThreadsExist,
+                              child: ListView.builder(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: EdgeInsets.fromLTRB(
+                                  20.w,
+                                  18.h,
+                                  20.w,
+                                  32.h,
+                                ),
+                                itemCount: threads.length,
+                                itemBuilder: (context, index) {
+                                  final doc = threads[index];
+                                  return _BookingChatThreadCard(
+                                    threadId: doc.id,
+                                    data: doc.data(),
+                                    currentUserId: user.uid,
+                                    isProviderView: widget.isProviderView,
+                                  );
+                                },
+                              ),
                             );
                           },
                         ),
-                      );
-                    },
-                  ),
                 ),
               ),
             ],
@@ -511,8 +508,8 @@ class _ThreadStatusBadge extends StatelessWidget {
       ),
       child: Text(
         (userFacing && normalized == BookingStatuses.accepted
-            ? 'Booked'
-            : BookingStatuses.label(normalized))
+                ? 'Booked'
+                : BookingStatuses.label(normalized))
             .toUpperCase(),
         style: TextStyle(
           color: color,

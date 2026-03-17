@@ -27,11 +27,15 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
   final ScrollController _scrollController = ScrollController();
 
   bool _isSending = false;
+  // True once thread document is created in Firestore. The messages stream
+  // must NOT start before this, otherwise Firestore denies the read because
+  // the parent booking_chats doc doesn't exist yet.
+  bool _threadReady = false;
 
   @override
   void initState() {
     super.initState();
-    _ensureThreadAndMarkRead();
+    _initThread();
   }
 
   @override
@@ -41,21 +45,23 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
     super.dispose();
   }
 
-  Future<void> _ensureThreadAndMarkRead() async {
+  Future<void> _initThread() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
     try {
-      await _chatService.ensureThreadExistsForBooking(
-        bookingId: widget.bookingId,
-        bookingData: widget.initialThreadData,
-      );
-      await _chatService.markThreadRead(
-        bookingId: widget.bookingId,
-        currentUserId: user.uid,
-      );
+      if (user != null) {
+        await _chatService.ensureThreadExistsForBooking(
+          bookingId: widget.bookingId,
+          bookingData: widget.initialThreadData,
+        );
+        await _chatService.markThreadRead(
+          bookingId: widget.bookingId,
+          currentUserId: user.uid,
+        );
+      }
     } catch (e) {
-      debugPrint('Error in _ensureThreadAndMarkRead: $e');
+      debugPrint('Error in _initThread: $e');
+    } finally {
+      if (mounted) setState(() => _threadReady = true);
     }
   }
 
@@ -158,15 +164,29 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
               : StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
             stream: _chatService.watchThread(widget.bookingId),
             builder: (context, snapshot) {
+              final threadData =
+                  snapshot.data?.data() ?? widget.initialThreadData;
+
               if (snapshot.hasError) {
                 String errorMessage = 'Error loading thread: ${snapshot.error}';
-                if (snapshot.error is FirebaseException &&
-                    (snapshot.error as FirebaseException).code ==
-                        'permission-denied') {
-                  errorMessage =
-                  'Error loading messages: The caller does not have permission to execute the specified operation.';
+                final isPermissionDenied =
+                    snapshot.error is FirebaseException &&
+                        (snapshot.error as FirebaseException).code ==
+                            'permission-denied';
+
+                // Keep chat usable when parent thread get is denied but we already
+                // have valid thread metadata from the previous screen.
+                if (isPermissionDenied && threadData != null) {
+                  debugPrint(
+                    'Thread stream denied for ${widget.bookingId}, using initialThreadData fallback.',
+                  );
+                } else {
+                  if (isPermissionDenied) {
+                    errorMessage =
+                    'Error loading messages: The caller does not have permission to execute the specified operation.';
+                  }
+                  return _buildErrorState(errorMessage);
                 }
-                return _buildErrorState(errorMessage);
               }
 
               if (snapshot.connectionState == ConnectionState.waiting &&
@@ -177,8 +197,6 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
                 );
               }
 
-              final threadData =
-                  snapshot.data?.data() ?? widget.initialThreadData;
               if (threadData == null) {
                 return _buildMissingThreadState(context);
               }
@@ -199,8 +217,14 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
                         children: [
                           _buildBookingSummary(threadData),
                           Expanded(
-                            child: StreamBuilder<
-                                QuerySnapshot<Map<String, dynamic>>>(
+                            child: !_threadReady
+                                ? const Center(
+                                    child: CircularProgressIndicator(
+                                      color: AppColors.primaryGreen,
+                                    ),
+                                  )
+                                : StreamBuilder<
+                                    QuerySnapshot<Map<String, dynamic>>>(
                               stream: _chatService.watchMessages(
                                 widget.bookingId,
                               ),
