@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 import 'provider_profile.dart';
 
 class DiscoveryPage extends StatefulWidget {
@@ -514,7 +515,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                 Row(
                   children: [
                     Expanded(
-                      child: ElevatedButton(
+                      child: GradientElevatedButton(
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -528,15 +529,8 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                             ),
                           );
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryGreen,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.r),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 16.h),
-                        ),
+                        borderRadius: 12.r,
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
                         child: Text(
                           widget.isEventSaving
                               ? 'Select Service'

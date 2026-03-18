@@ -6,6 +6,7 @@ import 'tasks_page.dart';
 import 'guest_list.dart';
 import '../budget/expenses_page.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 import '../discovery/discovery.dart';
 import 'edit_event.dart';
 import '../../../services/events_service.dart';
@@ -74,11 +75,9 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                 onPressed: () => Navigator.pop(dialogContext, false),
                 child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
               ),
-              ElevatedButton(
+              GradientElevatedButton(
                 onPressed: () => Navigator.pop(dialogContext, true),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade700,
-                ),
+                borderRadius: 12.r,
                 child: Text(
                   'Delete',
                   style: TextStyle(color: Colors.white, fontSize: 14.sp),
@@ -163,12 +162,9 @@ class _EventDetailsPageState extends State<EventDetailsPage>
             onPressed: () => Navigator.pop(context, false),
             child: Text('Keep it', style: TextStyle(color: Colors.grey.shade600)),
           ),
-          ElevatedButton(
+          GradientElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-            ),
+            borderRadius: 12.r,
             child: const Text('Yes, Cancel', style: TextStyle(color: Colors.white)),
           ),
         ],

@@ -11,6 +11,7 @@ import 'earnings_analytics.dart';
 import '../../user/info/privacy.dart';
 import '../../user/info/help.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 import '../../../services/booking_service.dart';
 
 class ServiceProviderProfilePage extends StatefulWidget {
@@ -478,7 +479,7 @@ class _ServiceProviderProfilePageState extends State<ServiceProviderProfilePage>
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
           ),
-          ElevatedButton(
+          GradientElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
               try {
@@ -501,9 +502,7 @@ class _ServiceProviderProfilePageState extends State<ServiceProviderProfilePage>
                 }
               }
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade700,
-            ),
+            borderRadius: 12.r,
             child: Text(
               'Logout',
               style: TextStyle(color: Colors.white, fontSize: 14.sp),

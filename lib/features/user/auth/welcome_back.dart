@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 import '../auth/login.dart';
 import '../auth/signup.dart';
 import '../../service_provider/auth/login.dart';
@@ -254,62 +255,30 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
     required IconData icon,
     required VoidCallback onPressed,
   }) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 56.h,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withValues(alpha: 0.95),
-            Colors.white.withValues(alpha: 0.85),
-          ],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10.r,
-            offset: Offset(0, 4.h),
-          ),
-        ],
-      ),
-      child: ElevatedButton(
+      child: GradientElevatedButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
-          ),
-        ),
+        borderRadius: 12.r,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Flexible(
-              child: ShaderMask(
-                shaderCallback: (bounds) => const LinearGradient(
-                  colors: [Color(0xFF00897B), Color(0xFF1565C0)],
-                ).createShader(bounds),
-                child: Text(
-                  text,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.w,
-                  ),
+              child: Text(
+                text,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.w,
                 ),
               ),
             ),
             SizedBox(width: 8.w),
-            ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Color(0xFF00897B), Color(0xFF1565C0)],
-              ).createShader(bounds),
-              child: Icon(icon, color: Colors.white, size: 20.sp),
-            ),
+            Icon(icon, color: Colors.white, size: 20.sp),
           ],
         ),
       ),
@@ -321,25 +290,12 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
     required IconData icon,
     required VoidCallback onPressed,
   }) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 56.h,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.5),
-          width: 1.5.w,
-        ),
-      ),
-      child: ElevatedButton(
+      child: GradientElevatedButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white.withValues(alpha: 0.1),
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
-          ),
-        ),
+        borderRadius: 12.r,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

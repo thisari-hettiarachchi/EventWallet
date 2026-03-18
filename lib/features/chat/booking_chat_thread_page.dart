@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/constants/colors.dart';
+import '../../core/widgets/gradient_elevated_button.dart';
 import '../../services/booking_service.dart';
 import '../../services/chat_service.dart';
 
@@ -509,16 +510,10 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
             SizedBox(
               width: 52.w,
               height: 52.w,
-              child: ElevatedButton(
+              child: GradientElevatedButton(
                 onPressed: _isSending ? null : () => _sendMessage(threadData),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16.r),
-                  ),
-                ),
+                padding: EdgeInsets.zero,
+                borderRadius: 12.r,
                 child: _isSending
                     ? SizedBox(
                   width: 18.w,

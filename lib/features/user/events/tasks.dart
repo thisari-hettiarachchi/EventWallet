@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 
 class TasksPage extends StatefulWidget {
   final String eventId;
@@ -196,7 +197,7 @@ class _TasksPageState extends State<TasksPage> {
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
           ),
-          ElevatedButton(
+          GradientElevatedButton(
             onPressed: () {
               if (_taskController.text.isNotEmpty) {
                 FirebaseFirestore.instance
@@ -212,9 +213,7 @@ class _TasksPageState extends State<TasksPage> {
                 Navigator.pop(context);
               }
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-            ),
+            borderRadius: 12.r,
             child: Text(
               'Add',
               style: TextStyle(color: Colors.white, fontSize: 14.sp),

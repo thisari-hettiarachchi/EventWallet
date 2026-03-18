@@ -41,9 +41,14 @@ class ServiceProviderPage extends StatelessWidget {
                             icon: Icon(
                               Icons.arrow_back,
                               color: Colors.white,
-                              size: 24.sp,
+                              size: 20.sp,
                             ),
                             onPressed: () => Navigator.pop(context),
+                            constraints: BoxConstraints.tightFor(
+                              width: 40.w,
+                              height: 40.w,
+                            ),
+                            padding: EdgeInsets.zero,
                           ),
                         ),
                       ),
@@ -57,7 +62,7 @@ class ServiceProviderPage extends StatelessWidget {
                       Text(
                         'Become a Service Provider',
                         style: TextStyle(
-                          fontSize: 32.sp,
+                          fontSize: 26.sp,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -76,7 +81,7 @@ class ServiceProviderPage extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: ElevatedButton(
+                            child: _buildAuthStyleButton(
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -86,27 +91,12 @@ class ServiceProviderPage extends StatelessWidget {
                                   ),
                                 );
                               },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: const Color(0xFF1565C0),
-                                padding: EdgeInsets.symmetric(vertical: 16.h),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                ),
-                                elevation: 4,
-                              ),
-                              child: Text(
-                                'Login',
-                                style: TextStyle(
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              label: 'Login',
                             ),
                           ),
                           SizedBox(width: 16.w),
                           Expanded(
-                            child: ElevatedButton(
+                            child: _buildAuthStyleButton(
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -116,22 +106,7 @@ class ServiceProviderPage extends StatelessWidget {
                                   ),
                                 );
                               },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF00897B),
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(vertical: 16.h),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                ),
-                                elevation: 4,
-                              ),
-                              child: Text(
-                                'Sign Up',
-                                style: TextStyle(
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              label: 'Sign Up',
                             ),
                           ),
                         ],
@@ -263,7 +238,7 @@ class ServiceProviderPage extends StatelessWidget {
                   SizedBox(height: 32.h),
                   SizedBox(
                     width: 200.w,
-                    child: ElevatedButton(
+                    child: _buildAuthStyleButton(
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -273,28 +248,56 @@ class ServiceProviderPage extends StatelessWidget {
                           ),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF00897B),
-                        padding: EdgeInsets.symmetric(vertical: 16.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        elevation: 4,
-                      ),
-                      child: Text(
-                        'Join Now',
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      label: 'Join Now',
                     ),
                   ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAuthStyleButton({
+    required VoidCallback onPressed,
+    required String label,
+  }) {
+    return Container(
+      width: double.infinity,
+      height: 56.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.r),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withValues(alpha: 0.95),
+            Colors.white.withValues(alpha: 0.85),
+          ],
+        ),
+      ),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+        ),
+        child: ShaderMask(
+          shaderCallback: (bounds) =>
+              const LinearGradient(
+                colors: [Color(0xFF00897B), Color(0xFF1565C0)],
+              ).createShader(bounds),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ),
     );

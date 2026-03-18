@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 import '../../../services/booking_service.dart';
 import '../../../services/chat_service.dart';
 import '../../chat/booking_chat_list_page.dart';
@@ -148,7 +149,7 @@ class UserBookingStatusPage extends StatelessWidget {
                 Text(
                   'My Booking Requests',
                   style: TextStyle(
-                    fontSize: 28.sp,
+                    fontSize: 24.sp,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
                     letterSpacing: -0.4,
@@ -496,9 +497,9 @@ class _BookingCard extends StatelessWidget {
             onPressed: () => Navigator.pop(dialogContext, false),
             child: const Text('Keep'),
           ),
-          ElevatedButton(
+          GradientElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            borderRadius: 14.r,
             child: Text(
               isAccepted ? 'Cancel Booking' : 'Cancel Request',
               style: const TextStyle(color: Colors.white),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 import '../auth/welcome_back.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -315,33 +316,11 @@ class _OnboardingPageState extends State<OnboardingPage>
 
                       // Next button
                       Expanded(
-                        child: Container(
+                        child: SizedBox(
                           height: 50.h,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF00897B), Color(0xFF1565C0)],
-                            ),
-                            borderRadius: BorderRadius.circular(25.r),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(
-                                  0xFF00897B,
-                                ).withValues(alpha: 0.2),
-                                blurRadius: 10.r,
-                                offset: Offset(0, 4.h),
-                              ),
-                            ],
-                          ),
-                          child: ElevatedButton(
+                          child: GradientElevatedButton(
                             onPressed: _nextPage,
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25.r),
-                              ),
-                            ),
+                            borderRadius: 12.r,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

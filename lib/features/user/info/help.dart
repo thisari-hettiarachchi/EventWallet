@@ -11,125 +11,176 @@ class HelpSupportPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
-      appBar: AppBar(
-        title: Text(
-          'Help & Support',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 20.sp,
-          ),
-        ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF00897B), Color(0xFF1565C0)],
-            ),
-          ),
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(20.r),
-              decoration: AppDecorations.pageGradientHeader,
-              child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(16.r),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.support_agent,
-                      size: 50.sp,
-                      color: Colors.white,
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.headerGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(context),
+              SizedBox(height: 20.h),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F7FA),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(35.r),
                     ),
                   ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'We\'re Here to Help',
-                    style: AppTextStyles.whiteText(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.all(20.r),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(20.r),
+                            decoration: AppDecorations.pageGradientHeader,
+                            child: Column(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(16.r),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.support_agent,
+                                    size: 50.sp,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                SizedBox(height: 16.h),
+                                Text(
+                                  'We\'re Here to Help',
+                                  style: AppTextStyles.whiteText(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 8.h),
+                                Text(
+                                  'Get assistance for your events and queries',
+                                  style: AppTextStyles.whiteText(
+                                    fontSize: 14,
+                                  ).copyWith(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 24.h),
+                          Text('Contact Us', style: AppTextStyles.sectionTitle),
+                          SizedBox(height: 16.h),
+                          _buildContactCard(
+                            icon: Icons.email_outlined,
+                            title: 'Email',
+                            subtitle: 'support@eventwallet.com',
+                            color: AppColors.primaryBlue,
+                            onTap: () => _launchEmail('support@eventwallet.com'),
+                          ),
+                          SizedBox(height: 12.h),
+                          _buildContactCard(
+                            icon: Icons.phone_outlined,
+                            title: 'Phone',
+                            subtitle: '+94 77 123 4567',
+                            color: AppColors.primaryGreen,
+                            onTap: () => _launchPhone('+15551234567'),
+                          ),
+                          SizedBox(height: 32.h),
+                          Text(
+                            'Frequently Asked Questions',
+                            style: AppTextStyles.sectionTitle,
+                          ),
+                          SizedBox(height: 16.h),
+                          _buildFAQItem(
+                            question: 'How do I create an event?',
+                            answer:
+                                'To create an event, go to the Home screen and tap the "+" button. Fill in the event details like name, date, and budget, then tap "Create Event".',
+                          ),
+                          _buildFAQItem(
+                            question: 'How can I track my event budget?',
+                            answer:
+                                'Each event has a budget tracker where you can add expenses. The app automatically calculates your spending and shows remaining budget.',
+                          ),
+                          _buildFAQItem(
+                            question: 'Can I edit or delete events?',
+                            answer:
+                                'Yes! Go to "Manage Events" from your profile page. You can edit event details or delete events you no longer need.',
+                          ),
+                          _buildFAQItem(
+                            question: 'How do I reset my password?',
+                            answer:
+                                'Go to Privacy & Security in your profile settings. Enter your current password and choose a new password to update it.',
+                          ),
+                          _buildFAQItem(
+                            question: 'Is my data secure?',
+                            answer:
+                                'Yes, all your data is securely stored using Firebase encryption. We follow industry-standard security practices to protect your information.',
+                          ),
+                          SizedBox(height: 32.h),
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'Get assistance for your events and queries',
-                    style: AppTextStyles.whiteText(
-                      fontSize: 14,
-                    ).copyWith(color: Colors.white.withValues(alpha: 0.9)),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(20.r),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Contact Us', style: AppTextStyles.sectionTitle),
-                  SizedBox(height: 16.h),
-                  _buildContactCard(
-                    icon: Icons.email_outlined,
-                    title: 'Email',
-                    subtitle: 'support@eventwallet.com',
-                    color: AppColors.primaryBlue,
-                    onTap: () => _launchEmail('support@eventwallet.com'),
-                  ),
-                  SizedBox(height: 12.h),
-                  _buildContactCard(
-                    icon: Icons.phone_outlined,
-                    title: 'Phone',
-                    subtitle: '+94 77 123 4567',
-                    color: AppColors.primaryGreen,
-                    onTap: () => _launchPhone('+15551234567'),
-                  ),
-                  SizedBox(height: 32.h),
-                  Text(
-                    'Frequently Asked Questions',
-                    style: AppTextStyles.sectionTitle,
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildFAQItem(
-                    question: 'How do I create an event?',
-                    answer:
-                        'To create an event, go to the Home screen and tap the "+" button. Fill in the event details like name, date, and budget, then tap "Create Event".',
-                  ),
-                  _buildFAQItem(
-                    question: 'How can I track my event budget?',
-                    answer:
-                        'Each event has a budget tracker where you can add expenses. The app automatically calculates your spending and shows remaining budget.',
-                  ),
-                  _buildFAQItem(
-                    question: 'Can I edit or delete events?',
-                    answer:
-                        'Yes! Go to "Manage Events" from your profile page. You can edit event details or delete events you no longer need.',
-                  ),
-                  _buildFAQItem(
-                    question: 'How do I reset my password?',
-                    answer:
-                        'Go to Privacy & Security in your profile settings. Enter your current password and choose a new password to update it.',
-                  ),
-                  _buildFAQItem(
-                    question: 'Is my data secure?',
-                    answer:
-                        'Yes, all your data is securely stored using Firebase encryption. We follow industry-standard security practices to protect your information.',
-                  ),
-                  SizedBox(height: 32.h),
-                ],
-              ),
-            ),
           ],
         ),
+      ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 0),
+      child: Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+            ),
+            child: IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(
+                Icons.arrow_back_ios_new,
+                color: Colors.white,
+                size: 20.sp,
+              ),
+            ),
+          ),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Help & Support',
+                  style: TextStyle(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -0.4,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  'Get quick answers and contact our support team.',
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: Colors.white.withValues(alpha: 0.88),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 48.w),
+        ],
       ),
     );
   }
