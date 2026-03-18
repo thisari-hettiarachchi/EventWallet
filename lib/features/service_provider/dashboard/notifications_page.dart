@@ -14,7 +14,7 @@ class ServiceProviderNotificationsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
+        decoration: const BoxDecoration(gradient: AppColors.headerGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -40,6 +40,15 @@ class ServiceProviderNotificationsPage extends StatelessWidget {
                         return const Center(
                           child: CircularProgressIndicator(
                             color: AppColors.primaryGreen,
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text(
+                            'Error loading notifications: ${snapshot.error}',
+                            style: TextStyle(fontSize: 14.sp, color: Colors.red),
                           ),
                         );
                       }
@@ -70,27 +79,65 @@ class ServiceProviderNotificationsPage extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+      padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 0),
       child: Row(
         children: [
-          IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 20.sp),
-            onPressed: () => Navigator.pop(context),
-          ),
-          Expanded(
-            child: Text(
-              'Notifications',
-              style: TextStyle(
-                fontSize: 28.sp,
-                fontWeight: FontWeight.bold,
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+            ),
+            child: IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(
+                Icons.arrow_back_ios_new,
                 color: Colors.white,
+                size: 20.sp,
               ),
             ),
           ),
-          IconButton(
-            icon: Icon(Icons.done_all, color: Colors.white, size: 24.sp),
-            onPressed: () => _markAllAsRead(),
-            tooltip: 'Mark all as read',
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Notifications',
+                  style: TextStyle(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -0.4,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  'Stay updated with your bookings and activity.',
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: Colors.white.withValues(alpha: 0.88),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 10.w),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+            ),
+            child: IconButton(
+              onPressed: () => _markAllAsRead(),
+              icon: Icon(
+                Icons.done_all,
+                color: Colors.white,
+                size: 20.sp,
+              ),
+              tooltip: 'Mark all as read',
+            ),
           ),
         ],
       ),
@@ -113,13 +160,7 @@ class ServiceProviderNotificationsPage extends StatelessWidget {
         border: isRead
             ? null
             : Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: [AppColors.cardShadow()],
       ),
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),

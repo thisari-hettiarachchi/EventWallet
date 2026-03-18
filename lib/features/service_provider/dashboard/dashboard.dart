@@ -5,6 +5,7 @@ import '../../../core/widgets/provider_bottom_nav.dart';
 import '../../../core/constants/colors.dart';
 import '../services/my_services.dart';
 import '../bookings/bookings.dart';
+import '../bookings/booking_details_page.dart';
 import '../../../services/booking_service.dart';
 import 'all_reviews_page.dart';
 import 'notifications_page.dart';
@@ -275,6 +276,15 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           initialBookingId: bookingId,
           initialStatus: bookingStatus,
         ),
+      ),
+    );
+  }
+
+  void _openBookingDetails(String bookingId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ServiceProviderBookingDetailsPage(bookingId: bookingId),
       ),
     );
   }
@@ -905,10 +915,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     final statusColor = _statusColor(status);
 
     return GestureDetector(
-      onTap: () => _navigateToBookings(
-        bookingId: bookingId,
-        bookingStatus: status,
-      ),
+      onTap: () => _openBookingDetails(bookingId),
       child: Container(
         margin: EdgeInsets.only(bottom: 12.h),
         padding: EdgeInsets.all(16.r),

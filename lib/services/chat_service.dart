@@ -341,6 +341,9 @@ class ChatService {
         'unreadCounts.$senderId': 0,
       });
       await batch.commit();
+
+      // Send notification to recipient
+      _sendMessageNotification(bookingId, recipientId, senderName, trimmed, bookingData);
     } catch (e) {
       debugPrint('ChatService: sendMessage fallback triggered: $e');
 
@@ -361,6 +364,62 @@ class ChatService {
         'unreadCounts': {recipientId: FieldValue.increment(1), senderId: 0},
       }, SetOptions(merge: true));
       await batch.commit();
+
+      // Send notification to recipient
+      _sendMessageNotification(bookingId, recipientId, senderName, trimmed, bookingData);
+    }
+  }
+
+  Future<void> _sendMessageNotification(
+    String bookingId,
+    String recipientId,
+    String senderName,
+    String messageText,
+    Map<String, dynamic>? bookingData,
+  ) async {
+    try {
+      // Determine if recipient is a provider or user based on thread metadata
+      final threadSnap = await threadRef(bookingId).get();
+      final threadData = threadSnap.data() ?? <String, dynamic>{};
+      
+      final isRecipientProvider = threadData['providerId'] == recipientId;
+      final messagePreview = messageText.length > 50 
+          ? '${messageText.substring(0, 50)}...' 
+          : messageText;
+
+      if (isRecipientProvider) {
+        // Send notification to provider
+        await _firestore
+            .collection('service_providers')
+            .doc(recipientId)
+            .collection('notifications')
+            .add({
+              'title': 'New Message from $senderName',
+              'message': messagePreview,
+              'type': 'message',
+              'bookingId': bookingId,
+              'senderId': threadData['userId'],
+              'timestamp': FieldValue.serverTimestamp(),
+              'isRead': false,
+            });
+      } else {
+        // Send notification to user/client
+        await _firestore
+            .collection('users')
+            .doc(recipientId)
+            .collection('notifications')
+            .add({
+              'title': 'New Message from $senderName',
+              'message': messagePreview,
+              'type': 'message',
+              'bookingId': bookingId,
+              'senderId': threadData['providerId'],
+              'timestamp': FieldValue.serverTimestamp(),
+              'isRead': false,
+            });
+      }
+    } catch (e) {
+      debugPrint('ChatService: Failed to send notification: $e');
     }
   }
 

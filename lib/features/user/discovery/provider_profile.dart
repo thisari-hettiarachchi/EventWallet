@@ -1078,6 +1078,23 @@ class ProviderProfilePage extends StatelessWidget {
 
     try {
       await FirebaseFirestore.instance.collection('bookings').add(payload);
+      
+      // Send notification to provider
+      await FirebaseFirestore.instance
+          .collection('service_providers')
+          .doc(providerId)
+          .collection('notifications')
+          .add({
+            'title': 'New Booking Request',
+            'message':
+                'You received a new booking request from ${user.displayName ?? user.email?.split('@').first ?? 'a client'} for ${selection.event.name}',
+            'type': 'booking',
+            'bookingId': payload['id'],
+            'userId': user.uid,
+            'timestamp': FieldValue.serverTimestamp(),
+            'isRead': false,
+          });
+      
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
