@@ -9,7 +9,14 @@ import '../../chat/booking_chat_list_page.dart';
 import '../../chat/booking_chat_thread_page.dart';
 
 class ServiceProviderBookingsPage extends StatefulWidget {
-  const ServiceProviderBookingsPage({super.key});
+  const ServiceProviderBookingsPage({
+    super.key,
+    this.initialBookingId,
+    this.initialStatus,
+  });
+
+  final String? initialBookingId;
+  final String? initialStatus;
 
   @override
   State<ServiceProviderBookingsPage> createState() =>
@@ -194,6 +201,20 @@ class _ServiceProviderBookingsPageState
     }
   }
 
+  int _initialTabIndex() {
+    switch (BookingStatuses.normalize(widget.initialStatus)) {
+      case BookingStatuses.accepted:
+        return 1;
+      case BookingStatuses.rejected:
+        return 2;
+      case BookingStatuses.completed:
+        return 3;
+      case BookingStatuses.pending:
+      default:
+        return 0;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (user == null) {
@@ -205,7 +226,8 @@ class _ServiceProviderBookingsPageState
     }
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
+      initialIndex: _initialTabIndex(),
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F7FA),
         body: Container(
@@ -234,6 +256,7 @@ class _ServiceProviderBookingsPageState
                       children: [
                         SizedBox(height: 10.h),
                         TabBar(
+                          isScrollable: true,
                           labelColor: const Color(0xFF00897B),
                           unselectedLabelColor: Colors.grey,
                           indicatorColor: const Color(0xFF00897B),
@@ -246,6 +269,7 @@ class _ServiceProviderBookingsPageState
                           tabs: const [
                             Tab(text: 'Pending'),
                             Tab(text: 'Accepted'),
+                            Tab(text: 'Cancelled'),
                             Tab(text: 'History'),
                           ],
                         ),
@@ -254,10 +278,8 @@ class _ServiceProviderBookingsPageState
                             children: [
                               _buildBookingList(BookingStatuses.pending),
                               _buildBookingList(BookingStatuses.accepted),
-                              _buildBookingList(
-                                BookingStatuses.completed,
-                                otherStatus: BookingStatuses.rejected,
-                              ),
+                              _buildBookingList(BookingStatuses.rejected),
+                              _buildBookingList(BookingStatuses.completed),
                             ],
                           ),
                         ),
@@ -336,6 +358,14 @@ class _ServiceProviderBookingsPageState
                   DateTime.fromMillisecondsSinceEpoch(0);
               return aDate.compareTo(bDate);
             });
+
+        if ((widget.initialBookingId ?? '').isNotEmpty) {
+          docs.sort((a, b) {
+            if (a.id == widget.initialBookingId) return -1;
+            if (b.id == widget.initialBookingId) return 1;
+            return 0;
+          });
+        }
 
         if (docs.isEmpty) {
           return Center(
