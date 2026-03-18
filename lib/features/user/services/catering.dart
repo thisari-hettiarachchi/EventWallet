@@ -267,7 +267,7 @@ class _CateringPageState extends State<CateringPage> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          '\$${pricePerPerson.toStringAsFixed(0)}',
+                          'Rs. ${pricePerPerson.toStringAsFixed(0)}',
                           style: TextStyle(
                             fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
@@ -573,7 +573,7 @@ class _CateringPageState extends State<CateringPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Base price: \$${data['pricePerPerson']}/person',
+              'Base price: Rs. ${data['pricePerPerson']}/person',
               style: TextStyle(fontSize: 14.sp),
             ),
             SizedBox(height: 16.h),

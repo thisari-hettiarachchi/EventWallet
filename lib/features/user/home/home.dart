@@ -404,7 +404,7 @@ class _HomePageState extends State<HomePage>
           ),
           SizedBox(height: 12.h),
           Text(
-            '\$${_totalBudget.toStringAsFixed(2)}',
+            'Rs. ${_totalBudget.toStringAsFixed(2)}',
             style: TextStyle(
               color: Colors.white,
               fontSize: 38.sp,
@@ -471,7 +471,7 @@ class _HomePageState extends State<HomePage>
           ),
           SizedBox(height: 6.h),
           Text(
-            '\$${amount.toStringAsFixed(2)}',
+            'Rs. ${amount.toStringAsFixed(2)}',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18.sp,
@@ -855,7 +855,7 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
                 subtitle: Text(
-                  '\$${(data['amount'] ?? 0).toStringAsFixed(2)}',
+                  'Rs. ${(data['amount'] ?? 0).toStringAsFixed(2)}',
                   style: TextStyle(fontSize: 14.sp),
                 ),
                 trailing: Icon(Icons.arrow_forward_ios, size: 16.sp),

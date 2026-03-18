@@ -137,7 +137,7 @@ class _EventSelectionBottomSheetState extends State<EventSelectionBottomSheet> {
               _buildDetailItem(
                 Icons.payments_outlined,
                 'Amount',
-                '\$${_selectedPackage!.amount.toStringAsFixed(2)}',
+                'Rs. ${_selectedPackage!.amount.toStringAsFixed(2)}',
               ),
             ],
             SizedBox(height: 40.h),
@@ -281,7 +281,7 @@ class _EventSelectionBottomSheetState extends State<EventSelectionBottomSheet> {
             return DropdownMenuItem(
               value: pkg,
               child: Text(
-                '${pkg.name} • \$${pkg.amount.toStringAsFixed(0)}',
+                '${pkg.name} • Rs. ${pkg.amount.toStringAsFixed(0)}',
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w600,

@@ -493,7 +493,9 @@ class _ServiceProviderBookingsPageState
                       ),
                       SizedBox(width: 8.w),
                       Text(
-                        amount > 0 ? '\$${amount.toStringAsFixed(2)}' : 'TBD',
+                        amount > 0
+                            ? 'Rs. ${amount.toStringAsFixed(2)}'
+                            : 'TBD',
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w800,

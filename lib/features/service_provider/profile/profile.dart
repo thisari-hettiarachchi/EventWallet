@@ -349,7 +349,10 @@ class _ServiceProviderProfilePageState extends State<ServiceProviderProfilePage>
               _buildDivider(),
               _buildStatItem('Completed', completedCount.toString()),
               _buildDivider(),
-              _buildStatItem('Revenue', '\$${totalRevenue.toStringAsFixed(0)}'),
+              _buildStatItem(
+                'Revenue',
+                'Rs. ${totalRevenue.toStringAsFixed(0)}',
+              ),
             ],
           ),
         );

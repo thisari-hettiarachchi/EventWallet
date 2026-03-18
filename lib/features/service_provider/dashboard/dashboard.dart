@@ -610,7 +610,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           ),
           SizedBox(height: 12.h),
           Text(
-            '\$${_totalRevenue.toStringAsFixed(2)}',
+            'Rs. ${_totalRevenue.toStringAsFixed(2)}',
             style: TextStyle(
               color: Colors.white,
               fontSize: 38.sp,
@@ -646,7 +646,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                       ),
                       SizedBox(height: 4.h),
                       Text(
-                        '\$${_monthlyRevenue.toStringAsFixed(2)}',
+                        'Rs. ${_monthlyRevenue.toStringAsFixed(2)}',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 22.sp,
@@ -1011,7 +1011,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                 ),
                 Text(
                   bookingAmountFrom(data['amount']) > 0
-                      ? '\$${bookingAmountFrom(data['amount']).toStringAsFixed(2)}'
+                      ? 'Rs. ${bookingAmountFrom(data['amount']).toStringAsFixed(2)}'
                       : 'TBD',
                   style: TextStyle(
                     fontSize: 18.sp,

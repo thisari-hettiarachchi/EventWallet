@@ -390,7 +390,7 @@ class _BookingCard extends StatelessWidget {
                             SizedBox(height: 6.h),
                             Text(
                               amount > 0
-                                  ? '\$${amount.toStringAsFixed(2)}'
+                                  ? 'Rs. ${amount.toStringAsFixed(2)}'
                                   : 'TBD',
                               style: TextStyle(
                                 fontSize: 22.sp,

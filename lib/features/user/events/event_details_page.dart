@@ -683,7 +683,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        '\$${spent.toStringAsFixed(2)} spent',
+                                        'Rs. ${spent.toStringAsFixed(2)} spent',
                                         style: TextStyle(
                                           fontSize: 13.sp,
                                           color: Colors.grey.shade600,
@@ -691,7 +691,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                         ),
                                       ),
                                       Text(
-                                        '\$${budget.toStringAsFixed(2)} budget',
+                                        'Rs. ${budget.toStringAsFixed(2)} budget',
                                         style: TextStyle(
                                           fontSize: 13.sp,
                                           color: Colors.grey.shade600,
@@ -987,7 +987,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '\$${amount.toStringAsFixed(0)}',
+                                'Rs. ${amount.toStringAsFixed(0)}',
                                 style: TextStyle(
                                   fontSize: 16.sp,
                                   fontWeight: FontWeight.bold,
