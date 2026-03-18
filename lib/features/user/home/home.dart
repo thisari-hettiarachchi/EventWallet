@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/strings.dart';
+import '../events/event_details_page.dart';
 import '../discovery/discovery.dart';
 import 'notifications.dart';
 
@@ -753,6 +754,8 @@ class _HomePageState extends State<HomePage>
         else
           ..._upcomingEvents.map((e) {
             final data = e.data() as Map<String, dynamic>;
+            final eventName = (data['eventName'] ?? data['name'] ?? 'Event')
+                .toString();
             return Card(
               color: Colors.white,
               elevation: 2,
@@ -761,6 +764,17 @@ class _HomePageState extends State<HomePage>
               ),
               margin: EdgeInsets.only(bottom: 12.h),
               child: ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EventDetailsPage(
+                        eventId: e.id,
+                        eventName: eventName,
+                      ),
+                    ),
+                  );
+                },
                 leading: Container(
                   padding: EdgeInsets.all(8.r),
                   decoration: BoxDecoration(
@@ -774,7 +788,7 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
                 title: Text(
-                  data['eventName'] ?? data['name'] ?? 'Event',
+                  eventName,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16.sp,

@@ -341,31 +341,6 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                             ),
                           ),
                           const Spacer(),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(12.r),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
-                                width: 1.w,
-                              ),
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () {},
-                                borderRadius: BorderRadius.circular(12.r),
-                                child: Padding(
-                                  padding: EdgeInsets.all(12.r),
-                                  child: Icon(
-                                    Icons.share_outlined,
-                                    color: Colors.white,
-                                    size: 20.sp,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
                           if (canManageEvent) ...[
                             SizedBox(width: 8.w),
                             Container(
