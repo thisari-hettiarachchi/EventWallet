@@ -5,6 +5,7 @@ import '../../../core/widgets/provider_bottom_nav.dart';
 import '../../../core/constants/colors.dart';
 import '../services/my_services.dart';
 import '../bookings/bookings.dart';
+import '../bookings/booking_details_page.dart';
 import '../../../services/booking_service.dart';
 import 'all_reviews_page.dart';
 import 'notifications_page.dart';
@@ -163,7 +164,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
         });
 
       setState(() {
-        _recentBookings = docs.take(5).toList();
+        _recentBookings = docs.take(4).toList();
       });
     } catch (e) {
       debugPrint('Error fetching recent bookings: $e');
@@ -267,10 +268,24 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     );
   }
 
-  void _navigateToBookings() {
+  void _navigateToBookings({String? bookingId, String? bookingStatus}) {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const ServiceProviderBookingsPage()),
+      MaterialPageRoute(
+        builder: (_) => ServiceProviderBookingsPage(
+          initialBookingId: bookingId,
+          initialStatus: bookingStatus,
+        ),
+      ),
+    );
+  }
+
+  void _openBookingDetails(String bookingId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ServiceProviderBookingDetailsPage(bookingId: bookingId),
+      ),
     );
   }
 
@@ -288,7 +303,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
+        decoration: const BoxDecoration(gradient: AppColors.headerGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -486,40 +501,56 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
 
         return Stack(
           children: [
-            IconButton(
-              icon: Icon(
-                Icons.notifications_none_rounded,
-                color: Colors.white,
-                size: 28.sp,
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(14.r),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.2),
+                ),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ServiceProviderNotificationsPage(
-                      providerId: widget.providerId,
+              child: IconButton(
+                icon: Icon(
+                  Icons.notifications_outlined,
+                  color: Colors.white,
+                  size: 28.sp,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ServiceProviderNotificationsPage(
+                        providerId: widget.providerId,
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
             if (unreadCount > 0)
               Positioned(
-                right: 8.w,
-                top: 8.h,
+                right: 6.w,
+                top: 6.h,
                 child: Container(
-                  padding: EdgeInsets.all(2.r),
+                  padding: EdgeInsets.all(5.r),
                   decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(10.r),
+                    color: const Color(0xFFFF3D00),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 2.5.w,
+                    ),
                   ),
-                  constraints: BoxConstraints(minWidth: 16.w, minHeight: 16.w),
+                  constraints: BoxConstraints(
+                    minWidth: 20.w,
+                    minHeight: 20.w,
+                  ),
                   child: Text(
                     unreadCount > 9 ? '9+' : '$unreadCount',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w700,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -873,122 +904,125 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
         else
           ..._recentBookings.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
-            return _buildBookingCard(data);
+            return _buildBookingCard(doc.id, data);
           }),
       ],
     );
   }
 
-  Widget _buildBookingCard(Map<String, dynamic> data) {
+  Widget _buildBookingCard(String bookingId, Map<String, dynamic> data) {
     final status = BookingStatuses.normalize(data['status']);
     final statusColor = _statusColor(status);
 
-    return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(16.r),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [AppColors.cardShadow()],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(10.r),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Icon(Icons.event, color: statusColor, size: 24.sp),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      bookingEventNameFrom(data),
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textDark,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      bookingClientNameFrom(data),
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.grey[600],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20.r),
-                ),
-                child: Text(
-                  bookingStatusLabelFrom(data).toUpperCase(),
-                  style: TextStyle(
-                    color: statusColor,
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5.w,
+    return GestureDetector(
+      onTap: () => _openBookingDetails(bookingId),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 12.h),
+        padding: EdgeInsets.all(16.r),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [AppColors.cardShadow()],
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(10.r),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
+                  child: Icon(Icons.event, color: statusColor, size: 24.sp),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today,
-                      size: 16.sp,
-                      color: Colors.grey[600],
-                    ),
-                    SizedBox(width: 6.w),
-                    Expanded(
-                      child: Text(
-                        _formatDate(bookingEventDateFromMap(data)),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        bookingEventNameFrom(data),
                         style: TextStyle(
-                          fontSize: 13.sp,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textDark,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        bookingClientNameFrom(data),
+                        style: TextStyle(
+                          fontSize: 14.sp,
                           color: Colors.grey[600],
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: Text(
+                    bookingStatusLabelFrom(data).toUpperCase(),
+                    style: TextStyle(
+                      color: statusColor,
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5.w,
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              Text(
-                bookingAmountFrom(data['amount']) > 0
-                    ? '\$${bookingAmountFrom(data['amount']).toStringAsFixed(2)}'
-                    : 'TBD',
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.primaryGreen,
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        size: 16.sp,
+                        color: Colors.grey[600],
+                      ),
+                      SizedBox(width: 6.w),
+                      Expanded(
+                        child: Text(
+                          _formatDate(bookingEventDateFromMap(data)),
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: Colors.grey[600],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                Text(
+                  bookingAmountFrom(data['amount']) > 0
+                      ? '\$${bookingAmountFrom(data['amount']).toStringAsFixed(2)}'
+                      : 'TBD',
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.primaryGreen,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

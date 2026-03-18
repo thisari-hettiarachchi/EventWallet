@@ -175,6 +175,10 @@ class NotificationsPage extends StatelessWidget {
     switch (type) {
       case 'event':
         return Icons.event;
+      case 'booking':
+        return Icons.event_available;
+      case 'message':
+        return Icons.chat_bubble_outline;
       case 'payment':
         return Icons.payment;
       case 'budget':
@@ -190,6 +194,10 @@ class NotificationsPage extends StatelessWidget {
     switch (type) {
       case 'event':
         return Colors.blue;
+      case 'booking':
+        return Colors.blue;
+      case 'message':
+        return Colors.green;
       case 'payment':
         return Colors.green;
       case 'budget':

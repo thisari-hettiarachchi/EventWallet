@@ -55,7 +55,7 @@ class ProviderProfilePage extends StatelessWidget {
         final String location = data['location'] ?? 'Location not specified';
         final String phone = data['phone'] ?? '';
         final String email = data['email'] ?? '';
-        final String website = data['website'] ?? '';
+        final Map<String, String> socialLinks = _extractSocialLinks(data);
         final String displayCategory = _resolveProviderCategory(
           data,
           fallback: category,
@@ -136,13 +136,7 @@ class ProviderProfilePage extends StatelessWidget {
                       SizedBox(height: 30.h),
                       _buildSectionTitle('Social Media & Links'),
                       SizedBox(height: 15.h),
-                      Row(
-                        children: [
-                          _buildSocialIcon(Icons.language, website),
-                          SizedBox(width: 15.w),
-                          _buildSocialIcon(Icons.camera_alt_outlined, ''),
-                        ],
-                      ),
+                      _buildSocialMediaSection(socialLinks),
                       SizedBox(height: 30.h),
                       _buildSectionTitle('About'),
                       SizedBox(height: 12.h),
@@ -210,7 +204,10 @@ class ProviderProfilePage extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF008069), Color(0xFF1E5BB1)],
+              colors: [
+                Color(0xFF008069),
+                Color(0xFF1E5BB1),
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -313,23 +310,205 @@ class ProviderProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialIcon(IconData icon, String url) {
+  Map<String, String> _extractSocialLinks(Map<String, dynamic> data) {
+    final socialLinks = <String, String>{};
+
+    // Extract from dedicated social fields
+    final platforms = {
+      'facebook': data['facebook'] ?? '',
+      'instagram': data['instagram'] ?? '',
+      'twitter': data['twitter'] ?? '',
+      'linkedin': data['linkedin'] ?? '',
+      'youtube': data['youtube'] ?? '',
+      'website': data['website'] ?? '',
+      'tiktok': data['tiktok'] ?? '',
+      'whatsapp': data['whatsapp'] ?? '',
+    };
+
+    // Add only non-empty links
+    platforms.forEach((platform, url) {
+      if (url.toString().trim().isNotEmpty) {
+        socialLinks[platform] = url.toString().trim();
+      }
+    });
+
+    // Also check for a socialLinks map if it exists
+    if (data['socialLinks'] is Map) {
+      final socialLinksMap = data['socialLinks'] as Map<String, dynamic>;
+      socialLinksMap.forEach((key, value) {
+        if (value != null && value.toString().trim().isNotEmpty) {
+          socialLinks[key.toString().toLowerCase()] = value.toString().trim();
+        }
+      });
+    }
+
+    return socialLinks;
+  }
+
+  Widget _buildSocialMediaSection(Map<String, String> socialLinks) {
+    if (socialLinks.isEmpty) {
+      return Container(
+        padding: EdgeInsets.all(15.r),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(15.r),
+        ),
+        child: Center(
+          child: Text(
+            'No social media links available',
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: Colors.grey.shade500,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Wrap(
+      spacing: 12.w,
+      runSpacing: 12.h,
+      children: socialLinks.entries.map((entry) {
+        return _buildSocialIcon(entry.key, entry.value);
+      }).toList(),
+    );
+  }
+
+  Widget _buildSocialIcon(String platform, String url) {
+    final IconData icon = _getSocialIconForPlatform(platform);
+    final Color color = _getColorForPlatform(platform);
+
     return GestureDetector(
       onTap: () async {
         if (url.isNotEmpty) {
-          final uri = Uri.parse(url);
-          if (await canLaunchUrl(uri)) await launchUrl(uri);
+          try {
+            final uri = Uri.parse(_formatUrl(url, platform));
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            }
+          } catch (_) {
+            // Silently fail if URL is invalid
+          }
         }
       },
-      child: Container(
-        padding: EdgeInsets.all(12.r),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E5BB1).withValues(alpha: 0.1),
-          shape: BoxShape.circle,
+      child: Tooltip(
+        message: platform[0].toUpperCase() + platform.substring(1),
+        child: Container(
+          padding: EdgeInsets.all(12.r),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: color, size: 24.sp),
         ),
-        child: Icon(icon, color: const Color(0xFF1E5BB1), size: 24.sp),
       ),
     );
+  }
+
+  IconData _getSocialIconForPlatform(String platform) {
+    switch (platform.toLowerCase()) {
+      case 'facebook':
+        return Icons.facebook;
+      case 'instagram':
+        return Icons.camera_alt_outlined;
+      case 'twitter':
+      case 'x':
+        return Icons.share;
+      case 'linkedin':
+        return Icons.business;
+      case 'youtube':
+        return Icons.play_circle_outline;
+      case 'tiktok':
+        return Icons.music_note;
+      case 'whatsapp':
+        return Icons.chat_bubble_outline;
+      case 'website':
+      default:
+        return Icons.language;
+    }
+  }
+
+  Color _getColorForPlatform(String platform) {
+    switch (platform.toLowerCase()) {
+      case 'facebook':
+        return const Color(0xFF1877F2);
+      case 'instagram':
+        return const Color(0xFFE4405F);
+      case 'twitter':
+      case 'x':
+        return const Color(0xFF000000);
+      case 'linkedin':
+        return const Color(0xFF0A66C2);
+      case 'youtube':
+        return const Color(0xFFFF0000);
+      case 'tiktok':
+        return const Color(0xFF000000);
+      case 'whatsapp':
+        return const Color(0xFF25D366);
+      case 'website':
+      default:
+        return const Color(0xFF1E5BB1);
+    }
+  }
+
+  String _formatUrl(String url, String platform) {
+    String formattedUrl = url.trim();
+
+    // If URL already has a protocol, return as is
+    if (formattedUrl.startsWith('http://') ||
+        formattedUrl.startsWith('https://')) {
+      return formattedUrl;
+    }
+
+    // Format based on platform
+    switch (platform.toLowerCase()) {
+      case 'facebook':
+        if (!formattedUrl.startsWith('facebook.com') &&
+            !formattedUrl.startsWith('www.')) {
+          return 'https://facebook.com/$formattedUrl';
+        }
+        return 'https://www.${formattedUrl.replaceFirst(RegExp(r'^(https?://)?(www\.)?'), '')}';
+      case 'instagram':
+        if (!formattedUrl.startsWith('instagram.com') &&
+            !formattedUrl.startsWith('www.')) {
+          return 'https://instagram.com/$formattedUrl';
+        }
+        return 'https://www.${formattedUrl.replaceFirst(RegExp(r'^(https?://)?(www\.)?'), '')}';
+      case 'twitter':
+      case 'x':
+        if (!formattedUrl.startsWith('twitter.com') &&
+            !formattedUrl.startsWith('x.com') &&
+            !formattedUrl.startsWith('www.')) {
+          return 'https://twitter.com/$formattedUrl';
+        }
+        return 'https://www.${formattedUrl.replaceFirst(RegExp(r'^(https?://)?(www\.)?'), '')}';
+      case 'linkedin':
+        if (!formattedUrl.startsWith('linkedin.com') &&
+            !formattedUrl.startsWith('www.')) {
+          return 'https://linkedin.com/in/$formattedUrl';
+        }
+        return 'https://www.${formattedUrl.replaceFirst(RegExp(r'^(https?://)?(www\.)?'), '')}';
+      case 'youtube':
+        if (!formattedUrl.startsWith('youtube.com') &&
+            !formattedUrl.startsWith('youtu.be') &&
+            !formattedUrl.startsWith('www.')) {
+          return 'https://youtube.com/@$formattedUrl';
+        }
+        return 'https://www.${formattedUrl.replaceFirst(RegExp(r'^(https?://)?(www\.)?'), '')}';
+      case 'tiktok':
+        if (!formattedUrl.startsWith('tiktok.com') &&
+            !formattedUrl.startsWith('www.')) {
+          return 'https://tiktok.com/@$formattedUrl';
+        }
+        return 'https://www.${formattedUrl.replaceFirst(RegExp(r'^(https?://)?(www\.)?'), '')}';
+      case 'whatsapp':
+        // Remove special characters from phone number
+        final phoneNumber = formattedUrl.replaceAll(RegExp(r'[^0-9+]'), '');
+        return 'https://wa.me/$phoneNumber';
+      case 'website':
+      default:
+        return 'https://$formattedUrl';
+    }
   }
 
   Widget _buildPackagesList(
@@ -899,6 +1078,23 @@ class ProviderProfilePage extends StatelessWidget {
 
     try {
       await FirebaseFirestore.instance.collection('bookings').add(payload);
+      
+      // Send notification to provider
+      await FirebaseFirestore.instance
+          .collection('service_providers')
+          .doc(providerId)
+          .collection('notifications')
+          .add({
+            'title': 'New Booking Request',
+            'message':
+                'You received a new booking request from ${user.displayName ?? user.email?.split('@').first ?? 'a client'} for ${selection.event.name}',
+            'type': 'booking',
+            'bookingId': payload['id'],
+            'userId': user.uid,
+            'timestamp': FieldValue.serverTimestamp(),
+            'isRead': false,
+          });
+      
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

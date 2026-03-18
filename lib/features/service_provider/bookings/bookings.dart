@@ -7,9 +7,17 @@ import '../../../services/booking_service.dart';
 import '../../../services/chat_service.dart';
 import '../../chat/booking_chat_list_page.dart';
 import '../../chat/booking_chat_thread_page.dart';
+import 'booking_details_page.dart';
 
 class ServiceProviderBookingsPage extends StatefulWidget {
-  const ServiceProviderBookingsPage({super.key});
+  const ServiceProviderBookingsPage({
+    super.key,
+    this.initialBookingId,
+    this.initialStatus,
+  });
+
+  final String? initialBookingId;
+  final String? initialStatus;
 
   @override
   State<ServiceProviderBookingsPage> createState() =>
@@ -194,6 +202,20 @@ class _ServiceProviderBookingsPageState
     }
   }
 
+  int _initialTabIndex() {
+    switch (BookingStatuses.normalize(widget.initialStatus)) {
+      case BookingStatuses.accepted:
+        return 1;
+      case BookingStatuses.rejected:
+        return 2;
+      case BookingStatuses.completed:
+        return 3;
+      case BookingStatuses.pending:
+      default:
+        return 0;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (user == null) {
@@ -205,7 +227,8 @@ class _ServiceProviderBookingsPageState
     }
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
+      initialIndex: _initialTabIndex(),
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F7FA),
         body: Container(
@@ -234,6 +257,7 @@ class _ServiceProviderBookingsPageState
                       children: [
                         SizedBox(height: 10.h),
                         TabBar(
+                          isScrollable: true,
                           labelColor: const Color(0xFF00897B),
                           unselectedLabelColor: Colors.grey,
                           indicatorColor: const Color(0xFF00897B),
@@ -246,6 +270,7 @@ class _ServiceProviderBookingsPageState
                           tabs: const [
                             Tab(text: 'Pending'),
                             Tab(text: 'Accepted'),
+                            Tab(text: 'Cancelled'),
                             Tab(text: 'History'),
                           ],
                         ),
@@ -254,10 +279,8 @@ class _ServiceProviderBookingsPageState
                             children: [
                               _buildBookingList(BookingStatuses.pending),
                               _buildBookingList(BookingStatuses.accepted),
-                              _buildBookingList(
-                                BookingStatuses.completed,
-                                otherStatus: BookingStatuses.rejected,
-                              ),
+                              _buildBookingList(BookingStatuses.rejected),
+                              _buildBookingList(BookingStatuses.completed),
                             ],
                           ),
                         ),
@@ -337,6 +360,14 @@ class _ServiceProviderBookingsPageState
               return aDate.compareTo(bDate);
             });
 
+        if ((widget.initialBookingId ?? '').isNotEmpty) {
+          docs.sort((a, b) {
+            if (a.id == widget.initialBookingId) return -1;
+            if (b.id == widget.initialBookingId) return 1;
+            return 0;
+          });
+        }
+
         if (docs.isEmpty) {
           return Center(
             child: Column(
@@ -375,328 +406,109 @@ class _ServiceProviderBookingsPageState
     final DateTime? eventDate = bookingEventDateFromMap(data);
     final String status = BookingStatuses.normalize(data['status']);
     final double amount = bookingAmountFrom(data['amount']);
-    final String packageName = bookingPackageNameFrom(data);
-
-    return Container(
-      margin: EdgeInsets.only(bottom: 20.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 15.r,
-            offset: Offset(0, 5.h),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ServiceProviderBookingDetailsPage(bookingId: id),
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24.r),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 14.h),
+        padding: EdgeInsets.all(16.r),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 12.r,
+              offset: Offset(0, 4.h),
+            ),
+          ],
+        ),
+        child: Row(
           children: [
             Container(
-              height: 4.h,
-              width: double.infinity,
-              color: _getStatusColor(status),
+              width: 46.w,
+              height: 46.w,
+              decoration: BoxDecoration(
+                color: _getStatusColor(status).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Icon(
+                Icons.event,
+                color: _getStatusColor(status),
+                size: 22.sp,
+              ),
             ),
-            Padding(
-              padding: EdgeInsets.all(20.r),
+            SizedBox(width: 12.w),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: Text(
                           bookingEventNameFrom(data),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 20.sp,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.w800,
                             color: const Color(0xFF1A1F36),
                           ),
                         ),
                       ),
+                      SizedBox(width: 8.w),
                       _buildStatusBadge(data),
                     ],
                   ),
-                  SizedBox(height: 16.h),
-                  _buildInfoTile(
-                    Icons.person,
-                    'Client',
+                  SizedBox(height: 6.h),
+                  Text(
                     bookingClientNameFrom(data),
-                    const Color(0xFF1565C0),
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      color: const Color(0xFF4A5568),
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  _buildInfoTile(
-                    Icons.calendar_today,
-                    'Date',
-                    eventDate != null ? _formatDate(eventDate) : 'Date not set',
-                    const Color(0xFF00897B),
-                  ),
-                  _buildInfoTile(
-                    Icons.location_on,
-                    'Location',
-                    bookingLocationFrom(data),
-                    Colors.orange,
-                  ),
-                  _buildInfoTile(
-                    Icons.category,
-                    'Event Type',
-                    firstNonEmpty([data['eventType']], fallback: 'N/A'),
-                    Colors.purple,
-                  ),
-                  _buildInfoTile(
-                    Icons.inventory_2_outlined,
-                    'Package',
-                    packageName,
-                    const Color(0xFF00897B),
-                  ),
-
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    child: const Divider(height: 1),
-                  ),
-
+                  SizedBox(height: 8.h),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Amount Selected',
-                        style: TextStyle(
-                          color: const Color(0xFF4A5568),
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
+                      Icon(Icons.calendar_today, size: 14.sp, color: Colors.grey),
+                      SizedBox(width: 5.w),
+                      Expanded(
+                        child: Text(
+                          eventDate != null ? _formatDate(eventDate) : 'Date not set',
+                          style: TextStyle(fontSize: 12.sp, color: Colors.grey[700]),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      SizedBox(width: 8.w),
                       Text(
                         amount > 0 ? '\$${amount.toStringAsFixed(2)}' : 'TBD',
                         style: TextStyle(
-                          fontSize: 22.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.w800,
                           color: const Color(0xFF00897B),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 16.h),
-                  _BookingChatSection(
-                    bookingId: id,
-                    bookingData: data,
-                    isProviderView: true,
-                  ),
                 ],
               ),
             ),
-            if (status == BookingStatuses.pending)
-              _buildPendingActions(id)
-            else if (status == BookingStatuses.accepted)
-              _buildAcceptedActions(id),
+            SizedBox(width: 8.w),
+            Icon(Icons.chevron_right, color: Colors.grey[500], size: 24.sp),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildPendingActions(String id) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        border: Border(top: BorderSide(color: Colors.grey[200]!)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => _updateBookingStatus(
-                  id,
-                  BookingStatuses.rejected,
-                  statusReason: 'rejected',
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.close, size: 20.sp, color: Colors.red[700]),
-                      SizedBox(width: 8.w),
-                      Text(
-                        'Reject',
-                        style: TextStyle(
-                          color: Colors.red[700],
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Container(width: 1.w, height: 30.h, color: Colors.grey[300]),
-          Expanded(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => _updateBookingStatus(id, BookingStatuses.accepted),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.check,
-                        size: 20.sp,
-                        color: const Color(0xFF00897B),
-                      ),
-                      SizedBox(width: 8.w),
-                      Text(
-                        'Accept',
-                        style: TextStyle(
-                          color: const Color(0xFF00897B),
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAcceptedActions(String id) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        border: Border(top: BorderSide(color: Colors.grey[200]!)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => _updateBookingStatus(
-                  id,
-                  BookingStatuses.rejected,
-                  statusReason: 'cancelled',
-                  cancelledBy: 'provider',
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.cancel_outlined,
-                        size: 20.sp,
-                        color: Colors.red[700],
-                      ),
-                      SizedBox(width: 8.w),
-                      Text(
-                        'Cancel',
-                        style: TextStyle(
-                          color: Colors.red[700],
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Container(width: 1.w, height: 30.h, color: Colors.grey[300]),
-          Expanded(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () =>
-                    _updateBookingStatus(id, BookingStatuses.completed),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.task_alt,
-                        size: 20.sp,
-                        color: const Color(0xFF1565C0),
-                      ),
-                      SizedBox(width: 8.w),
-                      Text(
-                        'Complete',
-                        style: TextStyle(
-                          color: const Color(0xFF1565C0),
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoTile(
-    IconData icon,
-    String label,
-    String value,
-    Color color,
-  ) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 12.h),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-            child: Icon(icon, size: 18.sp, color: color),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  value,
-                  style: TextStyle(
-                    color: const Color(0xFF1A1F36),
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
