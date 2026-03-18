@@ -20,7 +20,7 @@ class AppColors {
   );
 
   static const LinearGradient buttonGradient = LinearGradient(
-    colors: [primaryGreen, Color(0xFF26A69A)],
+    colors: [primaryGreen, primaryBlue],
   );
 
   static const LinearGradient cardGradient = LinearGradient(

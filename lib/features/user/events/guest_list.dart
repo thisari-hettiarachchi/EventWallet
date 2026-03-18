@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 
 class GuestListPage extends StatefulWidget {
   final String eventId;
@@ -445,7 +446,7 @@ class _GuestListPageState extends State<GuestListPage> {
               onPressed: _isSaving ? null : () => Navigator.pop(context),
               child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
             ),
-            ElevatedButton(
+            GradientElevatedButton(
               onPressed: _isSaving
                   ? null
                   : () async {
@@ -486,10 +487,8 @@ class _GuestListPageState extends State<GuestListPage> {
                   }
                 }
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryGreen,
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              ),
+              borderRadius: 12.r,
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
               child: _isSaving
                   ? SizedBox(
                       height: 18.sp,

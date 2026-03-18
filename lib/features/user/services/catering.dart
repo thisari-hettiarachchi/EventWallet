@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 
 class CateringPage extends StatefulWidget {
   const CateringPage({super.key});
@@ -366,17 +367,17 @@ class _CateringPageState extends State<CateringPage> {
                     ),
                     SizedBox(width: 12.w),
                     Expanded(
-                      child: ElevatedButton.icon(
+                      child: GradientElevatedButton(
                         onPressed: () => _getQuote(id, data),
-                        icon: Icon(Icons.request_quote, size: 18.sp),
-                        label: Text('Quote', style: TextStyle(fontSize: 14.sp)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryGreen,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        borderRadius: 12.r,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.request_quote, size: 18.sp, color: Colors.white),
+                            SizedBox(width: 6.w),
+                            Text('Quote', style: TextStyle(fontSize: 14.sp, color: Colors.white)),
+                          ],
                         ),
                       ),
                     ),
@@ -452,12 +453,10 @@ class _CateringPageState extends State<CateringPage> {
             SizedBox(height: 24.h),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: GradientElevatedButton(
                 onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  padding: EdgeInsets.symmetric(vertical: 15.h),
-                ),
+                padding: EdgeInsets.symmetric(vertical: 15.h),
+                borderRadius: 12.r,
                 child: Text(
                   'Apply Filters',
                   style: TextStyle(fontSize: 16.sp, color: Colors.white),
@@ -600,7 +599,7 @@ class _CateringPageState extends State<CateringPage> {
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
           ),
-          ElevatedButton(
+          GradientElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -610,9 +609,7 @@ class _CateringPageState extends State<CateringPage> {
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-            ),
+            borderRadius: 12.r,
             child: Text(
               'Request Quote',
               style: TextStyle(fontSize: 14.sp, color: Colors.white),

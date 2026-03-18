@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 
 class BookingEventOption {
   final String id;
@@ -166,7 +166,7 @@ class _EventSelectionBottomSheetState extends State<EventSelectionBottomSheet> {
                 ),
                 SizedBox(width: 15.w),
                 Expanded(
-                  child: ElevatedButton(
+                  child: GradientElevatedButton(
                     onPressed: (_selectedEvent != null && _selectedPackage != null)
                         ? () {
                             Navigator.pop(
@@ -178,14 +178,8 @@ class _EventSelectionBottomSheetState extends State<EventSelectionBottomSheet> {
                             );
                           }
                         : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF008069),
-                      padding: EdgeInsets.symmetric(vertical: 18.h),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.r),
-                      ),
-                    ),
+                    padding: EdgeInsets.symmetric(vertical: 18.h),
+                    borderRadius: 12.r,
                     child: Text(
                       'Send Request',
                       style: TextStyle(

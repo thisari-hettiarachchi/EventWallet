@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 
 class MusicPage extends StatefulWidget {
   const MusicPage({super.key});
@@ -637,14 +638,12 @@ class _MusicPageState extends State<MusicPage>
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
-                  child: ElevatedButton(
+                  child: GradientElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
                       _bookMusician(id, data);
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryGreen,
-                    ),
+                    borderRadius: 12.r,
                     child: Text(
                       'Send Request',
                       style: TextStyle(fontSize: 14.sp, color: Colors.white),
@@ -688,7 +687,7 @@ class _MusicPageState extends State<MusicPage>
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
           ),
-          ElevatedButton(
+          GradientElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -698,9 +697,7 @@ class _MusicPageState extends State<MusicPage>
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-            ),
+            borderRadius: 12.r,
             child: Text(
               'Send Request',
               style: TextStyle(fontSize: 14.sp, color: Colors.white),

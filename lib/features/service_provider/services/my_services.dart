@@ -512,7 +512,7 @@ class _MyServicesPageState extends State<MyServicesPage>
               height: 60.h,
               decoration: BoxDecoration(
                 gradient: AppColors.buttonGradient,
-                borderRadius: BorderRadius.circular(18.r),
+                borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.primaryGreen.withValues(alpha: 0.3),
@@ -527,7 +527,7 @@ class _MyServicesPageState extends State<MyServicesPage>
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.r),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
                 ),
                 child: Text(

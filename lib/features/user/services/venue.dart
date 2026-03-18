@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 
 class VenuesPage extends StatefulWidget {
   const VenuesPage({super.key});
@@ -372,16 +373,10 @@ class _VenuesPageState extends State<VenuesPage> {
                       ),
                       SizedBox(width: 12.w),
                       Expanded(
-                        child: ElevatedButton(
+                        child: GradientElevatedButton(
                           onPressed: () => _bookVenue(id, data),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryGreen,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            padding: EdgeInsets.symmetric(vertical: 12.h),
-                          ),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          borderRadius: 12.r,
                           child: Text(
                             'Book',
                             style: TextStyle(
@@ -583,7 +578,7 @@ class _VenuesPageState extends State<VenuesPage> {
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
           ),
-          ElevatedButton(
+          GradientElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -593,9 +588,7 @@ class _VenuesPageState extends State<VenuesPage> {
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-            ),
+            borderRadius: 12.r,
             child: Text(
               'Confirm',
               style: TextStyle(fontSize: 14.sp, color: Colors.white),

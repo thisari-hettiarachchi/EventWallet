@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 import '../../../services/review_service.dart';
 
 class ReviewDialog extends StatefulWidget {
@@ -126,12 +127,9 @@ class _ReviewDialogState extends State<ReviewDialog> {
           onPressed: _isSubmitting ? null : () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        ElevatedButton(
+        GradientElevatedButton(
           onPressed: _isSubmitting ? null : _submit,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryGreen,
-            foregroundColor: Colors.white,
-          ),
+          borderRadius: 12.r,
           child: _isSubmitting
               ? SizedBox(
                   height: 18.sp,

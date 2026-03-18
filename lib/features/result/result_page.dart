@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../core/constants/colors.dart';
+import '../../core/widgets/gradient_elevated_button.dart';
 
 class ResultPage extends StatelessWidget {
   final bool isSuccess;
@@ -143,15 +145,9 @@ class ResultCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             height: 50.h,
-            child: ElevatedButton(
+            child: GradientElevatedButton(
               onPressed: onButtonPressed,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: color,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                elevation: 0,
-              ),
+              borderRadius: 12.r,
               child: Text(
                 buttonText,
                 style: TextStyle(

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 import '../../../services/booking_service.dart';
 import '../../../services/chat_service.dart';
 import '../../chat/booking_chat_thread_page.dart';
@@ -207,8 +208,8 @@ class ProviderProfilePage extends StatelessWidget {
         Container(
           height: 220.h,
           width: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
               colors: [Color(0xFF008069), Color(0xFF1E5BB1)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -232,14 +233,25 @@ class ProviderProfilePage extends StatelessWidget {
                     size: 80.sp,
                     color: Colors.white.withValues(alpha: 0.5),
                   ),
-                ),
+          ),
         ),
         SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-            child: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.white, size: 28.sp),
-              onPressed: () => Navigator.pop(context),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(14.r),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+              ),
+              child: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Icon(
+                  Icons.arrow_back_ios_new,
+                  color: Colors.white,
+                  size: 20.sp,
+                ),
+              ),
             ),
           ),
         ),
@@ -601,7 +613,7 @@ class ProviderProfilePage extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
               child: const Text('Cancel'),
             ),
-            ElevatedButton(
+            GradientElevatedButton(
               onPressed: () async {
                 final reviewData = {
                   'userId': user.uid,
@@ -640,9 +652,7 @@ class ProviderProfilePage extends StatelessWidget {
 
                 if (context.mounted) Navigator.pop(context);
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF008069),
-              ),
+              borderRadius: 12.r,
               child: const Text('Submit', style: TextStyle(color: Colors.white)),
             ),
           ],
@@ -688,16 +698,10 @@ class ProviderProfilePage extends StatelessWidget {
           ),
           SizedBox(width: 15.w),
           Expanded(
-            child: ElevatedButton(
+            child: GradientElevatedButton(
               onPressed: () => _handleBooking(context, providerName, providerData),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF008069),
-                padding: EdgeInsets.symmetric(vertical: 18.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18.r),
-                ),
-                elevation: 0,
-              ),
+              padding: EdgeInsets.symmetric(vertical: 18.h),
+              borderRadius: 12.r,
               child: Text(
                 buttonText,
                 style: TextStyle(

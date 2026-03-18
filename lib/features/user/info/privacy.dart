@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 import '../../result/result_page.dart';
 
 class PrivacySecurityPage extends StatefulWidget {
@@ -120,43 +122,24 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: Text(
-          'Privacy & Security',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 20.sp,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF00897B), Color(0xFF1565C0)],
-            stops: [0.0, 0.3],
-          ),
-        ),
-        child: Column(
-          children: [
-            SizedBox(height: 100.h), // Space for AppBar
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F7FA),
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(35.r),
+        decoration: const BoxDecoration(gradient: AppColors.headerGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(context),
+              SizedBox(height: 20.h),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F7FA),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(35.r),
+                    ),
                   ),
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
                       Container(
                         width: double.infinity,
                         padding: EdgeInsets.all(24.r),
@@ -261,55 +244,86 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                               SizedBox(
                                 width: double.infinity,
                                 height: 56.h,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFF00897B),
-                                        Color(0xFF1565C0),
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(12.r),
-                                  ),
-                                  child: ElevatedButton(
-                                    onPressed: _isLoading
-                                        ? null
-                                        : _changePassword,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      shadowColor: Colors.transparent,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          12.r,
-                                        ),
-                                      ),
-                                    ),
-                                    child: _isLoading
-                                        ? const CircularProgressIndicator(
+                                child: GradientElevatedButton(
+                                  onPressed: _isLoading ? null : _changePassword,
+                                  borderRadius: 12.r,
+                                  child: _isLoading
+                                      ? const CircularProgressIndicator(
+                                          color: Colors.white,
+                                        )
+                                      : Text(
+                                          'Change Password',
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.bold,
                                             color: Colors.white,
-                                          )
-                                        : Text(
-                                            'Change Password',
-                                            style: TextStyle(
-                                              fontSize: 16.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
                                           ),
-                                  ),
+                                        ),
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 0),
+      child: Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+            ),
+            child: IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(
+                Icons.arrow_back_ios_new,
+                color: Colors.white,
+                size: 20.sp,
+              ),
+            ),
+          ),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Privacy & Security',
+                  style: TextStyle(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -0.4,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  'Manage password and account protection settings.',
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: Colors.white.withValues(alpha: 0.88),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 48.w),
+        ],
       ),
     );
   }

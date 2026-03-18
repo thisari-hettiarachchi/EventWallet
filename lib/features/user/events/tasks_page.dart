@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 
 class TasksPage extends StatefulWidget {
   final String eventId;
@@ -228,7 +229,7 @@ class _TasksPageState extends State<TasksPage> {
                   },
                   child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
                 ),
-                ElevatedButton(
+                GradientElevatedButton(
                   onPressed: _isAdding
                       ? null
                       : () async {
@@ -257,9 +258,7 @@ class _TasksPageState extends State<TasksPage> {
                             }
                           }
                         },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryBlue,
-                  ),
+                  borderRadius: 12.r,
                   child: _isAdding
                       ? SizedBox(
                           height: 18.sp,

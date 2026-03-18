@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/bottom_nav.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/styles.dart';
 import '../auth/login.dart';
@@ -461,7 +462,7 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
           ),
-          ElevatedButton(
+          GradientElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
               try {
@@ -484,9 +485,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 }
               }
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade700,
-            ),
+            borderRadius: 12.r,
             child: Text(
               'Logout',
               style: TextStyle(fontSize: 14.sp, color: Colors.white),

@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/strings.dart';
+import '../events/event_details_page.dart';
 import '../discovery/discovery.dart';
 import 'notifications.dart';
 
@@ -438,10 +439,10 @@ class _HomePageState extends State<HomePage>
 
   Widget _budgetInfoTile(String label, double amount, IconData icon) {
     return Container(
-      padding: EdgeInsets.all(16.r),
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(14.r),
         border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       ),
       child: Column(
@@ -449,24 +450,31 @@ class _HomePageState extends State<HomePage>
         children: [
           Row(
             children: [
-              Icon(icon, color: Colors.white, size: 18.sp),
-              SizedBox(width: 6.w),
+              Container(
+                padding: EdgeInsets.all(6.r),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(6.r),
+                ),
+                child: Icon(icon, color: Colors.white, size: 14.sp),
+              ),
+              SizedBox(width: 8.w),
               Text(
                 label,
                 style: TextStyle(
                   color: Colors.white70,
-                  fontSize: 13.sp,
+                  fontSize: 11.sp,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 6.h),
           Text(
             '\$${amount.toStringAsFixed(2)}',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 20.sp,
+              fontSize: 18.sp,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -746,6 +754,8 @@ class _HomePageState extends State<HomePage>
         else
           ..._upcomingEvents.map((e) {
             final data = e.data() as Map<String, dynamic>;
+            final eventName = (data['eventName'] ?? data['name'] ?? 'Event')
+                .toString();
             return Card(
               color: Colors.white,
               elevation: 2,
@@ -754,6 +764,17 @@ class _HomePageState extends State<HomePage>
               ),
               margin: EdgeInsets.only(bottom: 12.h),
               child: ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EventDetailsPage(
+                        eventId: e.id,
+                        eventName: eventName,
+                      ),
+                    ),
+                  );
+                },
                 leading: Container(
                   padding: EdgeInsets.all(8.r),
                   decoration: BoxDecoration(
@@ -767,7 +788,7 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
                 title: Text(
-                  data['eventName'] ?? data['name'] ?? 'Event',
+                  eventName,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16.sp,

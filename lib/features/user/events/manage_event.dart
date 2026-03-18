@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/colors.dart';
+import '../../../core/widgets/gradient_elevated_button.dart';
 import 'edit_event.dart';
 import 'event_details_page.dart';
 
@@ -372,7 +373,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
           ),
-          ElevatedButton(
+          GradientElevatedButton(
             onPressed: () async {
               final user = FirebaseAuth.instance.currentUser;
               await FirebaseFirestore.instance
@@ -397,9 +398,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
               if (!context.mounted) return;
               Navigator.pop(context);
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade700,
-            ),
+            borderRadius: 12.r,
             child: Text(
               'Delete',
               style: TextStyle(color: Colors.white, fontSize: 14.sp),
