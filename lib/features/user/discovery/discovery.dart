@@ -35,9 +35,12 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     'Catering',
     'Venue',
     'Photography',
-    'Music',
     'Decoration',
     'Transport',
+    'Entertainment',
+    'Cakes & Desserts',
+    'Makeup Artist',
+    'Other',
   ];
 
   late AnimationController _animationController;
@@ -250,19 +253,6 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                       contentPadding: EdgeInsets.symmetric(vertical: 15.h),
                     ),
                   ),
-                ),
-              ),
-              SizedBox(width: 12.w),
-              Container(
-                padding: EdgeInsets.all(12.r),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(15.r),
-                ),
-                child: Icon(
-                  Icons.tune,
-                  color: Colors.white,
-                  size: 24.sp,
                 ),
               ),
             ],
@@ -607,9 +597,6 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         return 'Photography';
       case 'venue':
         return 'Venue';
-      case 'music':
-      case 'musician':
-        return 'Music';
       case 'catering':
       case 'caterer':
         return 'Catering';
@@ -618,6 +605,15 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         return 'Decoration';
       case 'transport':
         return 'Transport';
+      case 'entertainment':
+        return 'Entertainment';
+      case 'cakes & desserts':
+      case 'cakes':
+      case 'desserts':
+        return 'Cakes & Desserts';
+      case 'makeup artist':
+      case 'makeup':
+        return 'Makeup Artist';
       default:
         return raw[0].toUpperCase() + raw.substring(1);
     }
