@@ -31,6 +31,7 @@ class _TasksPageState extends State<TasksPage> {
         decoration: const BoxDecoration(gradient: AppColors.headerGradient),
         child: SafeArea(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(),
               SizedBox(height: 20.h),
@@ -92,23 +93,55 @@ class _TasksPageState extends State<TasksPage> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-      child: Row(
+      padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 5.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
-            onPressed: () => Navigator.pop(context),
-          ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: Text(
-              'Tasks',
-              style: TextStyle(
-                fontSize: 24.sp,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+          Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    width: 1.w,
+                  ),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => Navigator.pop(context),
+                    borderRadius: BorderRadius.circular(12.r),
+                    child: Padding(
+                      padding: EdgeInsets.all(12.r),
+                      child: Icon(
+                        Icons.arrow_back_ios_new,
+                        color: Colors.white,
+                        size: 20.sp,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              overflow: TextOverflow.ellipsis,
+            ],
+          ),
+          SizedBox(height: 20.h),
+          Text(
+            'Tasks',
+            style: TextStyle(
+              fontSize: 36.sp,
+              fontWeight: FontWeight.w900,
+              color: Colors.white,
+              letterSpacing: -1.w,
+            ),
+          ),
+          Text(
+            'Manage your event tasks',
+            style: TextStyle(
+              fontSize: 16.sp,
+              color: Colors.white.withValues(alpha: 0.8),
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

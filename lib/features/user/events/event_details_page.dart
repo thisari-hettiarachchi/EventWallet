@@ -7,8 +7,8 @@ import 'guest_list.dart';
 import '../budget/expenses_page.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/widgets/gradient_elevated_button.dart';
-import '../discovery/discovery.dart';
 import 'edit_event.dart';
+import 'event_services_page.dart';
 import '../../../services/events_service.dart';
 import '../../../services/booking_service.dart';
 
@@ -499,9 +499,9 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                     () => Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) => DiscoveryPage(
+                                        builder: (_) => EventServicesPage(
                                           eventId: widget.eventId,
-                                          isEventSaving: true,
+                                          eventName: widget.eventName,
                                         ),
                                       ),
                                     ),

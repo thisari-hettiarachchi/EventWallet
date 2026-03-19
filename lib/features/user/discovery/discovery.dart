@@ -516,8 +516,8 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                   children: [
                     Expanded(
                       child: GradientElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
+                        onPressed: () async {
+                          final added = await Navigator.push<bool>(
                             context,
                             MaterialPageRoute(
                               builder: (_) => ProviderProfilePage(
@@ -528,6 +528,12 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                               ),
                             ),
                           );
+
+                          // When opened from EventServicesPage, return there after add attempt (success or error).
+                          if (!mounted) return;
+                          if (widget.isEventSaving && added != null) {
+                            Navigator.pop(context, added);
+                          }
                         },
                         borderRadius: 12.r,
                         padding: EdgeInsets.symmetric(vertical: 16.h),
