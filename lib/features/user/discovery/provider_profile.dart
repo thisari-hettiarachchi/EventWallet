@@ -202,8 +202,8 @@ class ProviderProfilePage extends StatelessWidget {
         Container(
           height: 220.h,
           width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
               colors: [
                 Color(0xFF008069),
                 Color(0xFF1E5BB1),

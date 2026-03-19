@@ -190,7 +190,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                       : 'Quality services for your events',
                   style: TextStyle(
                     fontSize: 16.sp,
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -203,7 +203,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
               child: Container(
                 padding: EdgeInsets.all(12.r),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(15.r),
                 ),
                 child: Icon(
@@ -256,7 +256,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
               Container(
                 padding: EdgeInsets.all(12.r),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(15.r),
                 ),
                 child: Icon(
@@ -284,7 +284,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                     decoration: BoxDecoration(
                       color: isSelected
                           ? Colors.white
-                          : Colors.white.withOpacity(0.2),
+                          : Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(25.r),
                     ),
                     alignment: Alignment.center,
@@ -404,7 +404,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         borderRadius: BorderRadius.circular(30.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20.r,
             offset: Offset(0, 10.h),
           ),
@@ -436,7 +436,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                     vertical: 6.h,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(15.r),
                   ),
                   child: Row(
@@ -553,7 +553,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                           border: Border.all(
                             color: isSaved
                                 ? AppColors.primaryGreen
-                                : AppColors.primaryGreen.withOpacity(0.5),
+                                : AppColors.primaryGreen.withValues(alpha: 0.5),
                             width: 2.w,
                           ),
                         ),

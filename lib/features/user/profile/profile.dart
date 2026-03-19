@@ -128,14 +128,12 @@ class _ProfilePageState extends State<ProfilePage> {
                           .snapshots(),
                       builder: (context, eventSnapshot) {
                         int eventsCount = 0;
-                        double totalBudget = 0;
                         double totalSpent = 0;
 
                         if (eventSnapshot.hasData) {
                           eventsCount = eventSnapshot.data!.docs.length;
                           for (var doc in eventSnapshot.data!.docs) {
                             final data = doc.data() as Map<String, dynamic>;
-                            totalBudget += (data['budget'] ?? 0).toDouble();
                             totalSpent += (data['spent'] ?? 0).toDouble();
                           }
                         }
@@ -150,26 +148,20 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              _buildStatItem('Total Events', '$eventsCount'),
-                              Container(
-                                width: 1.w,
-                                height: 40.h,
-                                color: Colors.white.withValues(alpha: 0.3),
-                              ),
-                              _buildStatItem(
-                                'Total Budget',
-                                'Rs. ${totalBudget.toStringAsFixed(0)}',
+                              Expanded(
+                                child: _buildStatItem('Total Events', '$eventsCount'),
                               ),
                               Container(
                                 width: 1.w,
                                 height: 40.h,
                                 color: Colors.white.withValues(alpha: 0.3),
                               ),
-                              _buildStatItem(
-                                'Amount Spent',
-                                'Rs. ${totalSpent.toStringAsFixed(0)}',
+                              Expanded(
+                                child: _buildStatItem(
+                                  'Amount Spent',
+                                  'Rs. ${totalSpent.toStringAsFixed(0)}',
+                                ),
                               ),
                             ],
                           ),
@@ -378,6 +370,9 @@ class _ProfilePageState extends State<ProfilePage> {
       children: [
         Text(
           value,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: AppTextStyles.whiteText(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -386,6 +381,9 @@ class _ProfilePageState extends State<ProfilePage> {
         SizedBox(height: 4.h),
         Text(
           label,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: AppTextStyles.whiteText(
             fontSize: 13,
             fontWeight: FontWeight.w500,

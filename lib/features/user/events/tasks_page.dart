@@ -124,7 +124,7 @@ class _TasksPageState extends State<TasksPage> {
           Icon(
             Icons.task_alt,
             size: 80.sp,
-            color: Colors.grey.withOpacity(0.4),
+            color: Colors.grey.withValues(alpha: 0.4),
           ),
           SizedBox(height: 16.h),
           Text(
@@ -199,12 +199,13 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   void _showAddTaskDialog() {
+    final parentContext = context;
     _taskController.clear();
     showDialog(
-      context: context,
-      builder: (context) {
+      context: parentContext,
+      builder: (dialogContext) {
         return StatefulBuilder(
-          builder: (context, setDialogState) {
+          builder: (dialogContext, setDialogState) {
             return AlertDialog(
               title: Text(
                 'Add a new task',
@@ -225,7 +226,7 @@ class _TasksPageState extends State<TasksPage> {
                 TextButton(
                   onPressed: () {
                     _taskController.clear();
-                    Navigator.pop(context);
+                    Navigator.pop(dialogContext);
                   },
                   child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
                 ),
@@ -246,13 +247,13 @@ class _TasksPageState extends State<TasksPage> {
                                 'createdAt': FieldValue.serverTimestamp(),
                               });
                               _taskController.clear();
-                              if (mounted) Navigator.pop(context);
+                              if (!dialogContext.mounted) return;
+                              Navigator.pop(dialogContext);
                             } catch (e) {
-                              if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Failed to add task: $e')),
-                                );
-                              }
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(parentContext).showSnackBar(
+                                SnackBar(content: Text('Failed to add task: $e')),
+                              );
                             } finally {
                               if (mounted) setDialogState(() => _isAdding = false);
                             }
