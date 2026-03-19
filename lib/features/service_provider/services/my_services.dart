@@ -243,7 +243,7 @@ class _MyServicesPageState extends State<MyServicesPage>
                             ),
                           ),
                           Text(
-                            '\$${data['price'] ?? 0}',
+                            'Rs. ${data['price'] ?? 0}',
                             style: TextStyle(
                               fontWeight: FontWeight.w900,
                               fontSize: 20.sp,

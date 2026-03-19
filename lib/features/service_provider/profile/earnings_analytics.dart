@@ -208,7 +208,7 @@ class EarningsAnalyticsPage extends StatelessWidget {
             ),
             _buildStatBox(
               'Avg. Value',
-              '\$${avgBookingValue.toStringAsFixed(0)}',
+              'Rs. ${avgBookingValue.toStringAsFixed(0)}',
               Colors.orange,
             ),
             _buildStatBox('Pending', pendingCount.toString(), Colors.purple),
@@ -277,7 +277,7 @@ class EarningsAnalyticsPage extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           Text(
-            '\$${total.toStringAsFixed(2)}',
+            'Rs. ${total.toStringAsFixed(2)}',
             style: TextStyle(
               color: Colors.white,
               fontSize: 32.sp,
@@ -404,7 +404,7 @@ class EarningsAnalyticsPage extends StatelessWidget {
             ),
           ),
           Text(
-            '+\$${amount.toStringAsFixed(0)}',
+            '+Rs. ${amount.toStringAsFixed(0)}',
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,

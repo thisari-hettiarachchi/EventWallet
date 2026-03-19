@@ -263,7 +263,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
                       ),
                     ),
                     Text(
-                      '\$${hourlyRate.toStringAsFixed(0)}/hr',
+                      'Rs. ${hourlyRate.toStringAsFixed(0)}/hr',
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.w700,
@@ -526,7 +526,7 @@ class _PhotographyPageState extends State<PhotographyPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Rate: \$${data['hourlyRate']}/hour',
+              'Rate: Rs. ${data['hourlyRate']}/hour',
               style: TextStyle(fontSize: 14.sp),
             ),
             SizedBox(height: 16.h),

@@ -272,6 +272,7 @@ class _HomePageState extends State<HomePage>
                     final int unreadCount = snapshot.hasData
                         ? snapshot.data!.docs.length
                         : 0;
+                    final bool hasUnread = unreadCount > 0;
                     return Stack(
                       children: [
                         Container(
@@ -299,32 +300,20 @@ class _HomePageState extends State<HomePage>
                             },
                           ),
                         ),
-                        if (unreadCount > 0)
+                        if (hasUnread)
                           Positioned(
                             right: 6.w,
                             top: 6.h,
                             child: Container(
-                              padding: EdgeInsets.all(5.r),
+                              width: 12.w,
+                              height: 12.w,
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFF3D00),
-                                borderRadius: BorderRadius.circular(12.r),
+                                shape: BoxShape.circle,
                                 border: Border.all(
                                   color: Colors.white,
-                                  width: 2.5.w,
+                                  width: 2.w,
                                 ),
-                              ),
-                              constraints: BoxConstraints(
-                                minWidth: 20.w,
-                                minHeight: 20.w,
-                              ),
-                              child: Text(
-                                '$unreadCount',
-                                style: TextStyle(
-                                  fontSize: 11.sp,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                textAlign: TextAlign.center,
                               ),
                             ),
                           ),
@@ -404,7 +393,7 @@ class _HomePageState extends State<HomePage>
           ),
           SizedBox(height: 12.h),
           Text(
-            '\$${_totalBudget.toStringAsFixed(2)}',
+            'Rs. ${_totalBudget.toStringAsFixed(2)}',
             style: TextStyle(
               color: Colors.white,
               fontSize: 38.sp,
@@ -471,7 +460,7 @@ class _HomePageState extends State<HomePage>
           ),
           SizedBox(height: 6.h),
           Text(
-            '\$${amount.toStringAsFixed(2)}',
+            'Rs. ${amount.toStringAsFixed(2)}',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18.sp,
@@ -855,7 +844,7 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
                 subtitle: Text(
-                  '\$${(data['amount'] ?? 0).toStringAsFixed(2)}',
+                  'Rs. ${(data['amount'] ?? 0).toStringAsFixed(2)}',
                   style: TextStyle(fontSize: 14.sp),
                 ),
                 trailing: Icon(Icons.arrow_forward_ios, size: 16.sp),

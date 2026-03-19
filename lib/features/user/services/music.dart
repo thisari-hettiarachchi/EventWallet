@@ -383,7 +383,7 @@ class _MusicPageState extends State<MusicPage>
                   Row(
                     children: [
                       Text(
-                        '\$${hourlyRate.toStringAsFixed(0)}/hr',
+                        'Rs. ${hourlyRate.toStringAsFixed(0)}/hr',
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
@@ -500,7 +500,7 @@ class _MusicPageState extends State<MusicPage>
                   Row(
                     children: [
                       Text(
-                        '\$${hourlyRate.toInt()}/hr',
+                        'Rs. ${hourlyRate.toInt()}/hr',
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.bold,
@@ -672,7 +672,7 @@ class _MusicPageState extends State<MusicPage>
           children: [
             Text('Type: ${data['type']}', style: TextStyle(fontSize: 14.sp)),
             Text(
-              'Rate: \$${data['hourlyRate']}/hour',
+              'Rate: Rs. ${data['hourlyRate']}/hour',
               style: TextStyle(fontSize: 14.sp),
             ),
             SizedBox(height: 16.h),

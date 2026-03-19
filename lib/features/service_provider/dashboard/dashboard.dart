@@ -498,6 +498,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           .snapshots(),
       builder: (context, snapshot) {
         final unreadCount = snapshot.data?.docs.length ?? 0;
+        final hasUnread = unreadCount > 0;
 
         return Stack(
           children: [
@@ -527,32 +528,20 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                 },
               ),
             ),
-            if (unreadCount > 0)
+            if (hasUnread)
               Positioned(
                 right: 6.w,
                 top: 6.h,
                 child: Container(
-                  padding: EdgeInsets.all(5.r),
+                  width: 12.w,
+                  height: 12.w,
                   decoration: BoxDecoration(
                     color: const Color(0xFFFF3D00),
-                    borderRadius: BorderRadius.circular(12.r),
+                    shape: BoxShape.circle,
                     border: Border.all(
                       color: Colors.white,
-                      width: 2.5.w,
+                      width: 2.w,
                     ),
-                  ),
-                  constraints: BoxConstraints(
-                    minWidth: 20.w,
-                    minHeight: 20.w,
-                  ),
-                  child: Text(
-                    unreadCount > 9 ? '9+' : '$unreadCount',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
@@ -610,7 +599,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
           ),
           SizedBox(height: 12.h),
           Text(
-            '\$${_totalRevenue.toStringAsFixed(2)}',
+            'Rs. ${_totalRevenue.toStringAsFixed(2)}',
             style: TextStyle(
               color: Colors.white,
               fontSize: 38.sp,
@@ -646,7 +635,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                       ),
                       SizedBox(height: 4.h),
                       Text(
-                        '\$${_monthlyRevenue.toStringAsFixed(2)}',
+                        'Rs. ${_monthlyRevenue.toStringAsFixed(2)}',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 22.sp,
@@ -1011,7 +1000,7 @@ class _ServiceProviderDashboardState extends State<ServiceProviderDashboard>
                 ),
                 Text(
                   bookingAmountFrom(data['amount']) > 0
-                      ? '\$${bookingAmountFrom(data['amount']).toStringAsFixed(2)}'
+                      ? 'Rs. ${bookingAmountFrom(data['amount']).toStringAsFixed(2)}'
                       : 'TBD',
                   style: TextStyle(
                     fontSize: 18.sp,

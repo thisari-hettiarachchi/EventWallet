@@ -216,7 +216,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                       Expanded(
                         child: _buildStatBox(
                           'Budget',
-                          '\$$budget',
+                          'Rs. $budget',
                           AppColors.primaryGreen,
                           Icons.account_balance_wallet,
                         ),
@@ -225,7 +225,7 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                       Expanded(
                         child: _buildStatBox(
                           'Spent',
-                          '\$$spent',
+                          'Rs. $spent',
                           AppColors.primaryBlue,
                           Icons.shopping_cart,
                         ),

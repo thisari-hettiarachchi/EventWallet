@@ -269,7 +269,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                             Expanded(
                                               child: _buildSummaryItem(
                                                 'Total Spent',
-                                                '\$${totalSpent.toStringAsFixed(2)}',
+                                                'Rs. ${totalSpent.toStringAsFixed(2)}',
                                                 Icons.payments_outlined,
                                                 AppColors.primaryGreen,
                                               ),
@@ -354,7 +354,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                '\$${totalSpent.toStringAsFixed(2)} spent',
+                                                'Rs. ${totalSpent.toStringAsFixed(2)} spent',
                                                 style: TextStyle(
                                                   fontSize: 13.sp,
                                                   color: Colors.grey.shade600,
@@ -362,7 +362,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                                                 ),
                                               ),
                                               Text(
-                                                '\$${budget.toStringAsFixed(2)} budget',
+                                                'Rs. ${budget.toStringAsFixed(2)} budget',
                                                 style: TextStyle(
                                                   fontSize: 13.sp,
                                                   color: Colors.grey.shade600,
@@ -612,7 +612,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '\$${amount.toStringAsFixed(2)}',
+                'Rs. ${amount.toStringAsFixed(2)}',
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,

@@ -160,7 +160,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               _buildStatItem(
                                 'Total Budget',
-                                '\$${totalBudget.toStringAsFixed(0)}',
+                                'Rs. ${totalBudget.toStringAsFixed(0)}',
                               ),
                               Container(
                                 width: 1.w,
@@ -169,7 +169,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               _buildStatItem(
                                 'Amount Spent',
-                                '\$${totalSpent.toStringAsFixed(0)}',
+                                'Rs. ${totalSpent.toStringAsFixed(0)}',
                               ),
                             ],
                           ),

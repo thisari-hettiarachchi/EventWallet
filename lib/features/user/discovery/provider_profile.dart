@@ -593,7 +593,7 @@ class ProviderProfilePage extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '\$${price.toStringAsFixed(0)}',
+                              'Rs. ${price.toStringAsFixed(0)}',
                               style: TextStyle(
                                 fontSize: 18.sp,
                                 fontWeight: FontWeight.w900,

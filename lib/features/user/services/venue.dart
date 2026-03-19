@@ -317,7 +317,7 @@ class _VenuesPageState extends State<VenuesPage> {
                       SizedBox(width: 8.w),
                       _infoChip(
                         Icons.attach_money,
-                        '\$${pricePerPerson.toInt()}/person',
+                        'Rs. ${pricePerPerson.toInt()}/person',
                       ),
                     ],
                   ),
@@ -566,7 +566,7 @@ class _VenuesPageState extends State<VenuesPage> {
               style: TextStyle(fontSize: 14.sp),
             ),
             Text(
-              'Price: \$${data['pricePerPerson']}/person',
+              'Price: Rs. ${data['pricePerPerson']}/person',
               style: TextStyle(fontSize: 14.sp),
             ),
             SizedBox(height: 16.h),

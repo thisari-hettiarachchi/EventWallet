@@ -380,7 +380,9 @@ class _ServiceProviderBookingDetailsPageState
                     ),
                   ),
                   Text(
-                    amount > 0 ? '\$${amount.toStringAsFixed(2)}' : 'TBD',
+                    amount > 0
+                        ? 'Rs. ${amount.toStringAsFixed(2)}'
+                        : 'TBD',
                     style: TextStyle(
                       fontSize: 22.sp,
                       fontWeight: FontWeight.w800,
