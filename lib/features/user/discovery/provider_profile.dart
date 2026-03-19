@@ -51,7 +51,7 @@ class ProviderProfilePage extends StatelessWidget {
         final String name = data['businessName'] ?? 'Service Provider';
         final String imageUrl = data['imageUrl'] ?? '';
         final String description =
-            data['description'] ?? 'No description available.';
+            (data['description'] ?? '').toString().trim();
         final double rating = (data['rating'] ?? 0.0).toDouble();
         final int reviewCount = (data['reviewCount'] ?? 0).toInt();
         final String location = data['location'] ?? 'Location not specified';
@@ -139,21 +139,21 @@ class ProviderProfilePage extends StatelessWidget {
                       _buildSectionTitle('Social Media & Links'),
                       SizedBox(height: 15.h),
                       _buildSocialMediaSection(socialLinks),
-                      SizedBox(height: 30.h),
-                      _buildSectionTitle('About'),
-                      SizedBox(height: 12.h),
-                      Text(
-                        description,
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          color: const Color(0xFF4A4D54),
-                          height: 1.6,
+                      if (description.isNotEmpty) ...[
+                        SizedBox(height: 30.h),
+                        _buildSectionTitle('About'),
+                        SizedBox(height: 12.h),
+                        Text(
+                          description,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            color: const Color(0xFF4A4D54),
+                            height: 1.6,
+                          ),
                         ),
-                      ),
+                      ],
                       SizedBox(height: 30.h),
-                      _buildSectionTitle('Packages'),
-                      SizedBox(height: 15.h),
-                      _buildPackagesList(displayCategory, data),
+                      _buildPackagesSection(displayCategory, data),
                       SizedBox(height: 30.h),
                       _buildSectionTitle('Contact Information'),
                       SizedBox(height: 15.h),
@@ -513,7 +513,7 @@ class ProviderProfilePage extends StatelessWidget {
     }
   }
 
-  Widget _buildPackagesList(
+  Widget _buildPackagesSection(
       String displayCategory,
       Map<String, dynamic> providerData,
       ) {
@@ -539,86 +539,88 @@ class ProviderProfilePage extends StatelessWidget {
           }
         }
 
+        // If no services/packages found, show nothing
         if (packages.isEmpty) {
-          packages.add({
-            'name': '$displayCategory Package',
-            'price': providerData['price'] ?? 0.0,
-            'description': 'Standard package details available on booking',
-          });
+          return const SizedBox.shrink();
         }
 
         return Column(
-          children: packages.map((pkg) {
-            final double price = (pkg['price'] ?? pkg['amount'] ?? 0.0).toDouble();
-            return Container(
-              margin: EdgeInsets.only(bottom: 15.h),
-              padding: EdgeInsets.all(20.r),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(25.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(12.r),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF008069).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12.r),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle('Packages'),
+            SizedBox(height: 15.h),
+            ...packages.map((pkg) {
+              final double price = (pkg['price'] ?? pkg['amount'] ?? 0.0).toDouble();
+              return Container(
+                margin: EdgeInsets.only(bottom: 15.h),
+                padding: EdgeInsets.all(20.r),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.03),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
                     ),
-                    child: Icon(Icons.inventory_2_outlined,
-                        color: const Color(0xFF008069), size: 24.sp),
-                  ),
-                  SizedBox(width: 15.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                pkg['name'] ?? 'Package',
-                                style: TextStyle(
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.w800,
-                                  color: const Color(0xFF1A1C1E),
+                  ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(12.r),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF008069).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Icon(Icons.inventory_2_outlined,
+                          color: const Color(0xFF008069), size: 24.sp),
+                    ),
+                    SizedBox(width: 15.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  pkg['name'] ?? 'Package',
+                                  style: TextStyle(
+                                    fontSize: 18.sp,
+                                    fontWeight: FontWeight.w800,
+                                    color: const Color(0xFF1A1C1E),
+                                  ),
                                 ),
                               ),
-                            ),
-                            Text(
-                              'Rs. ${price.toStringAsFixed(0)}',
-                              style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.w900,
-                                color: const Color(0xFF008069),
+                              Text(
+                                'Rs. ${price.toStringAsFixed(0)}',
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w900,
+                                  color: const Color(0xFF008069),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          pkg['description'] ?? 'No description',
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            color: Colors.grey.shade500,
+                            ],
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 4.h),
+                          Text(
+                            pkg['description'] ?? 'No description',
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
+                  ],
+                ),
+              );
+            }).toList(),
+          ],
         );
       },
     );
