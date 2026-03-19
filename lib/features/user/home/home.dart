@@ -272,6 +272,7 @@ class _HomePageState extends State<HomePage>
                     final int unreadCount = snapshot.hasData
                         ? snapshot.data!.docs.length
                         : 0;
+                    final bool hasUnread = unreadCount > 0;
                     return Stack(
                       children: [
                         Container(
@@ -299,32 +300,20 @@ class _HomePageState extends State<HomePage>
                             },
                           ),
                         ),
-                        if (unreadCount > 0)
+                        if (hasUnread)
                           Positioned(
                             right: 6.w,
                             top: 6.h,
                             child: Container(
-                              padding: EdgeInsets.all(5.r),
+                              width: 12.w,
+                              height: 12.w,
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFF3D00),
-                                borderRadius: BorderRadius.circular(12.r),
+                                shape: BoxShape.circle,
                                 border: Border.all(
                                   color: Colors.white,
-                                  width: 2.5.w,
+                                  width: 2.w,
                                 ),
-                              ),
-                              constraints: BoxConstraints(
-                                minWidth: 20.w,
-                                minHeight: 20.w,
-                              ),
-                              child: Text(
-                                '$unreadCount',
-                                style: TextStyle(
-                                  fontSize: 11.sp,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                textAlign: TextAlign.center,
                               ),
                             ),
                           ),
