@@ -152,7 +152,7 @@ class _ServiceProviderBookingDetailsPageState
       // Send notification to user/client about status change
       final bookingSnap =
           await FirebaseFirestore.instance.collection('bookings').doc(widget.bookingId).get();
-      final bookingData = bookingSnap.data() as Map<String, dynamic>?;
+      final bookingData = bookingSnap.data();
       if (bookingData != null) {
         final userId = bookingData['userId'];
         final eventName = bookingData['eventName'] ?? 'Your booking';

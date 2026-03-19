@@ -571,35 +571,45 @@ class _ExpensesPageState extends State<ExpensesPage> {
                     fontWeight: FontWeight.bold,
                     color: AppColors.textDark,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 4.h),
                 Row(
                   children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 3.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Text(
-                        category,
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: AppColors.primaryGreen,
-                          fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 3.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Text(
+                          category,
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: AppColors.primaryGreen,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),
                     if (timestamp != null) ...[
                       SizedBox(width: 8.w),
-                      Text(
-                        _formatDate(timestamp),
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: Colors.grey.shade500,
+                      Flexible(
+                        child: Text(
+                          _formatDate(timestamp),
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: Colors.grey.shade500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -608,6 +618,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
               ],
             ),
           ),
+          SizedBox(width: 12.w),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [

@@ -31,7 +31,7 @@ class AboutPage extends StatelessWidget {
                         Container(
                           width: double.infinity,
                           padding: EdgeInsets.all(30.r),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             gradient: AppColors.headerGradient,
                           ),
                           child: Column(

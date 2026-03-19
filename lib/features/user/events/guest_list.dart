@@ -6,6 +6,7 @@ import '../../../core/widgets/gradient_elevated_button.dart';
 
 class GuestListPage extends StatefulWidget {
   final String eventId;
+
   const GuestListPage({super.key, required this.eventId});
 
   @override
@@ -32,6 +33,7 @@ class _GuestListPageState extends State<GuestListPage> {
         decoration: const BoxDecoration(gradient: AppColors.headerGradient),
         child: SafeArea(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(),
               SizedBox(height: 20.h),
@@ -111,20 +113,55 @@ class _GuestListPageState extends State<GuestListPage> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-      child: Row(
+      padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 5.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
-            onPressed: () => Navigator.pop(context),
+          Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    width: 1.w,
+                  ),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => Navigator.pop(context),
+                    borderRadius: BorderRadius.circular(12.r),
+                    child: Padding(
+                      padding: EdgeInsets.all(12.r),
+                      child: Icon(
+                        Icons.arrow_back_ios_new,
+                        color: Colors.white,
+                        size: 20.sp,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 16.w),
+          SizedBox(height: 20.h),
           Text(
             'Guest List',
             style: TextStyle(
-              fontSize: 24.sp,
-              fontWeight: FontWeight.bold,
+              fontSize: 36.sp,
+              fontWeight: FontWeight.w900,
               color: Colors.white,
+              letterSpacing: -1.w,
+            ),
+          ),
+          Text(
+            'Manage your event invitations',
+            style: TextStyle(
+              fontSize: 16.sp,
+              color: Colors.white.withValues(alpha: 0.8),
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -193,7 +230,7 @@ class _GuestListPageState extends State<GuestListPage> {
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         leading: CircleAvatar(
-          backgroundColor: AppColors.primaryGreen.withOpacity(0.1),
+          backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.1),
           radius: 20.r,
           child: Text(
             (data['name'] ?? 'G').isNotEmpty
@@ -270,7 +307,7 @@ class _GuestListPageState extends State<GuestListPage> {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
             decoration: BoxDecoration(
-              color: _getStatusColor(data['status']).withOpacity(0.1),
+              color: _getStatusColor(data['status']).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Text(
@@ -306,7 +343,7 @@ class _GuestListPageState extends State<GuestListPage> {
           Icon(
             Icons.people_outline,
             size: 80.sp,
-            color: Colors.grey.withOpacity(0.3),
+            color: Colors.grey.withValues(alpha: 0.3),
           ),
           SizedBox(height: 16.h),
           Text(
@@ -323,9 +360,10 @@ class _GuestListPageState extends State<GuestListPage> {
   }
 
   void _confirmDelete(String guestId) {
+    final parentContext = context;
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+      context: parentContext,
+      builder: (dialogContext) => AlertDialog(
         title: Text(
           'Remove Guest',
           style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
@@ -336,7 +374,7 @@ class _GuestListPageState extends State<GuestListPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
           ),
           TextButton(
@@ -348,13 +386,13 @@ class _GuestListPageState extends State<GuestListPage> {
                     .collection('guests')
                     .doc(guestId)
                     .delete();
-                if (mounted) Navigator.pop(context);
+                if (!dialogContext.mounted) return;
+                Navigator.pop(dialogContext);
               } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to remove guest: $e')),
-                  );
-                }
+                if (!mounted) return;
+                ScaffoldMessenger.of(parentContext).showSnackBar(
+                  SnackBar(content: Text('Failed to remove guest: $e')),
+                );
               }
             },
             child: Text(
@@ -368,6 +406,7 @@ class _GuestListPageState extends State<GuestListPage> {
   }
 
   void _showGuestDialog({String? guestId, Map<String, dynamic>? currentData}) {
+    final parentContext = context;
     final bool isEditing = guestId != null;
     String selectedStatus = currentData?['status'] ?? 'Pending';
 
@@ -380,10 +419,10 @@ class _GuestListPageState extends State<GuestListPage> {
     }
 
     showDialog(
-      context: context,
+      context: parentContext,
       barrierDismissible: !_isSaving,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
           title: Text(
             isEditing ? 'Edit Guest' : 'Add Guest',
             style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
@@ -443,7 +482,7 @@ class _GuestListPageState extends State<GuestListPage> {
           ),
           actions: [
             TextButton(
-              onPressed: _isSaving ? null : () => Navigator.pop(context),
+              onPressed: _isSaving ? null : () => Navigator.pop(dialogContext),
               child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
             ),
             GradientElevatedButton(
@@ -475,13 +514,13 @@ class _GuestListPageState extends State<GuestListPage> {
                           .collection('guests')
                           .add(guestData);
                     }
-                    if (mounted) Navigator.pop(context);
+                    if (!dialogContext.mounted) return;
+                    Navigator.pop(dialogContext);
                   } catch (e) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Failed to save guest: $e')),
-                      );
-                    }
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(parentContext).showSnackBar(
+                      SnackBar(content: Text('Failed to save guest: $e')),
+                    );
                   } finally {
                     if (mounted) setDialogState(() => _isSaving = false);
                   }

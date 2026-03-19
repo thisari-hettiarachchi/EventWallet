@@ -15,6 +15,7 @@ class ProviderProfilePage extends StatelessWidget {
   final String category;
   final bool isEventSaving;
   final String? eventId;
+  final String? bookingEventId;
 
   const ProviderProfilePage({
     super.key,
@@ -22,6 +23,7 @@ class ProviderProfilePage extends StatelessWidget {
     required this.category,
     this.isEventSaving = false,
     this.eventId,
+    this.bookingEventId,
   });
 
   @override
@@ -188,7 +190,7 @@ class ProviderProfilePage extends StatelessWidget {
           bottomNavigationBar: _buildBottomAction(
             context,
             name,
-            isEventSaving ? 'Add to Event' : 'Book Now',
+            isEventSaving ? 'Add Service' : 'Book Now',
             data,
           ),
         );
@@ -202,8 +204,8 @@ class ProviderProfilePage extends StatelessWidget {
         Container(
           height: 220.h,
           width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
               colors: [
                 Color(0xFF008069),
                 Color(0xFF1E5BB1),
@@ -1044,6 +1046,7 @@ class ProviderProfilePage extends StatelessWidget {
         eventOptions: eventOptions,
         packageOptions: packageOptions,
         isFixedEvent: isEventSaving && eventId != null,
+        isSaveOnlyMode: isEventSaving,
       ),
     );
 
@@ -1051,6 +1054,44 @@ class ProviderProfilePage extends StatelessWidget {
 
     final selectedEventId =
     (isEventSaving && eventId != null) ? eventId! : selection.event.id;
+
+    if (isEventSaving) {
+      try {
+        await _saveSelectedService(
+          userId: user.uid,
+          eventId: selectedEventId,
+          providerName: providerName,
+          providerType: effectiveCategory,
+          providerData: providerData,
+          selection: selection,
+        );
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Service added. You can send booking request later from Services.',
+            ),
+            backgroundColor: AppColors.success,
+          ),
+        );
+        if (!context.mounted) return;
+        Navigator.pop(context, true);
+      } catch (e) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to add service: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        // Wait for error message to display, then redirect back to Event Services
+        await Future.delayed(const Duration(seconds: 3));
+        if (!context.mounted) return;
+        Navigator.pop(context, false);
+      }
+      return;
+    }
 
     final payload = buildBookingPayload(
       userId: user.uid,
@@ -1077,8 +1118,9 @@ class ProviderProfilePage extends StatelessWidget {
     );
 
     try {
-      await FirebaseFirestore.instance.collection('bookings').add(payload);
-      
+      final bookingRef =
+          await FirebaseFirestore.instance.collection('bookings').add(payload);
+
       // Send notification to provider
       await FirebaseFirestore.instance
           .collection('service_providers')
@@ -1089,7 +1131,7 @@ class ProviderProfilePage extends StatelessWidget {
             'message':
                 'You received a new booking request from ${user.displayName ?? user.email?.split('@').first ?? 'a client'} for ${selection.event.name}',
             'type': 'booking',
-            'bookingId': payload['id'],
+            'bookingId': bookingRef.id,
             'userId': user.uid,
             'timestamp': FieldValue.serverTimestamp(),
             'isRead': false,
@@ -1114,10 +1156,11 @@ class ProviderProfilePage extends StatelessWidget {
   }
 
   Future<List<BookingEventOption>> _loadEventOptions(String userId) async {
-    if (isEventSaving && eventId != null) {
+    final fixedEventId = (isEventSaving ? eventId : bookingEventId);
+    if (fixedEventId != null) {
       final eventDoc = await FirebaseFirestore.instance
           .collection('events')
-          .doc(eventId)
+          .doc(fixedEventId)
           .get();
       if (!eventDoc.exists) return const [];
       return [_toBookingEventOption(eventDoc.id, eventDoc.data() ?? {})];
@@ -1134,6 +1177,62 @@ class ProviderProfilePage extends StatelessWidget {
 
     options.sort((a, b) => a.date.compareTo(b.date));
     return options;
+  }
+
+  Future<void> _saveSelectedService({
+    required String userId,
+    required String eventId,
+    required String providerName,
+    required String providerType,
+    required Map<String, dynamic> providerData,
+    required BookingSelection selection,
+  }) async {
+    final eventDoc = await FirebaseFirestore.instance
+        .collection('events')
+        .doc(eventId)
+        .get();
+
+    if (!eventDoc.exists) {
+      throw Exception('Selected event was not found.');
+    }
+
+    final eventOwnerId = eventDoc.data()?['userId']?.toString() ?? '';
+    if (eventOwnerId.isNotEmpty && eventOwnerId != userId) {
+      throw Exception('You can only add services to your own event.');
+    }
+
+    final docId = '${providerId}_${selection.package.id}';
+    final docRef = FirebaseFirestore.instance
+        .collection('events')
+        .doc(eventId)
+        .collection('selected_services')
+        .doc(docId);
+
+    final existing = await docRef.get();
+    
+    // Prevent duplicate service additions
+    if (existing.exists) {
+      throw Exception('This service package is already added to your event.');
+    }
+    
+    final payload = <String, dynamic>{
+      'userId': userId,
+      'eventId': eventId,
+      'providerId': providerId,
+      'providerName': providerName,
+      'providerType': providerType,
+      'providerLocation': providerData['location']?.toString() ?? '',
+      'providerImageUrl': providerData['imageUrl']?.toString() ?? '',
+      'packageId': selection.package.id,
+      'packageName': selection.package.name,
+      'packageDescription': selection.package.description,
+      'amount': selection.package.amount,
+      'status': BookingStatuses.pending,
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+
+    await docRef.set(payload);
   }
 
   BookingEventOption _toBookingEventOption(

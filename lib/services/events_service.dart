@@ -28,3 +28,4 @@ class FirestoreService {
     await _db.collection('events').doc(id).delete();
   }
 }
+

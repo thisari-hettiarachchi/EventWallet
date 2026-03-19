@@ -355,9 +355,9 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.18),
+              color: Colors.white.withValues(alpha: 0.18),
               borderRadius: BorderRadius.circular(14.r),
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             ),
             child: IconButton(
               onPressed: () => Navigator.pop(context),
@@ -387,7 +387,7 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
                   eventName,
                   style: TextStyle(
                     fontSize: 13.sp,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -557,7 +557,7 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
               'Go back and reopen the booking to try again.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withValues(alpha: 0.85),
                 fontSize: 13.sp,
               ),
             ),
@@ -652,7 +652,7 @@ class _SummaryTile extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(8.r),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: Icon(icon, size: 18.sp, color: color),
@@ -754,7 +754,7 @@ class _MessageBubble extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11.sp,
                   color: isMe
-                      ? Colors.white.withOpacity(0.85)
+                      ? Colors.white.withValues(alpha: 0.85)
                       : Colors.grey.shade500,
                   fontWeight: FontWeight.w600,
                 ),

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -86,7 +87,7 @@ class ProfileImageStorageService {
     } catch (e) {
       // If deletion fails, we don't want to block the rest of the flow, 
       // but you might want to log it.
-      print('Error deleting image: $e');
+      debugPrint('Error deleting image: $e');
     }
   }
 

@@ -46,6 +46,7 @@ class EventSelectionBottomSheet extends StatefulWidget {
   final List<BookingEventOption> eventOptions;
   final List<BookingPackageOption> packageOptions;
   final bool isFixedEvent;
+  final bool isSaveOnlyMode;
 
   const EventSelectionBottomSheet({
     super.key,
@@ -54,6 +55,7 @@ class EventSelectionBottomSheet extends StatefulWidget {
     required this.eventOptions,
     required this.packageOptions,
     this.isFixedEvent = false,
+    this.isSaveOnlyMode = false,
   });
 
   @override
@@ -90,7 +92,7 @@ class _EventSelectionBottomSheetState extends State<EventSelectionBottomSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Book ${widget.providerName}',
+              '${widget.isSaveOnlyMode ? 'Add' : 'Book'} ${widget.providerName}',
               style: TextStyle(
                 fontSize: 28.sp,
                 fontWeight: FontWeight.w900,
@@ -99,7 +101,9 @@ class _EventSelectionBottomSheetState extends State<EventSelectionBottomSheet> {
             ),
             SizedBox(height: 12.h),
             Text(
-              'Choose the event and package so both you and the provider see the same booking details.',
+              widget.isSaveOnlyMode
+                  ? 'Choose an event and package to save this service. You can send a booking request later.'
+                  : 'Choose the event and package so both you and the provider see the same booking details.',
               style: TextStyle(
                 fontSize: 15.sp,
                 color: Colors.grey.shade500,
@@ -113,7 +117,7 @@ class _EventSelectionBottomSheetState extends State<EventSelectionBottomSheet> {
             SizedBox(height: 25.h),
 
             _buildLabel('Event'),
-            _buildEventDropdown(),
+            widget.isFixedEvent ? _buildReadOnlyEvent() : _buildEventDropdown(),
             if (_selectedEvent != null) ...[
               SizedBox(height: 20.h),
               _buildDetailItem(
@@ -181,7 +185,7 @@ class _EventSelectionBottomSheetState extends State<EventSelectionBottomSheet> {
                     padding: EdgeInsets.symmetric(vertical: 18.h),
                     borderRadius: 12.r,
                     child: Text(
-                      'Send Request',
+                      widget.isSaveOnlyMode ? 'Add Service' : 'Send Request',
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
@@ -262,6 +266,15 @@ class _EventSelectionBottomSheetState extends State<EventSelectionBottomSheet> {
         ),
       ),
     );
+  }
+
+  Widget _buildReadOnlyEvent() {
+    final selected = _selectedEvent;
+    if (selected == null) {
+      return _buildReadOnlyField('No event available');
+    }
+    final dateStr = DateFormat('d MMM yyyy').format(selected.date);
+    return _buildReadOnlyField('${selected.name} - $dateStr');
   }
 
   Widget _buildPackageDropdown() {
