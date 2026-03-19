@@ -25,6 +25,18 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  final List<String> _categories = [
+    'Catering',
+    'Venue',
+    'Photography',
+    'Decoration',
+    'Transport',
+    'Entertainment',
+    'Cakes & Desserts',
+    'Makeup Artist',
+    'Other',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -267,10 +279,29 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
                             ),
                             SizedBox(height: 12.h),
                             _buildField(
-                              child: _textField(
-                                label: 'Provider Type',
-                                icon: Icons.category,
-                                controller: _typeController,
+                              child: DropdownButtonFormField<String>(
+                                dropdownColor: const Color(0xFF00897B),
+                                decoration: InputDecoration(
+                                  labelText: 'Provider Type',
+                                  labelStyle: TextStyle(color: Colors.white, fontSize: 13.sp),
+                                  prefixIcon: Icon(Icons.category, color: Colors.white, size: 20.sp),
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                                  border: InputBorder.none,
+                                ),
+                                iconEnabledColor: Colors.white,
+                                style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                                items: _categories.map((String category) {
+                                  return DropdownMenuItem<String>(
+                                    value: category,
+                                    child: Text(category),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    _typeController.text = newValue;
+                                  }
+                                },
+                                validator: (value) => value == null ? 'Please select a type' : null,
                               ),
                             ),
                             SizedBox(height: 12.h),

@@ -511,9 +511,9 @@ class _HomePageState extends State<HomePage>
                 },
               ),
               _promoCard(
-                'Top Music Bands',
-                'Best live performances',
-                Icons.music_note_rounded,
+                'Top Entertainment',
+                'Make your party fun',
+                Icons.emoji_emotions_rounded,
                 [const Color(0xFF26A69A), AppColors.primaryGreen],
                 imagePath: 'assets/images/hire3.jpg',
                 onTap: () {
@@ -521,7 +521,7 @@ class _HomePageState extends State<HomePage>
                     context,
                     MaterialPageRoute(
                       builder: (_) => const DiscoveryPage(
-                        initialCategory: 'Music',
+                        initialCategory: 'Entertainment',
                       ),
                     ),
                   ).then((_) => _refreshData());
@@ -652,7 +652,11 @@ class _HomePageState extends State<HomePage>
       },
       {'icon': Icons.location_city, 'label': 'Venues', 'category': 'Venue'},
       {'icon': Icons.restaurant, 'label': 'Catering', 'category': 'Catering'},
-      {'icon': Icons.music_note, 'label': 'Music', 'category': 'Music'},
+      {'icon': Icons.celebration, 'label': 'Decoration', 'category': 'Decoration'},
+      {'icon': Icons.emoji_emotions, 'label': 'Entertainment', 'category': 'Entertainment'},
+      {'icon': Icons.cake, 'label': 'Cakes', 'category': 'Cakes & Desserts'},
+      {'icon': Icons.face_retouching_natural, 'label': 'Makeup', 'category': 'Makeup Artist'},
+      {'icon': Icons.directions_car, 'label': 'Transport', 'category': 'Transport'},
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
