@@ -117,7 +117,7 @@ class GradientCard extends StatelessWidget {
   }
 }
 
-// Gradient Header Widget (for page headers)
+// Gradient Header Widget
 class GradientHeader extends StatelessWidget {
   final String title;
   final Widget? subtitle;
@@ -213,7 +213,6 @@ class GradientIconContainer extends StatelessWidget {
   }
 }
 
-// Gradient FAB
 class GradientFAB extends StatelessWidget {
   final VoidCallback onPressed;
   final IconData icon;

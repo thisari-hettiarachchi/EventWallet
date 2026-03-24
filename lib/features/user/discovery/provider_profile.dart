@@ -370,9 +370,11 @@ class ProviderProfilePage extends StatelessWidget {
     return Wrap(
       spacing: 12.w,
       runSpacing: 12.h,
-      children: socialLinks.entries.map((entry) {
-        return _buildSocialIcon(entry.key, entry.value);
-      }).toList(),
+      children: [
+        ...socialLinks.entries.map((entry) {
+          return _buildSocialIcon(entry.key, entry.value);
+        }),
+      ],
     );
   }
 
@@ -560,8 +562,8 @@ class ProviderProfilePage extends StatelessWidget {
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.03),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
@@ -763,34 +765,47 @@ class ProviderProfilePage extends StatelessWidget {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
+          insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
           title: const Text('Add Review'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(5, (index) {
-                  return IconButton(
-                    icon: Icon(
-                      index < selectedRating ? Icons.star : Icons.star_border,
-                      color: Colors.amber,
-                      size: 32.sp,
+          content: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (index) {
+                        return GestureDetector(
+                          onTap: () => setState(() => selectedRating = index + 1.0),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4.w),
+                            child: Icon(
+                              index < selectedRating ? Icons.star : Icons.star_border,
+                              color: Colors.amber,
+                              size: 32.sp,
+                            ),
+                          ),
+                        );
+                      }),
                     ),
-                    onPressed: () => setState(() => selectedRating = index + 1.0),
-                  );
-                }),
+                  ),
+                  SizedBox(height: 20.h),
+                  TextField(
+                    controller: commentController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      hintText: 'Share your experience...',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 15.h),
-              TextField(
-                controller: commentController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText: 'Share your experience...',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
+            ),
           ),
+          actionsPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -836,6 +851,7 @@ class ProviderProfilePage extends StatelessWidget {
                 if (context.mounted) Navigator.pop(context);
               },
               borderRadius: 12.r,
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
               child: const Text('Submit', style: TextStyle(color: Colors.white)),
             ),
           ],

@@ -89,6 +89,8 @@ class _ReviewDialogState extends State<ReviewDialog> {
               children: List.generate(5, (index) {
                 final starValue = index + 1;
                 return IconButton(
+                  padding: EdgeInsets.symmetric(horizontal: 2.w),
+                  constraints: const BoxConstraints(),
                   onPressed: _isSubmitting
                       ? null
                       : () => setState(() => _rating = starValue.toDouble()),
@@ -97,12 +99,12 @@ class _ReviewDialogState extends State<ReviewDialog> {
                         ? Icons.star_rounded
                         : Icons.star_border_rounded,
                     color: Colors.amber,
-                    size: 30.sp,
+                    size: 32.sp,
                   ),
                 );
               }),
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 16.h),
             TextField(
               controller: _commentController,
               enabled: !_isSubmitting,
@@ -122,6 +124,7 @@ class _ReviewDialogState extends State<ReviewDialog> {
           ],
         ),
       ),
+      actionsPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
       actions: [
         TextButton(
           onPressed: _isSubmitting ? null : () => Navigator.pop(context),
@@ -130,6 +133,7 @@ class _ReviewDialogState extends State<ReviewDialog> {
         GradientElevatedButton(
           onPressed: _isSubmitting ? null : _submit,
           borderRadius: 12.r,
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           child: _isSubmitting
               ? SizedBox(
                   height: 18.sp,

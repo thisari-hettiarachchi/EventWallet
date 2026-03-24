@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../core/widgets/gradient_elevated_button.dart';
 import '../auth/login.dart';
 import '../auth/signup.dart';
 import '../../service_provider/auth/login.dart';
@@ -258,28 +257,49 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
     return SizedBox(
       width: double.infinity,
       height: 56.h,
-      child: GradientElevatedButton(
-        onPressed: onPressed,
-        borderRadius: 12.r,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Flexible(
-              child: Text(
-                text,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.w,
-                ),
-              ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.r),
+          gradient: LinearGradient(
+            colors: [
+              Colors.white.withValues(alpha: 0.95),
+              Colors.white.withValues(alpha: 0.85),
+            ],
+          ),
+        ),
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.r),
             ),
-            SizedBox(width: 8.w),
-            Icon(icon, color: Colors.white, size: 20.sp),
-          ],
+          ),
+          child: ShaderMask(
+            shaderCallback: (bounds) => const LinearGradient(
+              colors: [Color(0xFF00897B), Color(0xFF1565C0)],
+            ).createShader(bounds),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: Colors.white, size: 20.sp),
+                SizedBox(width: 8.w),
+                Flexible(
+                  child: Text(
+                    text,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -290,34 +310,7 @@ class _WelcomeBackPageState extends State<WelcomeBackPage>
     required IconData icon,
     required VoidCallback onPressed,
   }) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56.h,
-      child: GradientElevatedButton(
-        onPressed: onPressed,
-        borderRadius: 12.r,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Flexible(
-              child: Text(
-                text,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.w,
-                ),
-              ),
-            ),
-            SizedBox(width: 8.w),
-            Icon(icon, color: Colors.white, size: 20.sp),
-          ],
-        ),
-      ),
-    );
+    return _buildMainButton(text: text, icon: icon, onPressed: onPressed);
   }
 
   Widget _buildServiceProviderButton(BuildContext context) {

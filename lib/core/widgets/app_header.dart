@@ -3,8 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/colors.dart';
 import '../constants/styles.dart';
 
-/// Common app header with gradient background
-/// Can be used at the top of all pages for consistency
+
 class AppHeader extends StatelessWidget {
   final String title;
   final List<Widget>? actions;

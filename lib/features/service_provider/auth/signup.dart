@@ -69,7 +69,6 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
   }
 
   Future<void> _signupServiceProvider() async {
-    // Basic validation
     if (_emailController.text.trim().isEmpty ||
         _passwordController.text.trim().isEmpty ||
         _businessController.text.trim().isEmpty ||
@@ -81,7 +80,6 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
     }
 
     try {
-      // Show loading indicator
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -98,7 +96,7 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
       );
 
       if (!mounted) return;
-      Navigator.pop(context); // Remove loading indicator
+      Navigator.pop(context);
 
       if (user != null) {
         Navigator.push(
@@ -121,7 +119,7 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
       }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      Navigator.pop(context); // Remove loading indicator
+      Navigator.pop(context);
 
       String message = e.message ?? 'Signup failed';
       if (e.code == 'email-already-in-use') {
@@ -142,7 +140,7 @@ class _ServiceProviderSignupPageState extends State<ServiceProviderSignupPage>
       );
     } catch (e) {
       if (!mounted) return;
-      Navigator.pop(context); // Remove loading indicator
+      Navigator.pop(context);
 
       Navigator.push(
         context,

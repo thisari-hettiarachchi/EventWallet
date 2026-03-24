@@ -175,8 +175,6 @@ class _BookingChatThreadPageState extends State<BookingChatThreadPage> {
                         (snapshot.error as FirebaseException).code ==
                             'permission-denied';
 
-                // Keep chat usable when parent thread get is denied but we already
-                // have valid thread metadata from the previous screen.
                 if (isPermissionDenied && threadData != null) {
                   debugPrint(
                     'Thread stream denied for ${widget.bookingId}, using initialThreadData fallback.',

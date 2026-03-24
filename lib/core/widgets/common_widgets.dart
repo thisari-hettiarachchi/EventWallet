@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/colors.dart';
 import '../constants/styles.dart';
 
-/// Standard card widget with consistent styling
 class AppCard extends StatelessWidget {
   final Widget child;
   final EdgeInsets? padding;
@@ -42,7 +41,6 @@ class AppCard extends StatelessWidget {
   }
 }
 
-/// Section title widget for consistent section headers
 class SectionTitle extends StatelessWidget {
   final String title;
   final Widget? trailing;
@@ -71,7 +69,6 @@ class SectionTitle extends StatelessWidget {
   }
 }
 
-/// Stat card for displaying metrics
 class StatCard extends StatelessWidget {
   final String label;
   final String value;
@@ -101,7 +98,6 @@ class StatCard extends StatelessWidget {
   }
 }
 
-/// Info tile for profile and settings pages
 class InfoTile extends StatelessWidget {
   final IconData icon;
   final String title;
