@@ -219,22 +219,26 @@ service cloud.firestore {
     // =========================
     match /{collection}/{providerId} {
 
-      allow read: if collection in [
-        'musicians',
-        'photographers',
-        'venues',
-        'caterers',
-        'service_providers'
-      ];
-
-      allow write: if isOwner(providerId) &&
-        collection in [
+      function isProviderCollection() {
+        return collection in [
           'musicians',
           'photographers',
           'venues',
           'caterers',
           'service_providers'
         ];
+      }
+
+      allow read: if isProviderCollection();
+
+      // Only the owner can create or delete the provider document
+      allow create, delete: if isProviderCollection() && isOwner(providerId);
+
+      // Allow owner to update everything, OR allowed authenticated users to update ONLY rating fields
+      allow update: if isProviderCollection() && (
+        isOwner(providerId) ||
+        (isAuthenticated() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'reviewCount']))
+      );
 
       match /services/{serviceId} {
         allow read: if true;

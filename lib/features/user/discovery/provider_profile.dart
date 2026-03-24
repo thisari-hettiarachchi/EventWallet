@@ -757,163 +757,139 @@ class ProviderProfilePage extends StatelessWidget {
       );
       return;
     }
-
-    double selectedRating = 5.0;
-    final TextEditingController commentController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
-          title: const Text('Add Review'),
-          content: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(5, (index) {
-                        return GestureDetector(
-                          onTap: () => setState(() => selectedRating = index + 1.0),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 4.w),
-                            child: Icon(
-                              index < selectedRating ? Icons.star : Icons.star_border,
-                              color: Colors.amber,
-                              size: 32.sp,
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
+    // Check if user already reviewed
+    FirebaseFirestore.instance
+        .collection('service_providers')
+        .doc(providerId)
+        .collection('reviews')
+        .where('userId', isEqualTo: user.uid)
+        .get()
+        .then((snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You have already submitted a review for this provider.')),
+        );
+        return;
+      }
+      showDialog(
+        context: context,
+        builder: (dialogContext) => StatefulBuilder(
+          builder: (context, setState) {
+            double selectedRating = 5.0;
+            final TextEditingController commentController = TextEditingController();
+            bool isSubmitting = false;
+            return AlertDialog(
+              insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
+              title: const Text('Add Review'),
+              content: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(5, (index) {
+                            return GestureDetector(
+                              onTap: isSubmitting
+                                  ? null
+                                  : () => setState(() => selectedRating = index + 1.0),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 4.w),
+                                child: Icon(
+                                  index < selectedRating ? Icons.star : Icons.star_border,
+                                  color: Colors.amber,
+                                  size: 32.sp,
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
+                      TextField(
+                        controller: commentController,
+                        enabled: !isSubmitting,
+                        maxLines: 3,
+                        decoration: const InputDecoration(
+                          hintText: 'Share your experience...',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 20.h),
-                  TextField(
-                    controller: commentController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      hintText: 'Share your experience...',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actionsPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            GradientElevatedButton(
-              onPressed: () async {
-                final reviewData = {
-                  'userId': user.uid,
-                  'userName': user.displayName ?? 'Anonymous',
-                  'rating': selectedRating,
-                  'comment': commentController.text.trim(),
-                  'createdAt': FieldValue.serverTimestamp(),
-                };
-
-                await FirebaseFirestore.instance
-                    .collection('service_providers')
-                    .doc(providerId)
-                    .collection('reviews')
-                    .add(reviewData);
-
-                // Update provider average rating (simplified)
-                final reviewsSnapshot = await FirebaseFirestore.instance
-                    .collection('service_providers')
-                    .doc(providerId)
-                    .collection('reviews')
-                    .get();
-
-                double totalRating = 0;
-                for (var doc in reviewsSnapshot.docs) {
-                  totalRating += (doc.data()['rating'] ?? 0.0).toDouble();
-                }
-                final avgRating = totalRating / reviewsSnapshot.docs.length;
-
-                await FirebaseFirestore.instance
-                    .collection('service_providers')
-                    .doc(providerId)
-                    .update({
-                  'rating': avgRating,
-                  'reviewCount': reviewsSnapshot.docs.length,
-                });
-
-                if (context.mounted) Navigator.pop(context);
-              },
-              borderRadius: 12.r,
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-              child: const Text('Submit', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomAction(
-      BuildContext context,
-      String providerName,
-      String buttonText,
-      Map<String, dynamic> providerData,
-      ) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(20.w, 15.h, 20.w, 20.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => _handleMessage(context),
-            child: Container(
-              padding: EdgeInsets.all(16.r),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE6F3F1),
-                borderRadius: BorderRadius.circular(15.r),
-              ),
-              child: Icon(
-                Icons.chat_bubble_outline,
-                color: const Color(0xFF008069),
-                size: 24.sp,
-              ),
-            ),
-          ),
-          SizedBox(width: 15.w),
-          Expanded(
-            child: GradientElevatedButton(
-              onPressed: () => _handleBooking(context, providerName, providerData),
-              padding: EdgeInsets.symmetric(vertical: 18.h),
-              borderRadius: 12.r,
-              child: Text(
-                buttonText,
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
                 ),
               ),
-            ),
-          ),
-        ],
-      ),
-    );
+              actionsPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
+              actions: [
+                TextButton(
+                  onPressed: isSubmitting ? null : () => Navigator.pop(dialogContext),
+                  child: const Text('Cancel'),
+                ),
+                GradientElevatedButton(
+                  onPressed: isSubmitting
+                      ? null
+                      : () async {
+                          setState(() => isSubmitting = true);
+                          try {
+                            final userDoc = await FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(user.uid)
+                                .get();
+                            final userData = userDoc.data() ?? {};
+                            final realName = userData['name'] ?? user.displayName ?? user.email?.split('@').first ?? 'User';
+                            final reviewData = {
+                              'userId': user.uid,
+                              'userName': realName,
+                              'rating': selectedRating,
+                              'comment': commentController.text.trim(),
+                              'createdAt': FieldValue.serverTimestamp(),
+                            };
+                            await FirebaseFirestore.instance
+                                .collection('service_providers')
+                                .doc(providerId)
+                                .collection('reviews')
+                                .add(reviewData);
+                            // Update provider average rating (simplified)
+                            final reviewsSnapshot = await FirebaseFirestore.instance
+                                .collection('service_providers')
+                                .doc(providerId)
+                                .collection('reviews')
+                                .get();
+                            double totalRating = 0;
+                            for (var doc in reviewsSnapshot.docs) {
+                              totalRating += (doc.data()['rating'] ?? 0.0).toDouble();
+                            }
+                            final avgRating = totalRating / reviewsSnapshot.docs.length;
+                            await FirebaseFirestore.instance
+                                .collection('service_providers')
+                                .doc(providerId)
+                                .update({
+                              'rating': avgRating,
+                              'reviewCount': reviewsSnapshot.docs.length,
+                            });
+                            Navigator.pop(dialogContext); // Close dialog after submit
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Review submitted successfully.')),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Unable to submit review: $e')),
+                            );
+                          } finally {
+                            setState(() => isSubmitting = false);
+                          }
+                        },
+                  child: const Text('Submit'),
+                ),
+              ],
+            );
+          },
+        ),
+      );
+    });
   }
 
   Future<void> _handleMessage(BuildContext context) async {
@@ -1358,6 +1334,58 @@ class ProviderProfilePage extends StatelessWidget {
         if (source.isEmpty) return 'Service';
         return source[0].toUpperCase() + source.substring(1);
     }
+  }
+
+  // Add this method to fix the missing _buildBottomAction error
+  Widget _buildBottomAction(BuildContext context, String providerName, String buttonText, Map<String, dynamic> providerData) {
+    return Container(
+      padding: EdgeInsets.all(16.r),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => _handleMessage(context),
+            child: Container(
+              padding: EdgeInsets.all(16.r),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE6F3F1),
+                borderRadius: BorderRadius.circular(15.r),
+              ),
+              child: Icon(
+                Icons.chat_bubble_outline,
+                color: const Color(0xFF008069),
+                size: 24.sp,
+              ),
+            ),
+          ),
+          SizedBox(width: 15.w),
+          Expanded(
+            child: GradientElevatedButton(
+              onPressed: () => _handleBooking(context, providerName, providerData),
+              padding: EdgeInsets.symmetric(vertical: 18.h),
+              borderRadius: 12.r,
+              child: Text(
+                buttonText,
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
